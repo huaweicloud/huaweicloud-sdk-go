@@ -1,0 +1,81 @@
+package main
+
+import (
+	"fmt"
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud/auth/aksk"
+	"github.com/gophercloud/gophercloud/openstack/ims/v2/cloudimages"
+	"encoding/json"
+)
+
+func main() {
+
+	opts := aksk.AKSKOptions{
+		//hec new
+		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		DomainID:         "3b011b89b2f64fb68782a43380e2a78fd",
+		ProjectID:        "128a7bf965154373a7b73c89eb6b65aa",
+		AccessKey:        "BWEXRUBXIPWUKJMRC0WH",
+		SecretKey:        "muSDXBCGYvbDSs2pRVYhuBbXMyahWuqKoF5vbikE",
+		Domain:           "myhuaweicloud.com",
+		Region:           "cn-north-1",
+	}
+
+	provider, err_auth := openstack.AuthenticatedClient(opts)
+	if err_auth != nil {
+		fmt.Println("Failed to get the provider: ", err_auth)
+		return
+	}
+
+	client, err_client := openstack.NewIMSV2(provider, gophercloud.EndpointOpts{})
+
+	if err_client != nil {
+		fmt.Println("Failed to get the NewIMSV2 client: ", err_client)
+		return
+	}
+	//
+	createOpts := &cloudimages.CreateByServerOpts{
+		Name:            "test_image_by_server",
+		InstanceId:      "83822ddc-a6e1-41e0-9073-c2a0c7309fa9",
+	}
+
+	job, err_create := cloudimages.CreateImageByServer(client, createOpts).ExtractJob()
+
+	if err_create != nil {
+		if ue, ok := err_create.(*gophercloud.UnifiedError); ok {
+			fmt.Println("Failed to create image from the server.")
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("Succeed to create image!")
+	fmt.Println("jobID:", job.Id)
+
+	//ff80808265a3d24b0165a90b7f3953c0
+
+	jr, err := cloudimages.GetJobResult(client, "ff80808265a3d24b0165a90b7f3953c0").ExtractJobResult()
+	if err != nil {
+		if se, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", se.ErrorCode())
+			fmt.Println("Message:", se.Message())
+		}
+		return
+	}
+
+	p,_:=json.MarshalIndent(*jr,""," ")
+	fmt.Println(string(p))
+
+	fmt.Println("Id:", jr.Id)
+	fmt.Println("Type:", jr.Type)
+	fmt.Println("Status:", jr.Status)
+	fmt.Println("BeginTime:", jr.BeginTime)
+	fmt.Println("EndTime:", jr.EndTime)
+	fmt.Println("ErrorCode:", jr.ErrorCode)
+	fmt.Println("FailReason:", jr.FailReason)
+	fmt.Println("Entities:", jr.Entities)
+	fmt.Println("Entities.ImageId:", jr.Entities.ImageId)
+
+}
