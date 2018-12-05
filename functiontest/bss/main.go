@@ -1,12 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
-	"github.com/gophercloud/gophercloud/functiontest/common"
-
+	
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud/openstack"
+	"github.com/gophercloud/gophercloud/openstack/bss/v1/account"
 	"github.com/gophercloud/gophercloud/openstack/bss/v1/resource"
 )
 
@@ -21,7 +23,7 @@ func main() {
 		return
 	}
 
-	// 设置计算服务的client
+	// 初始化服务的client
 	sc, err := openstack.NewBSSV1(provider, gophercloud.EndpointOpts{})
 	if err != nil {
 		fmt.Println("get bss client failed")
@@ -30,6 +32,8 @@ func main() {
 	}
 
 	TestListDetail(sc)
+
+    TestResourceDailyALL(sc)
 
 	fmt.Println("main end...")
 }
@@ -107,4 +111,30 @@ func TestListDetail(sc *gophercloud.ServiceClient) {
 	fmt.Println("allRes.ErrorCode:", allRes.ErrorCode)
 	fmt.Println("allRes.ErrorMsg:", allRes.ErrorMsg)
 	fmt.Println("allRes.Data:", len(allRes.Data))
+}
+
+func TestResourceDailyALL(sc *gophercloud.ServiceClient){
+
+	reqTmp := account.ResourceDailyOpts{
+		StartTime: "2018-06-01",
+		EndTime: "2018-06-30",
+		PayMethod: "0",
+		CloudServiceType: "hws.service.type.ebs",
+		RegionCode:"cn-xianhz-1",
+		ResourceId:"",
+		EnterpriseProjectId: "",
+	}
+
+	rspTmp,err := account.ListResourceDaily(sc, reqTmp)
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b,_:=json.MarshalIndent(rspTmp,""," ")
+	fmt.Println(string(b))
 }

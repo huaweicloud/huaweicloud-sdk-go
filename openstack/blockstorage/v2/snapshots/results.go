@@ -79,17 +79,19 @@ func (r *Snapshot) UnmarshalJSON(b []byte) error {
 
 // IsEmpty returns true if a SnapshotPage contains no Snapshots.
 func (r SnapshotPage) IsEmpty() (bool, error) {
-	volumes, err := ExtractSnapshots(r)
-	return len(volumes) == 0, err
+	resp, err := ExtractSnapshots(r)
+	return len(resp.SnapshotsLinks) == 0, err
 }
+type SnapshotList struct {
+	Snapshots []Snapshot `json:"snapshots"`
+	SnapshotsLinks []map[string]string `json:"snapshots_links"`
 
+}
 // ExtractSnapshots extracts and returns Snapshots. It is used while iterating over a snapshots.List call.
-func ExtractSnapshots(r pagination.Page) ([]Snapshot, error) {
-	var s struct {
-		Snapshots []Snapshot `json:"snapshots"`
-	}
+func ExtractSnapshots(r pagination.Page) (SnapshotList, error) {
+	var s SnapshotList
 	err := (r.(SnapshotPage)).ExtractInto(&s)
-	return s.Snapshots, err
+	return s, err
 }
 
 // UpdateMetadataResult contains the response body and error from an UpdateMetadata request.

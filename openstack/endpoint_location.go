@@ -25,6 +25,7 @@ var endpointSchemaList = map[string]string{
 	//"BSS":           "https://bss.%(region)s.%(domain)s/",
 	"BSS": "https://bss.cn-north-1.%(domain)s/",
 	"VPC":  "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
+	"CESV1":  "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
 }
 
 /*

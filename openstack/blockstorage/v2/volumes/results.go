@@ -76,6 +76,28 @@ type Volume struct {
 	ConsistencyGroupID string `json:"consistencygroup_id"`
 	// Multiattach denotes if the volume is multi-attach capable.
 	Multiattach bool `json:"multiattach"`
+
+	//Cloud hard disk uri self-description information.
+	Links []map[string]string `json:"links"`
+
+	//Whether it is a shared cloud drive.
+	Shareable bool `json:"shareable"`
+	//Volume image metadata
+	VolumeImageMetadata map[string]string `json:"volume_image_metadata"`
+
+	//The tenant ID to which the cloud drive belongs.
+	TenantAttr string `json:"os-vol-tenant-attr:tenant_id"`
+
+	//The host name to which the cloud drive belongs.
+	HostAttr string `json:"os-vol-host-attr:host"`
+	//Reserved attribute
+	RepAttrDriverData string `json:"os-volume-replication:driver_data"`
+	//Reserved attribute
+	RepAttrExtendedStatus string `json:"os-volume-replication:extended_status"`
+	//Reserved attribute
+	MigAttrStat string `json:"os-vol-mig-status-attr:migstat"`
+	//Reserved attribute
+	MigAttrNameID string `json:"os-vol-mig-status-attr:name_id"`
 }
 
 func (r *Volume) UnmarshalJSON(b []byte) error {

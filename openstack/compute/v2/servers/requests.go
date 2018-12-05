@@ -43,7 +43,7 @@ type ListOpts struct {
 	Status string `q:"status"`
 
 	// Host is the name of the host as a string.
-	Host string `q:"host"`
+	//Host string `q:"host"`
 
 	// Marker is a UUID of the server at which you want to set a marker.
 	Marker string `q:"marker"`
@@ -52,11 +52,20 @@ type ListOpts struct {
 	Limit int `q:"limit"`
 
 	// AllTenants is a bool to show all tenants.
-	AllTenants bool `q:"all_tenants"`
+	//AllTenants bool `q:"all_tenants"`
+
+	//When you create an elastic cloud server in batches, you can specify the returned ID to query the elastic cloud server created in batches.
+	ReservationId string `q:"reservation_id"`
 
 	// TenantID lists servers for a particular tenant.
 	// Setting "AllTenants = true" is required.
-	TenantID string `q:"tenant_id"`
+	//TenantID string `q:"tenant_id"`
+
+	//The query results are sorted by elastic cloud server attributes. The default sort order is create_at reverse order.
+	SortKey string `q:"sort_key"`
+
+	//Query the cloud server that does not contain this value in the tag field.
+	NoTags string `q:"not-tags"`
 }
 
 // ToServerListQuery formats a ListOpts into a query string.
@@ -373,11 +382,14 @@ type UpdateOpts struct {
 	// Server names are not constrained to be unique, even within the same tenant.
 	Name string `json:"name,omitempty"`
 
+	// Description for the instance.
+	Description string `json:"description,omitempty"`
+
 	// AccessIPv4 provides a new IPv4 address for the instance.
-	AccessIPv4 string `json:"accessIPv4,omitempty"`
+	//AccessIPv4 string `json:"accessIPv4,omitempty"`
 
 	// AccessIPv6 provides a new IPv6 address for the instance.
-	AccessIPv6 string `json:"accessIPv6,omitempty"`
+	//AccessIPv6 string `json:"accessIPv6,omitempty"`
 }
 
 // ToServerUpdateMap formats an UpdateOpts structure into a request body.

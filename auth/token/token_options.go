@@ -70,6 +70,9 @@ type TokenOptions struct {
 	TenantID   string `json:"tenantId,omitempty"`
 	TenantName string `json:"tenantName,omitempty"`
 
+	ProjectID   string `json:"project_id,omitempty"`
+	ProjectName string `json:"project_name,omitempty"`
+
 	// AllowReauth should be set to true if you grant permission for Gophercloud to
 	// cache your credentials in memory, and to allow Gophercloud to attempt to
 	// re-authenticate automatically if/when your token expires.  If you set it to
@@ -95,6 +98,9 @@ func (opts TokenOptions) GetIdentityEndpoint() string {
 }
 
 func (opts TokenOptions) GetProjectId() string {
+	if opts.ProjectID != "" {
+		return opts.ProjectID
+	}
 	return opts.TenantID
 }
 
@@ -327,6 +333,17 @@ func (opts *TokenOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 		ProjectName string
 		DomainID    string
 		DomainName  string
+	}
+
+	//init project token scope
+	if opts.ProjectID != "" {
+		scope.ProjectID = opts.ProjectID
+	} else {
+		if opts.ProjectName != "" {
+			scope.ProjectName = opts.ProjectName
+			scope.DomainID = opts.DomainID
+			scope.DomainName = opts.DomainName
+		}
 	}
 
 	if opts.TenantID != "" {

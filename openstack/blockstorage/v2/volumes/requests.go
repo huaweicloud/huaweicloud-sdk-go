@@ -20,7 +20,7 @@ type CreateOpts struct {
 	// The size of the volume, in GB
 	Size int `json:"size" required:"true"`
 	// The availability zone
-	AvailabilityZone string `json:"availability_zone,omitempty"`
+	AvailabilityZone string `json:"availability_zone" required:"true"`
 	// ConsistencyGroupID is the ID of a consistency group
 	ConsistencyGroupID string `json:"consistencygroup_id,omitempty"`
 	// The volume description
@@ -29,17 +29,23 @@ type CreateOpts struct {
 	Metadata map[string]string `json:"metadata,omitempty"`
 	// The volume name
 	Name string `json:"name,omitempty"`
-	// the ID of the existing volume snapshot
+	// The ID of the existing volume snapshot
 	SnapshotID string `json:"snapshot_id,omitempty"`
 	// SourceReplica is a UUID of an existing volume to replicate with
 	SourceReplica string `json:"source_replica,omitempty"`
-	// the ID of the existing volume
+	// The ID of the existing volume
 	SourceVolID string `json:"source_volid,omitempty"`
 	// The ID of the image from which you want to create the volume.
 	// Required to create a bootable volume.
 	ImageID string `json:"imageRef,omitempty"`
 	// The associated volume type
 	VolumeType string `json:"volume_type,omitempty"`
+
+	//The scheduling parameter currently supports the dedicated_storage_id field, indicating that the cloud disk is created in the DSS storage pool.
+	SchedulerHints map[string]string `json:"OS-SCH-HNT:scheduler_hints,omitempty"`
+
+	//Share the cloud drive flag. The default is false.
+	Multiattach *bool `json:"multiattach,omitempty"`
 }
 
 // ToVolumeCreateMap assembles a request body based on the contents of a
@@ -63,9 +69,43 @@ func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r Create
 	return
 }
 
+// DeleteOptsBuilder allows extensions to add additional parameters to the Delete
+// request.
+type DeleteOptsBuilder interface {
+	ToVolumeDeleteQuery() (string, error)
+}
+
+// DeleteOpts holds options for delete Volumes. It is passed to the volumes.Delete
+// function.
+type DeleteOpts struct {
+	// Delete all snapshots associated with the cloud drive. The default value is false.
+	Cascade *bool `q:"cascade,omitempty"`
+}
+
+// ToVolumeDeleteQuery formats a DeleteOpts into a query string.
+func (opts DeleteOpts) ToVolumeDeleteQuery() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
 // Delete will delete the existing Volume with the provided ID.
 func Delete(client *gophercloud.ServiceClient, id string) (r DeleteResult) {
 	_, r.Err = client.Delete(deleteURL(client, id), nil)
+	return
+}
+
+// Delete will delete the existing Volume with the provided ID,Delete all snapshots associated with the Volume.
+func DeleteCascade(client *gophercloud.ServiceClient, id string, opts DeleteOptsBuilder) (r DeleteResult) {
+	url := deleteURL(client, id)
+	if opts != nil {
+		query, err := opts.ToVolumeDeleteQuery()
+		if err != nil {
+			r.Err = err
+			return
+		}
+		url += query
+	}
+	_, r.Err = client.Delete(url, nil)
 	return
 }
 
@@ -134,9 +174,16 @@ type UpdateOptsBuilder interface {
 // to the volumes.Update function. For more information about the parameters, see
 // the Volume object.
 type UpdateOpts struct {
-	Name        string            `json:"name,omitempty"`
-	Description string            `json:"description,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
+	// The volume name
+	Name               string            `json:"name,omitempty"`
+	// The volume description
+	Description        string            `json:"description,omitempty"`
+	// Metadata will filter results based on specified metadata.
+	Metadata           map[string]string `json:"metadata,omitempty"`
+	// The volume name show for users
+	DisplayName        string            `json:"display_name,omitempty"`
+	// The volume description show for users
+	DisplayDescription string            `json:"display_description,omitempty"`
 }
 
 // ToVolumeUpdateMap assembles a request body based on the contents of an

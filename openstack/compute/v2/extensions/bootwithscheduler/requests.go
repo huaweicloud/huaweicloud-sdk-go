@@ -40,16 +40,18 @@ func (opts CreateOptsExt) ToServerCreateMap() (map[string]interface{}, error) {
 		blockDevice[i] = b
 	}
 	serverMap["block_device_mapping_v2"] = blockDevice
+/*
+	schedulerHints 只需要“check_resources”一个参数
+	if &(opts.SchedulerHints) != nil {
+		schedulerHints := make(map[string]interface{})
+		if opts.SchedulerHints.CheckResources != "" {
+			schedulerHints["check_resources"] = opts.SchedulerHints.CheckResources
+		}
+		base["os:scheduler_hints"] = schedulerHints
+	}
+*/
 
-	//schedulerHints 只需要“check_resources”一个参数
-	//if &(opts.SchedulerHints) != nil {
-	//	schedulerHints := make(map[string]interface{})
-	//	if opts.SchedulerHints.CheckResources != "" {
-	//		schedulerHints["check_resources"] = opts.SchedulerHints.CheckResources
-	//	}
-	//	base["os:scheduler_hints"] = schedulerHints
-	//}
-
+//注释：支持opts.SchedulerHints 可传入多个参数
 	schedulerData,err:=opts.SchedulerHints.ToServerSchedulerHintsCreateMap()
 	if err!=nil{
 		return nil, err

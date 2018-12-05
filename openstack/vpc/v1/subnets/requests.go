@@ -15,9 +15,18 @@ type ListOptsBuilder interface {
 // the API. Filtering is achieved by passing in struct field values that map to
 // the subnet attributes you want to see returned.
 type ListOpts struct {
+	//Specifies that the VPC ID is used as the filtering condition.
 	VpcID    string `q:"vpc_id"`
+
+	//Specifies the tenant ID of the operator.
 	TenantID string `q:"tenant_id"`
+
+	//Specifies the number of records returned on each page.
+	//The value ranges from 0 to intmax.
 	Limit    int    `q:"limit"`
+
+	//Specifies the resource ID of pagination query.
+	//If the parameter is left blank, only resources on the first page are queried.
 	Marker   string `q:"marker"`
 }
 

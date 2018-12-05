@@ -17,11 +17,16 @@ type CreateOptsBuilder interface {
 // the snapshots.Create function. For more information about these parameters,
 // see the Snapshot object.
 type CreateOpts struct {
-	VolumeID    string            `json:"volume_id" required:"true"`
-	Force       bool              `json:"force,omitempty"`
-	Name        string            `json:"name,omitempty"`
-	Description string            `json:"description,omitempty"`
-	Metadata    map[string]string `json:"metadata,omitempty"`
+	//Create a snapshot source EVS UUID.
+	VolumeID string `json:"volume_id" required:"true"`
+	//Forced to create a snapshot, the default is false.
+	Force bool `json:"force,omitempty"`
+	//Snapshot name
+	Name string `json:"name,omitempty"`
+	//Snapshot description
+	Description string `json:"description,omitempty"`
+	//Metadata information of the cloud disk snapshot.
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // ToSnapshotCreateMap assembles a request body based on the contents of a
@@ -68,7 +73,7 @@ type ListOptsBuilder interface {
 // snapshots.List function.
 type ListOpts struct {
 	// AllTenants will retrieve snapshots of all tenants/projects.
-	AllTenants bool `q:"all_tenants"`
+	//AllTenants bool `q:"all_tenants"`
 
 	// Name will filter by the specified snapshot name.
 	Name string `q:"name"`
@@ -78,10 +83,16 @@ type ListOpts struct {
 
 	// TenantID will filter by a specific tenant/project ID.
 	// Setting AllTenants is required to use this.
-	TenantID string `q:"project_id"`
+	//TenantID string `q:"project_id"`
 
 	// VolumeID will filter by a specified volume ID.
 	VolumeID string `q:"volume_id"`
+
+	//Used when paginating snapshots, used in conjunction with limit.
+	Offset int `q:"offset"`
+
+	//Returns the number of results limit, an integer greater than 0. The default is 1000.
+	Limit int `q:"limit"`
 }
 
 // ToSnapshotListQuery formats a ListOpts into a query string.
@@ -154,7 +165,7 @@ func IDFromName(client *gophercloud.ServiceClient, name string) (string, error) 
 		return "", err
 	}
 
-	for _, s := range all {
+	for _, s := range all.Snapshots {
 		if s.Name == name {
 			count++
 			id = s.ID

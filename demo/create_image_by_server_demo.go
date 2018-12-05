@@ -6,7 +6,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud/openstack/ims/v2/cloudimages"
-	"encoding/json"
 )
 
 func main() {
@@ -64,9 +63,6 @@ func main() {
 		}
 		return
 	}
-
-	p,_:=json.MarshalIndent(*jr,""," ")
-	fmt.Println(string(p))
 
 	fmt.Println("Id:", jr.Id)
 	fmt.Println("Type:", jr.Type)

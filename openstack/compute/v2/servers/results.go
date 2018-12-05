@@ -197,7 +197,7 @@ type Server struct {
 
 	// Image refers to a JSON object, which itself indicates the OS image used to
 	// deploy the server.
-	Image map[string]interface{} `json:"-"`
+	Image map[string]interface{} `json:"image"`
 
 	// Flavor refers to a JSON object, which itself indicates the hardware
 	// configuration of the deployed server.
@@ -256,8 +256,25 @@ type Server struct {
 	ReservationID string `json:"OS-EXT-SRV-ATTR:reservation_id"`
 	//root_device_name
 	RootDeviceName string `json:"OS-EXT-SRV-ATTR:root_device_name"`
+	//hypervisor_hostname
+	HypervisorHostname string `json:"OS-EXT-SRV-ATTR:hypervisor_hostname"`
+	//instance_name
+	InstanceName string `json:"OS-EXT-SRV-ATTR:instance_name"`
 
-
+	//instance launched time
+	LaunchedAt string `json:"OS-SRV-USG:launched_at"`
+	//instance terminated time
+	TerminatedAt string `json:"OS-SRV-USG:terminated_at"`
+	//Reserved attribute
+	ConfigDrive string `json:"config_drive"`
+	//Reserved attribute
+	EvsOpts int `json:"evs_opts"`
+	//Reserved attribute
+	HyperThreadAffinity string `json:"hyperThreadAffinity"`
+	//Reserved attribute
+	NumaOpts int `json:"numa_opts"`
+	//Reserved attribute
+	VcpuAffinity []int `json:"vcpuAffinity"`
 }
 
 //ListBrief接口返回的结构

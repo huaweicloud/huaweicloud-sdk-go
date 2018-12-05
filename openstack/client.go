@@ -54,6 +54,7 @@ const (
 	ecsv2MicroVersion         = ""
 	imageSelfDevMicroVersion  = ""
 	bssMicroVersion           = ""
+	cesMicroVersion           = ""
 )
 
 /* 重写RoundTrip，实现reauth 限制3次 */
@@ -683,5 +684,10 @@ func NewBSSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // package.
 func NewVPCV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "vpc", vpcv1MicroVersion)
+	return sc, err
+}
+
+func NewCESV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "cesv1", cesMicroVersion)
 	return sc, err
 }
