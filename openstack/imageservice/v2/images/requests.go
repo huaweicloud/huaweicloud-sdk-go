@@ -56,7 +56,60 @@ type ListOpts struct {
 
 	// SortDir will sort the list results either ascending or decending.
 	SortDir string `q:"sort_dir"`
+
+	// Tags is a list of image tags. Tags are arbitrarily defined strings
+	// attached to an image.
 	Tag     string `q:"tag"`
+
+	// Specifies whether the image is available.
+	IsRegistered 	string 	`q:"__isregistered"`
+
+	//Image type
+	ImageType    	string 	`q:"__imagetype"`
+
+	//Image ID
+	ID 		string	`q:"id"`
+
+	// ContainerFormat is the format of the container.
+	// Valid values are ami, ari, aki, bare, and ovf.
+	ContainerFormat string	`q:"container_format"`
+
+	// DiskFormat is the format of the disk.
+	// If set, valid values are ami, ari, aki, vhd, vmdk, raw, qcow2, vdi,
+	// and iso.
+	DiskFormat 	string	`q:"disk_format"`
+
+	//Specifies the minimum memory size (MB) required for running the image.
+	MinRam 		int	`q:"min_ram"`
+
+	//pecifies the minimum disk space (GB) required for running the image.
+	MinDisk 	int	`q:"min_disk"`
+
+	//Specifies the number of bits in the operating system: 32&nbsp;or&nbsp;64.
+	OsBit 		string	`q:"__os_bit"`
+
+	//Specifies the image platform type.
+	Platform 	string	`q:"__platform"`
+
+	//Indicates the image OS type. The value can be Linux,&nbsp;Windows, or&nbsp;Other.
+	OsType 		string	`q:"__os_type"`
+
+	//Specifies whether the image supports KVM.
+	//If yes, the value is true. Otherwise, this attribute is not required.
+	SupportKvm 	string	`q:"__support_kvm"`
+
+	//Specifies whether the image supports Xen.
+	//If yes, the value is true. Otherwise, this attribute is not required.
+	SupportXen 	string	`q:"__support_xen"`
+
+	//Specifies whether the image supports disk-intensive ECSs.
+	SupportDiskIntensive 	string	`q:"__support_diskintensive"`
+
+	//Specifies whether the image supports high-performance ECSs
+	SupportHighPerformance 	string	`q:"__support_highperformance"`
+
+	//Specifies whether the image supports GPU-optimized ECSs on the Xen platform
+	SupportXenGpuType 	string	`q:"__support_xen_gpu_type"`
 }
 
 // ToImageListQuery formats a ListOpts into a query string.
@@ -89,7 +142,7 @@ type CreateOptsBuilder interface {
 // CreateOpts represents options used to create an image.
 type CreateOpts struct {
 	// Name is the name of the new image.
-	Name string `json:"name" required:"true"`
+	Name string `json:"name"`
 
 	// Id is the the image ID.
 	ID string `json:"id,omitempty"`

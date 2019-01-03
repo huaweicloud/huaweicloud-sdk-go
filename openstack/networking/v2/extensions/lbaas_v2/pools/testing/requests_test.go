@@ -116,7 +116,7 @@ func TestRequiredPoolCreateOpts(t *testing.T) {
 	}
 	res = pools.Create(fake.ServiceClient(), pools.CreateOpts{
 		LBMethod:       pools.LBMethod("invalid"),
-		Protocol:       pools.ProtocolHTTPS,
+		Protocol:       pools.ProtocolTCP,
 		LoadbalancerID: "69055154-f603-4a28-8951-7cc2d9e54a9a",
 	})
 	if res.Err == nil {
@@ -134,7 +134,7 @@ func TestRequiredPoolCreateOpts(t *testing.T) {
 
 	res = pools.Create(fake.ServiceClient(), pools.CreateOpts{
 		LBMethod: pools.LBMethodRoundRobin,
-		Protocol: pools.ProtocolHTTPS,
+		Protocol: pools.ProtocolTCP,
 	})
 	if res.Err == nil {
 		t.Fatalf("Expected error, but got none")
@@ -188,14 +188,14 @@ func TestCreateMember(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 	HandleMemberCreationSuccessfully(t, SingleMemberBody)
-
+	wei := 10
 	actual, err := pools.CreateMember(fake.ServiceClient(), "332abe93-f488-41ba-870b-2ac66be7f853", pools.CreateMemberOpts{
 		Name:         "db",
 		SubnetID:     "1981f108-3c48-48d2-b908-30f7d28532c9",
 		TenantID:     "2ffc6e22aae24e4795f87155d24c896f",
 		Address:      "10.0.2.11",
 		ProtocolPort: 80,
-		Weight:       10,
+		Weight:       &wei,
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -248,11 +248,11 @@ func TestUpdateMember(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
 	HandleMemberUpdateSuccessfully(t)
-
+	wei := 4
 	client := fake.ServiceClient()
 	actual, err := pools.UpdateMember(client, "332abe93-f488-41ba-870b-2ac66be7f853", "2a280670-c202-4b0b-a562-34077415aabf", pools.UpdateMemberOpts{
 		Name:   "newMemberName",
-		Weight: 4,
+		Weight: &wei,
 	}).Extract()
 	if err != nil {
 		t.Fatalf("Unexpected Update error: %v", err)

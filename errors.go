@@ -157,10 +157,17 @@ type OneLevelError struct {
 	Request_id string
 	ErrCode    string `json:"error_code"`
 	ErrMsg     string `json:"error_msg"`
+	Code	   string `json:"code"`
 }
 
 func ParseSeverError(httpStatus int, responseContent string) error {
+	//一层结构如下：
+	//第一种：{"error_msg": "Instance *89973356-f733-418b-95b2-f6fc27244f18 could not be found.","err_code": 404}
+	//第二种：{"message": "Instance *89973356-f733-418b-95b2-f6fc27244f18 could not be found.","code": "VPC.0101"}
+
+	//两层结构如下：
 	//{"itemNotFound": {"message": "Instance *89973356-f733-418b-95b2-f6fc27244f18 could not be found.", "code": 404}}
+	//{"error": {"message": "instance is not shutoff.","code": "IMG.0008"}}
 	var olErr OneLevelError
 	var errMsg = make(map[string]UnifiedError)
 	var isDevApi bool //是否为自研api接口
@@ -173,6 +180,10 @@ func ParseSeverError(httpStatus int, responseContent string) error {
 		if err1 != nil {
 			errCode = MatchErrorCode(httpStatus, message)
 			message = responseContent
+		}
+		if olErr.Code != "" {
+			errCode = olErr.Code
+			message = olErr.Message
 		} else {
 			if olErr.ErrCode != "" {
 				errCode = olErr.ErrCode

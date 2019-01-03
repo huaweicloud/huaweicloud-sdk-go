@@ -167,11 +167,12 @@ func HandleImageCreationSuccessfully(t *testing.T) {
 		th.TestJSONRequest(t, r, `{
 			"id": "e7db3b45-8db7-47ad-8109-3fb55c2c24fd",
 			"name": "Ubuntu 12.10",
-			"architecture": "x86_64",
 			"tags": [
 				"ubuntu",
 				"quantal"
-			]
+			],
+			"architecture": "x86_64",
+			"__os_version": "Ubuntu 14.04 server 64bit"
 		}`)
 
 		w.WriteHeader(http.StatusCreated)
@@ -199,7 +200,8 @@ func HandleImageCreationSuccessfully(t *testing.T) {
 			"virtual_size": 0,
 			"hw_disk_bus": "scsi",
 			"hw_disk_bus_model": "virtio-scsi",
-			"hw_scsi_model": "virtio-scsi"
+			"hw_scsi_model": "virtio-scsi",
+			"__os_version": "Ubuntu 14.04 server 64bit"
 		}`)
 	})
 }
@@ -276,7 +278,9 @@ func HandleImageGetSuccessfully(t *testing.T) {
 			"virtual_size": null,
 			"hw_disk_bus": "scsi",
 			"hw_disk_bus_model": "virtio-scsi",
-			"hw_scsi_model": "virtio-scsi"
+			"hw_scsi_model": "virtio-scsi",
+			"__os_version": "Ubuntu 14.04 server 64bit",
+			"__platform": "Ubuntu"
 		}`)
 	})
 }

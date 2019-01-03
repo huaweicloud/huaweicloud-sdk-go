@@ -39,12 +39,14 @@ func TestList(t *testing.T) {
 		expected := []ports.Port{
 			{
 				Status:       "ACTIVE",
+				BindingHostId:"devstack",
 				Name:         "",
 				AdminStateUp: true,
 				NetworkID:    "70c1db1f-b701-45bd-96e0-a313ee3430b3",
 				TenantID:     "",
 				DeviceOwner:  "network:router_gateway",
 				MACAddress:   "fa:16:3e:58:42:ed",
+				BindingVnicType:"normal",
 				FixedIPs: []ports.IP{
 					{
 						SubnetID:  "008ba151-0b8c-4a67-98b5-0d2b87666062",
@@ -94,7 +96,7 @@ func TestListWithExtensions(t *testing.T) {
 	err = ports.ExtractPortsInto(allPages, &allPorts)
 
 	th.AssertEquals(t, allPorts[0].Status, "ACTIVE")
-	th.AssertEquals(t, allPorts[0].PortSecurityEnabled, false)
+	th.AssertEquals(t, allPorts[0].Port.PortSecurityEnabled, false)
 }
 
 func TestGet(t *testing.T) {
@@ -128,6 +130,33 @@ func TestGet(t *testing.T) {
 	th.AssertDeepEquals(t, n.SecurityGroups, []string{})
 	th.AssertEquals(t, n.Status, "ACTIVE")
 	th.AssertEquals(t, n.DeviceID, "5e3898d7-11be-483e-9732-b2f5eccd2b2e")
+	th.AssertDeepEquals(t, n.ExtraDhcpOpts, []ports.ExtraDhcpOpt{
+		{
+			OptName: "opt_name1",
+			OptValue: "opt_value1",
+		},
+		{
+			OptName: "opt_name2",
+			OptValue: "opt_value2",
+		},
+	})
+	th.AssertEquals(t, n.PortSecurityEnabled, true)
+	th.AssertEquals(t, n.BindingVifType, "ovs")
+	th.AssertEquals(t, n.BindingHostId, "devstack")
+	th.AssertDeepEquals(t, n.BindingVifDetails, map[string]interface{}{
+		"port_filter": true,
+		"ovs_hybrid_plug": true,
+	})
+	th.AssertDeepEquals(t, n.BindingProfile, map[string]interface{}{"internal_elb":true})
+	th.AssertEquals(t, n.BindingVnicType, "normal")
+	th.AssertDeepEquals(t, n.DnsAssignment, []map[string]string{
+		{
+			"hostname": "ip-10-1-0-37",
+			"ip_address": "10.1.0.37",
+			"fqdn": "ip-10-1-0-37.xxx.compute.internal.",
+		},
+	})
+	th.AssertEquals(t, n.DnsName, "testget")
 }
 
 func TestGetWithExtensions(t *testing.T) {
@@ -153,7 +182,7 @@ func TestGetWithExtensions(t *testing.T) {
 	th.AssertNoErr(t, err)
 
 	th.AssertEquals(t, portWithExtensions.Status, "ACTIVE")
-	th.AssertEquals(t, portWithExtensions.PortSecurityEnabled, false)
+	th.AssertEquals(t, portWithExtensions.Port.PortSecurityEnabled, false)
 }
 
 func TestCreate(t *testing.T) {
@@ -174,6 +203,7 @@ func TestCreate(t *testing.T) {
 	})
 
 	asu := true
+	pse := true
 	options := ports.CreateOpts{
 		Name:         "private-port",
 		AdminStateUp: &asu,
@@ -185,6 +215,20 @@ func TestCreate(t *testing.T) {
 		AllowedAddressPairs: []ports.AddressPair{
 			{IPAddress: "10.0.0.4", MACAddress: "fa:16:3e:c9:cb:f0"},
 		},
+		ExtraDhcpOpts:[]ports.ExtraDhcpOpt{
+			{
+				OptName: "opt_name1",
+				OptValue: "opt_value1",
+			},
+			{
+				OptName: "opt_name2",
+				OptValue: "opt_value2",
+			},
+		},
+		BindingProfile:map[string]interface{}{
+			"internal_elb": true,
+		},
+		PortSecurityEnabled:&pse,
 	}
 	n, err := ports.Create(fake.ServiceClient(), options).Extract()
 	th.AssertNoErr(t, err)
@@ -327,7 +371,7 @@ func TestUpdate(t *testing.T) {
 
 		fmt.Fprintf(w, UpdateResponse)
 	})
-
+	pse :=true
 	options := ports.UpdateOpts{
 		Name: "new_port_name",
 		FixedIPs: []ports.IP{
@@ -337,6 +381,17 @@ func TestUpdate(t *testing.T) {
 		AllowedAddressPairs: &[]ports.AddressPair{
 			{IPAddress: "10.0.0.4", MACAddress: "fa:16:3e:c9:cb:f0"},
 		},
+		ExtraDhcpOpts:[]ports.ExtraDhcpOpt{
+			{
+				OptName: "opt_name1",
+				OptValue: "opt_value1",
+			},
+			{
+				OptName: "opt_name2",
+				OptValue: "opt_value2",
+			},
+		},
+		PortSecurityEnabled:&pse,
 	}
 
 	s, err := ports.Update(fake.ServiceClient(), "65c0ee9f-d634-4522-8954-51021b570b0d", options).Extract()

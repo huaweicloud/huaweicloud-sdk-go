@@ -64,6 +64,10 @@ type Router struct {
 	// Availability zone hints groups network nodes that run services like DHCP, L3, FW, and others.
 	// Used to make network resources highly available.
 	AvailabilityZoneHints []string `json:"availability_zone_hints"`
+
+	// Specifies the HA deployment mode.
+	// Administrator permission required.
+	Ha bool `json:"ha,omitempty"`
 }
 
 // RouterPage is the page returned by a pager when traversing over a

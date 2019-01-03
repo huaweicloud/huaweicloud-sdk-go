@@ -129,6 +129,7 @@ func TestUpdateHealthmonitor(t *testing.T) {
 }
 
 func TestDelayMustBeGreaterOrEqualThanTimeout(t *testing.T) {
+	HandleHealthmonitorCreationSuccessfully(t)
 	_, err := monitors.Create(fake.ServiceClient(), monitors.CreateOpts{
 		Type:          "HTTP",
 		PoolID:        "d459f7d8-c6ee-439d-8713-d3fc08aeed8d",

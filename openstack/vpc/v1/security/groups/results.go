@@ -49,3 +49,12 @@ func ExtractGroups(r pagination.Page) ([]SecGroup, error) {
 	err := (r.(SecGroupPage)).ExtractInto(&s)
 	return s.SecGroups, err
 }
+
+
+func (r SecGroupPage) NextPageURL() (string, error) {
+	s,err := ExtractGroups(r)
+	if err != nil {
+		return "", err
+	}
+	return r.WrapNextPageURL(s[len(s)-1].ID)
+}

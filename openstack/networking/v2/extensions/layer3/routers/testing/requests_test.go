@@ -58,7 +58,8 @@ func TestList(t *testing.T) {
             "admin_state_up": true,
             "tenant_id": "a3e881e0a6534880c5473d95b9442099",
             "distributed": false,
-            "id": "308a035c-005d-4452-a9fe-6f8f2f0c28d8"
+            "id": "308a035c-005d-4452-a9fe-6f8f2f0c28d8",
+            "ha":true
         }
     ]
 }
@@ -108,6 +109,7 @@ func TestList(t *testing.T) {
 				Name:         "gateway",
 				ID:           "308a035c-005d-4452-a9fe-6f8f2f0c28d8",
 				TenantID:     "a3e881e0a6534880c5473d95b9442099",
+				Ha: true,
 			},
 		}
 
@@ -139,7 +141,8 @@ func TestCreate(t *testing.T) {
          "enable_snat": false,
          "network_id":"8ca37218-28ff-41cb-9b10-039601ea7e6b"
 	  },
-	  "availability_zone_hints": ["zone1", "zone2"]
+	  "availability_zone_hints": ["zone1", "zone2"],
+	  "ha":true
    }
 }
 			`)
@@ -160,6 +163,7 @@ func TestCreate(t *testing.T) {
         },
         "name": "foo_router",
         "admin_state_up": false,
+        "ha":true,
         "tenant_id": "6b96ff0cb17a4b859e1e575d221683d3",
 		"distributed": false,
 		"availability_zone_hints": ["zone1", "zone2"],
@@ -171,6 +175,7 @@ func TestCreate(t *testing.T) {
 
 	asu := false
 	enableSNAT := false
+	ha := true
 	gwi := routers.GatewayInfo{
 		NetworkID:  "8ca37218-28ff-41cb-9b10-039601ea7e6b",
 		EnableSNAT: &enableSNAT,
@@ -180,6 +185,7 @@ func TestCreate(t *testing.T) {
 		AdminStateUp:          &asu,
 		GatewayInfo:           &gwi,
 		AvailabilityZoneHints: []string{"zone1", "zone2"},
+		Ha:		       &ha,
 	}
 	r, err := routers.Create(fake.ServiceClient(), options).Extract()
 	th.AssertNoErr(t, err)
@@ -249,6 +255,7 @@ func TestGet(t *testing.T) {
 	th.AssertEquals(t, n.ID, "a07eea83-7710-4860-931b-5fe220fae533")
 	th.AssertDeepEquals(t, n.Routes, []routers.Route{{DestinationCIDR: "40.0.1.0/24", NextHop: "10.1.0.10"}})
 	th.AssertDeepEquals(t, n.AvailabilityZoneHints, []string{"zone1", "zone2"})
+	th.AssertEquals(t, n.Ha, true)
 }
 
 func TestUpdate(t *testing.T) {

@@ -98,6 +98,55 @@ type Port struct {
 
 	// Identifies the list of IP addresses the port will recognize/accept
 	AllowedAddressPairs []AddressPair `json:"allowed_address_pairs"`
+
+	// Specifies the extended DHCP option.
+	// This is an extended attribute.
+	ExtraDhcpOpts []ExtraDhcpOpt `json:"extra_dhcp_opts"`
+
+	// Specifies the port virtual interface (VIF) type.
+	// The value can be ovs or hw_veb.
+	// This is an extended attribute.
+	// This parameter is visible only to administrators.
+	BindingVifType string `json:"binding:vif_type,omitempty"`
+
+	// Specifies the VIF details.
+	// Parameter ovs_hybrid_plug specifies
+	// whether the OVS/bridge hybrid mode is used.
+	BindingVifDetails map[string]interface{} `json:"binding:vif_details"`
+
+	// Specifies the host ID.
+	// This is an extended attribute.
+	// This parameter is visible only to administrators.
+	BindingHostId string `json:"binding:host_id,omitempty"`
+
+	// Specifies the user-defined settings.
+	// This is an extended attribute.
+	BindingProfile map[string]interface{} `json:"binding:profile"`
+
+	// Specifies the type of the bound vNIC.
+	// normal: Softswitch
+	BindingVnicType string `json:"binding:vnic_type"`
+
+	// Specifies whether the security option is enabled for the port.
+	// If the option is not enabled, the security group
+	// and DHCP snooping do not take effect.
+	PortSecurityEnabled bool `json:"port_security_enabled,omitempty"`
+
+	// Specifies the default private network domain name information of the active NIC.
+	// This is an extended attribute.
+	DnsAssignment []map[string]string `json:"dns_assignment"`
+
+	// Specifies the default private network DNS name of the active NIC.
+	// This is an extended attribute.
+	DnsName string `json:"dns_name,omitempty"`
+}
+
+//Specifies the extended DHCP option.
+type ExtraDhcpOpt struct {
+	//Specifies the option name.
+	OptName string `json:"opt_name"`
+	//Specifies the option value.
+	OptValue string `json:"opt_value"`
 }
 
 // PortPage is the page returned by a pager when traversing over a collection

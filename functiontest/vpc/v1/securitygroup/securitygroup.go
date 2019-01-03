@@ -23,7 +23,6 @@ func main() {
 		}
 		return
 	}
-
 	sc, err := openstack.NewVPCV1(provider, gophercloud.EndpointOpts{})
 
 	if err != nil {
@@ -34,15 +33,16 @@ func main() {
 		}
 		return
 	}
-
 	TestGroupsList(sc)
 	fmt.Println("main end...")
 }
 
 func TestGroupsList(sc *gophercloud.ServiceClient) {
 
-
-	allPages, err := groups.List(sc, groups.ListOpts{Limit:3}).AllPages()
+	allPages, err := groups.List(sc, groups.ListOpts{
+		Marker:"199d019f-a742-4cf6-ae75-68f78d242b2c",
+		Limit:3,
+	}).AllPages()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {

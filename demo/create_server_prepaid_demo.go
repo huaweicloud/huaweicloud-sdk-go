@@ -13,12 +13,12 @@ func main() {
 
 	opts := aksk.AKSKOptions{
 		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
-		ProjectID:        "eed87f6fc2c948bd8770f21077aef75f",
-		AccessKey:        "XXXXXXXXXXXXXXXXXXXXX",
-		SecretKey:        "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+		ProjectID:        "{ProjectID}",
+		AccessKey:        "{your AK string}",
+		SecretKey:        "{your SK string}",
 		Domain:           "myhuaweicloud.com",
 		Region:           "cn-north-1",
-		DomainID:         "8c1d78bc75bf4154a4d0c73a28c3e0b7",
+		DomainID:         "{domainID}",
 	}
 
 

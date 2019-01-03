@@ -47,7 +47,9 @@ const GetResponse = `
         "device_owner": "network:router_interface",
         "port_security_enabled": false,
         "mac_address": "fa:16:3e:23:fd:d7",
-        "binding:profile": {},
+        "binding:profile": {
+          "internal_elb": true
+        },
         "binding:vnic_type": "normal",
         "fixed_ips": [
             {
@@ -57,7 +59,25 @@ const GetResponse = `
         ],
         "id": "46d4bfb9-b26e-41f3-bd2e-e6dcc1ccedb2",
         "security_groups": [],
-        "device_id": "5e3898d7-11be-483e-9732-b2f5eccd2b2e"
+        "device_id": "5e3898d7-11be-483e-9732-b2f5eccd2b2e",
+        "extra_dhcp_opts": [
+          {
+            "opt_name": "opt_name1",
+            "opt_value": "opt_value1"
+          },{
+            "opt_name": "opt_name2",
+            "opt_value": "opt_value2"
+          }
+        ],
+	"port_security_enabled": true,
+	"dns_assignment": [
+                {
+                    "hostname": "ip-10-1-0-37",
+                    "ip_address": "10.1.0.37",
+                    "fqdn": "ip-10-1-0-37.xxx.compute.internal."
+                }
+        ],
+        "dns_name": "testget"
     }
 }
 `
@@ -80,7 +100,20 @@ const CreateRequest = `
             "ip_address": "10.0.0.4",
             "mac_address": "fa:16:3e:c9:cb:f0"
           }
-        ]
+        ],
+        "extra_dhcp_opts": [
+          {
+            "opt_name": "opt_name1",
+            "opt_value": "opt_value1"
+          },{
+            "opt_name": "opt_name2",
+            "opt_value": "opt_value2"
+          }
+        ],
+	"binding:profile": {
+	  "internal_elb": true
+	},
+	"port_security_enabled": true
     }
 }
 `
@@ -111,7 +144,20 @@ const CreateResponse = `
             "mac_address": "fa:16:3e:c9:cb:f0"
           }
         ],
-        "device_id": ""
+        "device_id": "",
+        "extra_dhcp_opts": [
+          {
+            "opt_name": "opt_name1",
+            "opt_value": "opt_value1"
+          },{
+            "opt_name": "opt_name2",
+            "opt_value": "opt_value2"
+          }
+        ],
+	"binding:profile": {
+	  "internal_elb": true
+	},
+	"port_security_enabled": true
     }
 }
 `
@@ -238,7 +284,17 @@ const UpdateRequest = `
         ],
         "security_groups": [
             "f0ac4394-7e4a-4409-9701-ba8be283dbc3"
-        ]
+        ],
+        "extra_dhcp_opts": [
+          {
+            "opt_name": "opt_name1",
+            "opt_value": "opt_value1"
+          },{
+            "opt_name": "opt_name2",
+            "opt_value": "opt_value2"
+          }
+        ],
+	"port_security_enabled": true
     }
 }
 `
@@ -269,7 +325,17 @@ const UpdateResponse = `
         "security_groups": [
             "f0ac4394-7e4a-4409-9701-ba8be283dbc3"
         ],
-        "device_id": ""
+        "device_id": "",
+        "extra_dhcp_opts": [
+          {
+            "opt_name": "opt_name1",
+            "opt_value": "opt_value1"
+          },{
+            "opt_name": "opt_name2",
+            "opt_value": "opt_value2"
+          }
+        ],
+	"port_security_enabled": true
     }
 }
 `

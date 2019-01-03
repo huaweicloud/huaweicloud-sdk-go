@@ -11,14 +11,13 @@ import (
 func main() {
 
 	opts := aksk.AKSKOptions{
-		//hec new
 		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
-		DomainID:         "3b011b89b2f64fb68782a43380e2a78fd",
-		ProjectID:        "128a7bf965154373a7b73c89eb6b65aa",
-		AccessKey:        "BWEXRUBXIPWUKJMRC0WH",
-		SecretKey:        "muSDXBCGYvbDSs2pRVYhuBbXMyahWuqKoF5vbikE",
+		ProjectID:        "{ProjectID}",
+		AccessKey:        "{your AK string}",
+		SecretKey:        "{your SK string}",
 		Domain:           "myhuaweicloud.com",
 		Region:           "cn-north-1",
+		DomainID:         "{domainID}",
 	}
 
 	provider, err_auth := openstack.AuthenticatedClient(opts)

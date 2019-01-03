@@ -79,10 +79,10 @@ func TestListAllServersWithExtensions(t *testing.T) {
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, 3, len(actual))
 	th.AssertEquals(t, "nova", actual[0].AvailabilityZone)
-	th.AssertEquals(t, "RUNNING", actual[0].PowerState.String())
-	th.AssertEquals(t, "", actual[0].TaskState)
+	th.AssertEquals(t, 1, actual[0].Server.PowerState)
+	th.AssertEquals(t, "", actual[0].Server.TaskState)
 	th.AssertEquals(t, "active", actual[0].VmState)
-	th.AssertEquals(t, diskconfig.Manual, actual[0].DiskConfig)
+	th.AssertEquals(t, "MANUAL", actual[0].Server.DiskConfig)
 }
 
 func TestCreateServer(t *testing.T) {
@@ -94,6 +94,9 @@ func TestCreateServer(t *testing.T) {
 		Name:      "derp",
 		ImageRef:  "f90f6034-2570-4974-8351-6b49732ef2eb",
 		FlavorRef: "1",
+		Networks: []servers.Network{
+
+		},
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -110,6 +113,9 @@ func TestCreateServerWithCustomField(t *testing.T) {
 			Name:      "derp",
 			ImageRef:  "f90f6034-2570-4974-8351-6b49732ef2eb",
 			FlavorRef: "1",
+			Networks: []servers.Network{
+
+			},
 		},
 		Foo: "bar",
 	}).Extract()
@@ -130,6 +136,8 @@ func TestCreateServerWithMetadata(t *testing.T) {
 		Metadata: map[string]string{
 			"abc": "def",
 		},
+		Networks: []servers.Network{
+		},
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -146,6 +154,8 @@ func TestCreateServerWithUserdataString(t *testing.T) {
 		ImageRef:  "f90f6034-2570-4974-8351-6b49732ef2eb",
 		FlavorRef: "1",
 		UserData:  []byte("userdata string"),
+		Networks: []servers.Network{
+		},
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -164,6 +174,8 @@ func TestCreateServerWithUserdataEncoded(t *testing.T) {
 		ImageRef:  "f90f6034-2570-4974-8351-6b49732ef2eb",
 		FlavorRef: "1",
 		UserData:  []byte(encoded),
+		Networks: []servers.Network{
+		},
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -180,6 +192,9 @@ func TestCreateServerWithImageNameAndFlavorName(t *testing.T) {
 		ImageName:     "cirros-0.3.2-x86_64-disk",
 		FlavorName:    "m1.tiny",
 		ServiceClient: client.ServiceClient(),
+		Networks: []servers.Network{
+
+		},
 	}).Extract()
 	th.AssertNoErr(t, err)
 
@@ -249,10 +264,10 @@ func TestGetServerWithExtensions(t *testing.T) {
 	err := servers.Get(client.ServiceClient(), "1234asdf").ExtractInto(&s)
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, "nova", s.AvailabilityZone)
-	th.AssertEquals(t, "RUNNING", s.PowerState.String())
-	th.AssertEquals(t, "", s.TaskState)
+	th.AssertEquals(t, 1, s.Server.PowerState)
+	th.AssertEquals(t, "", s.Server.TaskState)
 	th.AssertEquals(t, "active", s.VmState)
-	th.AssertEquals(t, diskconfig.Manual, s.DiskConfig)
+	th.AssertEquals(t, "MANUAL", s.Server.DiskConfig)
 
 	err = servers.Get(client.ServiceClient(), "1234asdf").ExtractInto(s)
 	if err == nil {

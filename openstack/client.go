@@ -38,7 +38,8 @@ const (
 	computeMicroVersion       = "2.26"
 	objectSstoreMicroVersion  = ""
 	networkMicroVersion       = ""
-	vpcv1MicroVersion     = ""
+	vpcv1MicroVersion         = ""
+	vpcv2MicroVersion         = ""
 	volumeMicroVersion        = ""
 	volumev2MicroVersion      = ""
 	volumev3MicroVersion      = ""
@@ -689,5 +690,10 @@ func NewVPCV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 
 func NewCESV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "cesv1", cesMicroVersion)
+	return sc, err
+}
+
+func NewVPCV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "vpcv2.0", vpcv1MicroVersion)
 	return sc, err
 }

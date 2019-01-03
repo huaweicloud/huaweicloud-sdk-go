@@ -112,7 +112,9 @@ func TestListAllWithExtensions(t *testing.T) {
 	err = volumes.ExtractVolumesInto(allPages, &actual)
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, 2, len(actual))
-	th.AssertEquals(t, "304dc00909ac4d0da6c62d816bcb3459", actual[0].TenantID)
+	th.AssertEquals(t, "available", actual[0].Status)
+	th.AssertEquals(t, 75, actual[0].Size)
+	th.AssertEquals(t, "nova", actual[0].AvailabilityZone)
 }
 
 func TestListAll(t *testing.T) {
@@ -206,10 +208,9 @@ func TestCreate(t *testing.T) {
 
 	MockCreateResponse(t)
 
-	options := &volumes.CreateOpts{Size: 75, Name: "vol-001"}
+	options := &volumes.CreateOpts{Size: 75, Name: "vol-001",AvailabilityZone:"nova",}
 	n, err := volumes.Create(client.ServiceClient(), options).Extract()
 	th.AssertNoErr(t, err)
-
 	th.AssertEquals(t, n.Size, 75)
 	th.AssertEquals(t, n.ID, "d32019d3-bc6e-4319-9c1d-6722fc136a22")
 }

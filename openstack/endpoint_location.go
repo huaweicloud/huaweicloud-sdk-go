@@ -23,9 +23,10 @@ var endpointSchemaList = map[string]string{
 	"VOLUMEV2": "https://evs.%(region)s.%(domain)s/v2/%(projectID)s/",
 	//"ANTIDDOS":      "https://antiddos.%(region)s.%(domain)s/",
 	//"BSS":           "https://bss.%(region)s.%(domain)s/",
-	"BSS": "https://bss.cn-north-1.%(domain)s/",
-	"VPC":  "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
-	"CESV1":  "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
+	"BSS":   "https://bss.cn-north-1.%(domain)s/",
+	"VPC":   "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
+	"CESV1": "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
+	"VPCV2.0":   "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
 }
 
 /*

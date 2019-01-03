@@ -19,19 +19,44 @@ type ListOptsBuilder interface {
 // by a particular port attribute. SortDir sets the direction, and is either
 // `asc' or `desc'. Marker and Limit are used for pagination.
 type ListOpts struct {
+	// Specifies the port status.
 	Status       string `q:"status"`
+
+	// Specifies the port name.
 	Name         string `q:"name"`
+
+	// Specifies the administrative status.
 	AdminStateUp *bool  `q:"admin_state_up"`
+
+	// Specifies the ID of the network to which the port belongs.
 	NetworkID    string `q:"network_id"`
+
+	// Specifies the tenant ID. Only the administrator can specify the tenant ID of other tenants.
 	TenantID     string `q:"tenant_id"`
+
+	// Specifies the DHCP, router or Nova to which a device belongs.
 	DeviceOwner  string `q:"device_owner"`
+
+	// Specifies the port MAC address.
 	MACAddress   string `q:"mac_address"`
+
+	// Specifies the port ID.
 	ID           string `q:"id"`
+
+	// Specifies the device ID.
 	DeviceID     string `q:"device_id"`
+
+	// Limit limits the number of Ports to return.
 	Limit        int    `q:"limit"`
+
+	// Mark is an Port UUID at which to set a marker.
 	Marker       string `q:"marker"`
-	SortKey      string `q:"sort_key"`
-	SortDir      string `q:"sort_dir"`
+
+	// SortKey will sort the results based on a specified port property.
+	SortKey string `q:"sort_key"`
+
+	// SortDir will sort the list results either ascending or decending.
+	SortDir string `q:"sort_dir"`
 }
 
 // ToPortListQuery formats a ListOpts into a query string.
@@ -75,16 +100,44 @@ type CreateOptsBuilder interface {
 
 // CreateOpts represents the attributes used when creating a new port.
 type CreateOpts struct {
+	// Specifies the ID of the network to which the port belongs.
 	NetworkID           string        `json:"network_id" required:"true"`
+
+	// Specifies the port name.
 	Name                string        `json:"name,omitempty"`
+
+	// Specifies the administrative status.
 	AdminStateUp        *bool         `json:"admin_state_up,omitempty"`
+
+	// Specifies the port MAC address.
 	MACAddress          string        `json:"mac_address,omitempty"`
+
+	// Specifies the port IP address.
 	FixedIPs            interface{}   `json:"fixed_ips,omitempty"`
+
+	// Specifies the device ID.
 	DeviceID            string        `json:"device_id,omitempty"`
+
+	// Specifies the DHCP, router or Nova to which a device belongs.
 	DeviceOwner         string        `json:"device_owner,omitempty"`
+
+	// Specifies the project ID. Only the administrator can specify tenant_id of other tenants.
 	TenantID            string        `json:"tenant_id,omitempty"`
+
+	// Specifies the UUID of the security group.
 	SecurityGroups      *[]string     `json:"security_groups,omitempty"`
+
+	// Specifies the IP and MAC address pair.
 	AllowedAddressPairs []AddressPair `json:"allowed_address_pairs,omitempty"`
+
+	// Specifies the extended DHCP option.
+	ExtraDhcpOpts []ExtraDhcpOpt `json:"extra_dhcp_opts,omitempty"`
+
+	// Specifies the user-defined settings.
+	BindingProfile map[string]interface{} `json:"binding:profile,omitempty"`
+
+	// Specifies whether the security option is enabled for the port.
+	PortSecurityEnabled *bool `json:"port_security_enabled,omitempty"`
 }
 
 // ToPortCreateMap builds a request body from CreateOpts.
@@ -112,13 +165,32 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts represents the attributes used when updating an existing port.
 type UpdateOpts struct {
+	// Specifies the port name.
 	Name                string         `json:"name,omitempty"`
+
+	// Specifies the administrative status.
 	AdminStateUp        *bool          `json:"admin_state_up,omitempty"`
+
+	// Specifies the port IP address.
 	FixedIPs            interface{}    `json:"fixed_ips,omitempty"`
+
+	// Specifies the device ID.
 	DeviceID            string         `json:"device_id,omitempty"`
+
+	// Specifies the DHCP, router or Nova to which a device belongs.
 	DeviceOwner         string         `json:"device_owner,omitempty"`
+
+	// Specifies the UUID of the security group.
 	SecurityGroups      *[]string      `json:"security_groups,omitempty"`
+
+	// Specifies the IP and MAC address pair.
 	AllowedAddressPairs *[]AddressPair `json:"allowed_address_pairs,omitempty"`
+
+	// Specifies the extended DHCP option.
+	ExtraDhcpOpts []ExtraDhcpOpt `json:"extra_dhcp_opts,omitempty"`
+
+	// Specifies whether the security option is enabled for the port.
+	PortSecurityEnabled *bool `json:"port_security_enabled,omitempty"`
 }
 
 // ToPortUpdateMap builds a request body from UpdateOpts.

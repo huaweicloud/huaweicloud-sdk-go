@@ -55,6 +55,7 @@ type CreateOpts struct {
 	TenantID              string       `json:"tenant_id,omitempty"`
 	GatewayInfo           *GatewayInfo `json:"external_gateway_info,omitempty"`
 	AvailabilityZoneHints []string     `json:"availability_zone_hints,omitempty"`
+	Ha                    *bool        `json:"ha,omitempty"`
 }
 
 // ToRouterCreateMap builds a create request body from CreateOpts.

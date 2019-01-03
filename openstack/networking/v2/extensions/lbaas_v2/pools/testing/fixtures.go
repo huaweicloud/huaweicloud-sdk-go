@@ -95,11 +95,11 @@ var (
 		TenantID:      "83657cfcdfe44cd5920adaf26c48ceea",
 		AdminStateUp:  true,
 		Name:          "web",
-		Members:       []pools.Member{{ID: "53306cda-815d-4354-9fe4-59e09da9c3c5"}},
+		Members:       []pools.MemberID{{ID: "53306cda-815d-4354-9fe4-59e09da9c3c5"}},
 		ID:            "72741b06-df4d-4715-b142-276b6bce75ab",
 		Loadbalancers: []pools.LoadBalancerID{{ID: "79e05663-7f03-45d2-a092-8b94062f22ab"}},
 		Listeners:     []pools.ListenerID{{ID: "2a280670-c202-4b0b-a562-34077415aabf"}},
-		Provider:      "haproxy",
+		//Provider:      "haproxy",
 	}
 	PoolDb = pools.Pool{
 		LBMethod:      "LEAST_CONNECTION",
@@ -109,11 +109,11 @@ var (
 		TenantID:      "83657cfcdfe44cd5920adaf26c48ceea",
 		AdminStateUp:  true,
 		Name:          "db",
-		Members:       []pools.Member{{ID: "67306cda-815d-4354-9fe4-59e09da9c3c5"}},
+		Members:       []pools.MemberID{{ID: "67306cda-815d-4354-9fe4-59e09da9c3c5"}},
 		ID:            "c3741b06-df4d-4715-b142-276b6bce75ab",
 		Loadbalancers: []pools.LoadBalancerID{{ID: "79e05663-7f03-45d2-a092-8b94062f22ab"}},
 		Listeners:     []pools.ListenerID{{ID: "2a280670-c202-4b0b-a562-34077415aabf"}},
-		Provider:      "haproxy",
+		//Provider:      "haproxy",
 	}
 	PoolUpdated = pools.Pool{
 		LBMethod:      "LEAST_CONNECTION",
@@ -123,11 +123,11 @@ var (
 		TenantID:      "83657cfcdfe44cd5920adaf26c48ceea",
 		AdminStateUp:  true,
 		Name:          "db",
-		Members:       []pools.Member{{ID: "67306cda-815d-4354-9fe4-59e09da9c3c5"}},
+		Members:       []pools.MemberID{{ID: "67306cda-815d-4354-9fe4-59e09da9c3c5"}},
 		ID:            "c3741b06-df4d-4715-b142-276b6bce75ab",
 		Loadbalancers: []pools.LoadBalancerID{{ID: "79e05663-7f03-45d2-a092-8b94062f22ab"}},
 		Listeners:     []pools.ListenerID{{ID: "2a280670-c202-4b0b-a562-34077415aabf"}},
-		Provider:      "haproxy",
+		//Provider:      "haproxy",
 	}
 )
 

@@ -77,7 +77,7 @@ func TestListWithExtensions(t *testing.T) {
 	th.AssertNoErr(t, err)
 
 	th.AssertEquals(t, allNetworks[0].Status, "ACTIVE")
-	th.AssertEquals(t, allNetworks[0].PortSecurityEnabled, true)
+	th.AssertEquals(t, allNetworks[0].Network.PortSecurityEnabled, true)
 }
 
 func TestGet(t *testing.T) {
@@ -122,7 +122,7 @@ func TestGetWithExtensions(t *testing.T) {
 	th.AssertNoErr(t, err)
 
 	th.AssertEquals(t, networkWithExtensions.Status, "ACTIVE")
-	th.AssertEquals(t, networkWithExtensions.PortSecurityEnabled, true)
+	th.AssertEquals(t, networkWithExtensions.Network.PortSecurityEnabled, true)
 }
 
 func TestCreate(t *testing.T) {
@@ -203,6 +203,7 @@ func TestUpdate(t *testing.T) {
 	th.AssertEquals(t, n.AdminStateUp, false)
 	th.AssertEquals(t, n.Shared, true)
 	th.AssertEquals(t, n.ID, "4e8e5957-649f-477b-9e5b-f1f75b21c03c")
+	th.AssertEquals(t, n.PortSecurityEnabled, false)
 }
 
 func TestDelete(t *testing.T) {

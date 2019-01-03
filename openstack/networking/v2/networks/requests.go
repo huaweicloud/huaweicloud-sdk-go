@@ -73,6 +73,23 @@ type CreateOpts struct {
 	Shared                *bool    `json:"shared,omitempty"`
 	TenantID              string   `json:"tenant_id,omitempty"`
 	AvailabilityZoneHints []string `json:"availability_zone_hints,omitempty"`
+
+	// Specifies the physical network used by this network.
+	// This is an extended attribute.This attribute is available only to administrators.
+	ProviderPhysicalNetwork  string `json:"provider:physical_network,omitempty"`
+
+	// Specifies the network type. Only the VXLAN and GENEVE networks are supported.
+	ProviderNetworkType string `json:"provider:network_type,omitempty"`
+
+	// Specifies the network segment ID.
+	// The value is a VLAN ID for a VLAN network and is a VNI for a VXLAN network.
+	// This is an extended attribute.This attribute is available only to administrators.
+	ProviderSegmentationId int64 `json:"provider:segmentation_id,omitempty"`
+
+	// Specifies whether the security option is enabled for the port.
+	// If the option is not enabled, the security group and DHCP
+	// snooping settings of all VMs in the network do not take effect.
+	PortSecurityEnabled *bool `json:"port_security_enabled,omitempty"`
 }
 
 // ToNetworkCreateMap builds a request body from CreateOpts.
@@ -108,6 +125,11 @@ type UpdateOpts struct {
 	AdminStateUp *bool  `json:"admin_state_up,omitempty"`
 	Name         string `json:"name,omitempty"`
 	Shared       *bool  `json:"shared,omitempty"`
+
+	// Specifies whether the security option is enabled for the port.
+	// If the option is not enabled, the security group and DHCP
+	// snooping settings of all VMs in the network do not take effect.
+	PortSecurityEnabled *bool `json:"port_security_enabled,omitempty"`
 }
 
 // ToNetworkUpdateMap builds a request body from UpdateOpts.

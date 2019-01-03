@@ -35,7 +35,8 @@ func TestList(t *testing.T) {
             "remote_group_id": null,
             "remote_ip_prefix": null,
             "security_group_id": "85cc3048-abc3-43cc-89b3-377341426ac5",
-            "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550"
+            "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550",
+            "description": "testcreate1"
         },
         {
             "direction": "egress",
@@ -47,7 +48,8 @@ func TestList(t *testing.T) {
             "remote_group_id": null,
             "remote_ip_prefix": null,
             "security_group_id": "85cc3048-abc3-43cc-89b3-377341426ac5",
-            "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550"
+            "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550",
+            "description": "testcreate2"
         }
     ]
 }
@@ -76,6 +78,7 @@ func TestList(t *testing.T) {
 				RemoteIPPrefix: "",
 				SecGroupID:     "85cc3048-abc3-43cc-89b3-377341426ac5",
 				TenantID:       "e4f50856753b4dc6afee5fa6b9b6c550",
+				Description:    "testcreate1",
 			},
 			{
 				Direction:      "egress",
@@ -88,6 +91,7 @@ func TestList(t *testing.T) {
 				RemoteIPPrefix: "",
 				SecGroupID:     "85cc3048-abc3-43cc-89b3-377341426ac5",
 				TenantID:       "e4f50856753b4dc6afee5fa6b9b6c550",
+				Description:    "testcreate2",
 			},
 		}
 
@@ -119,7 +123,8 @@ func TestCreate(t *testing.T) {
         "port_range_max": 80,
         "protocol": "tcp",
         "remote_group_id": "85cc3048-abc3-43cc-89b3-377341426ac5",
-        "security_group_id": "a7734e61-b545-452d-a3cd-0189cbd9747a"
+        "security_group_id": "a7734e61-b545-452d-a3cd-0189cbd9747a",
+        "description": "testcreate"
     }
 }
       `)
@@ -139,7 +144,8 @@ func TestCreate(t *testing.T) {
         "remote_group_id": "85cc3048-abc3-43cc-89b3-377341426ac5",
         "remote_ip_prefix": null,
         "security_group_id": "a7734e61-b545-452d-a3cd-0189cbd9747a",
-        "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550"
+        "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550",
+        "description": "testcreate"
     }
 }
     `)
@@ -153,6 +159,7 @@ func TestCreate(t *testing.T) {
 		Protocol:      "tcp",
 		RemoteGroupID: "85cc3048-abc3-43cc-89b3-377341426ac5",
 		SecGroupID:    "a7734e61-b545-452d-a3cd-0189cbd9747a",
+		Description:   "testcreate",
 	}
 	_, err := rules.Create(fake.ServiceClient(), opts).Extract()
 	th.AssertNoErr(t, err)
@@ -200,7 +207,8 @@ func TestGet(t *testing.T) {
         "remote_group_id": null,
         "remote_ip_prefix": null,
         "security_group_id": "85cc3048-abc3-43cc-89b3-377341426ac5",
-        "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550"
+        "tenant_id": "e4f50856753b4dc6afee5fa6b9b6c550",
+        "description": "testcreate"
     }
 }
       `)
@@ -219,6 +227,7 @@ func TestGet(t *testing.T) {
 	th.AssertEquals(t, "", sr.RemoteIPPrefix)
 	th.AssertEquals(t, "85cc3048-abc3-43cc-89b3-377341426ac5", sr.SecGroupID)
 	th.AssertEquals(t, "e4f50856753b4dc6afee5fa6b9b6c550", sr.TenantID)
+	th.AssertEquals(t, "testcreate", sr.Description)
 }
 
 func TestDelete(t *testing.T) {

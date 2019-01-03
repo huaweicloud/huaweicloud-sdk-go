@@ -113,7 +113,10 @@ type UpdateOptsBuilder interface {
 // linked to. To associate the floating IP with a new internal port, provide its
 // ID. To disassociate the floating IP from all ports, provide an empty string.
 type UpdateOpts struct {
+	// Specifies the port ID.
 	PortID *string `json:"port_id"`
+	// Specifies the private IP address of the associated port.
+	FixedIP *string `json:"fixed_ip_address,omitempty"`
 }
 
 // ToFloatingIPUpdateMap allows UpdateOpts to satisfy the UpdateOptsBuilder

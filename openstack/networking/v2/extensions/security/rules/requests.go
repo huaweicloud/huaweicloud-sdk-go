@@ -121,6 +121,9 @@ type CreateOpts struct {
 	// The UUID of the tenant who owns the Rule. Only administrative users
 	// can specify a tenant UUID other than their own.
 	TenantID string `json:"tenant_id,omitempty"`
+
+	// Provides supplementary information about the security group rule.
+	Description string `json:"description,omitempty"`
 }
 
 // ToSecGroupRuleCreateMap builds a request body from CreateOpts.

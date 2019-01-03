@@ -9,13 +9,13 @@ import (
 // outgoing traffic for a particular security group.
 type SecGroupRule struct {
 	// The UUID for this security group rule.
-	ID string
+	ID string `json:"id"`
 
 	// The direction in which the security group rule is applied. The only values
 	// allowed are "ingress" or "egress". For a compute instance, an ingress
 	// security group rule is applied to incoming (ingress) traffic for that
 	// instance. An egress rule is applied to traffic leaving the instance.
-	Direction string
+	Direction string `json:"direction"`
 
 	// Must be IPv4 or IPv6, and addresses represented in CIDR must match the
 	// ingress or egress rules.
@@ -37,7 +37,7 @@ type SecGroupRule struct {
 
 	// The protocol that is matched by the security group rule. Valid values are
 	// "tcp", "udp", "icmp" or an empty string.
-	Protocol string
+	Protocol string `json:"protocol"`
 
 	// The remote group ID to be associated with this security group rule. You
 	// can specify either RemoteGroupID or RemoteIPPrefix.
@@ -50,6 +50,18 @@ type SecGroupRule struct {
 
 	// The owner of this security group rule.
 	TenantID string `json:"tenant_id"`
+
+	// Provides supplementary information about the security group rule.
+	Description string `json:"description"`
+
+	// Specifies the project ID.
+	ProjectId string `json:"project_id"`
+
+	// Specifies the time when the security group rule is created.
+	CreatedAt string `json:"created_at"`
+
+	// Specifies the time when the security group rule is updated.
+	UpdatedAt string `json:"updated_at"`
 }
 
 // SecGroupRulePage is the page returned by a pager when traversing over a

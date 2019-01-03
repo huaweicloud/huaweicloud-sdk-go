@@ -2,31 +2,22 @@ package subnets
 
 import "github.com/gophercloud/gophercloud"
 
-//
-//func resourceURL(c *gophercloud.ServiceClient, id string) string {
-//	return c.ServiceURL("subnets", id)
-//}
-
-func rootURL(c *gophercloud.ServiceClient) string {
+func listURL(c *gophercloud.ServiceClient) string {
 	return c.ServiceURL("subnets")
 }
 
-func listURL(c *gophercloud.ServiceClient) string {
-	return rootURL(c)
+func CreateURL(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("subnets")
 }
 
-//func getURL(c *gophercloud.ServiceClient, id string) string {
-//	return resourceURL(c, id)
-//}
-//
-//func createURL(c *gophercloud.ServiceClient) string {
-//	return rootURL(c)
-//}
-//
-//func updateURL(c *gophercloud.ServiceClient, id string) string {
-//	return resourceURL(c, id)
-//}
-//
-//func deleteURL(c *gophercloud.ServiceClient, id string) string {
-//	return resourceURL(c, id)
-//}
+func DeleteURL(c *gophercloud.ServiceClient, vpcId string, subnetId string) string {
+	return c.ServiceURL("vpcs", vpcId, "subnets", subnetId)
+}
+
+func GetURL(c *gophercloud.ServiceClient, subnetId string) string {
+	return c.ServiceURL("subnets", subnetId)
+}
+
+func UpdateURL(c *gophercloud.ServiceClient, vpcId string, subnetId string) string {
+	return c.ServiceURL("vpcs", vpcId, "subnets", subnetId)
+}

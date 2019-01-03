@@ -63,7 +63,6 @@ func TestCreateLoadbalancer(t *testing.T) {
 		AdminStateUp: gophercloud.Enabled,
 		VipSubnetID:  "9cedb85d-0759-4898-8a4b-fa5a5ea10086",
 		VipAddress:   "10.30.176.48",
-		Flavor:       "medium",
 		Provider:     "haproxy",
 	}).Extract()
 	th.AssertNoErr(t, err)
@@ -110,12 +109,12 @@ func TestGetLoadbalancerStatusesTree(t *testing.T) {
 	HandleLoadbalancerGetStatusesTree(t)
 
 	client := fake.ServiceClient()
-	actual, err := loadbalancers.GetStatuses(client, "36e08a3e-a78f-4b40-a229-1e7e23eee1ab").Extract()
+	actual, err := loadbalancers.GetStatuses(client, "38278031-cfca-44be-81be-a412f618773b").Extract()
 	if err != nil {
 		t.Fatalf("Unexpected Get error: %v", err)
 	}
 
-	th.CheckDeepEquals(t, LoadbalancerStatusesTree, *(actual.Loadbalancer))
+	th.CheckDeepEquals(t, LoadbalancerStatuses, *actual.Loadbalancer)
 }
 
 func TestDeleteLoadbalancer(t *testing.T) {

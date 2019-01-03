@@ -48,7 +48,7 @@ func MockListResponse(t *testing.T) {
       "id": "289da7f8-6440-407c-9fb4-7db01ec49164",
       "size": 75,
       "user_id": "ff1ce52c03ab433aaba9108c2e3ef541",
-      "os-vol-tenant-attr:tenant_id": "304dc00909ac4d0da6c62d816bcb3459",
+      "os-vol-tenant-attr:tenant_id": "",
       "os-vol-mig-status-attr:migstat": null,
       "metadata": {"foo": "bar"},
       "status": "available",
@@ -74,7 +74,7 @@ func MockListResponse(t *testing.T) {
       "id": "96c3bda7-c82a-4f50-be73-ca7621794835",
       "size": 75,
       "user_id": "ff1ce52c03ab433aaba9108c2e3ef541",
-      "os-vol-tenant-attr:tenant_id": "304dc00909ac4d0da6c62d816bcb3459",
+      "os-vol-tenant-attr:tenant_id": "",
       "os-vol-mig-status-attr:migstat": null,
       "metadata": {},
       "status": "available",
@@ -144,8 +144,9 @@ func MockCreateResponse(t *testing.T) {
 {
     "volume": {
     	"name": "vol-001",
-        "size": 75
-    }
+        "size": 75,
+		"availability_zone": "nova"
+	}
 }
       `)
 

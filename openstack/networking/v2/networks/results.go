@@ -76,6 +76,37 @@ type Network struct {
 	// Availability zone hints groups network nodes that run services like DHCP, L3, FW, and others.
 	// Used to make network resources highly available.
 	AvailabilityZoneHints []string `json:"availability_zone_hints"`
+
+	// Specifies whether the network is an external network.
+	// This is an extended attribute.This attribute is for administrators only.
+	// Tenants cannot configure or update this attribute and can only query it.
+	RouterExternal bool `json:"router:external,omitempty"`
+
+	// Specifies the physical network used by this network.
+	// This is an extended attribute.This attribute is available only to administrators.
+	ProviderPhysicalNetwork  string `json:"provider:physical_network,omitempty"`
+
+	// Specifies the network type. Only the VXLAN and GENEVE networks are supported.
+	ProviderNetworkType string `json:"provider:network_type,omitempty"`
+
+	// Specifies the network segment ID.
+	// The value is a VLAN ID for a VLAN network and is a VNI for a VXLAN network.
+	// This is an extended attribute.This attribute is available only to administrators.
+	ProviderSegmentationId int64 `json:"provider:segmentation_id,omitempty"`
+
+	// Specifies the availability zone of this network.
+	// An empty list is returned.
+	AvailabilityZones []string `json:"availability_zones,omitempty"`
+
+	// Specifies whether the security option is enabled for the port.
+	// If the option is not enabled, the security group and DHCP
+	// snooping settings of all VMs in the network do not take effect.
+	PortSecurityEnabled bool `json:"port_security_enabled,omitempty"`
+
+	// Specifies the default private network DNS domain address.
+	// The system automatically sets this parameter,
+	// and you are not allowed to configure or change the parameter value.
+	DnsDomain string `json:"dns_domain,omitempty"`
 }
 
 // NetworkPage is the page returned by a pager when traversing over a

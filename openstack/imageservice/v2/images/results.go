@@ -87,22 +87,22 @@ type Image struct {
 	// VirtualSize is the virtual size of the image
 	VirtualSize int64 `json:"virtual_size"`
 
-	/***********************自研镜像参数*******************************/
-	//镜像链接信息。
+	// Specifies the image URL.
 	Self string `json:"self"`
 
-	//是否是删除的镜像，取值为true或者false。
+	// Specifies whether the image has been deleted.
+	// The value can be true&nbsp;or&nbsp;false.
 	Deleted bool `json:"deleted"`
 
-	/*
-		镜像使用环境类型：FusionCompute，Ironic，DataImage。
-		如果弹性云服务器镜像，则取值为FusionCompute，
-		如果是数据卷镜像则取值是DataImage，
-		如果是裸金属服务器镜像，则取值是Ironic。
-	*/
+	// Specifies the environment where the image is used.
+	// The value can be FusionCompute,Ironic, or DataImage.
+	// For an ECS image, the value is FusionCompute.
+	// For a data disk image, the value is DataImage.
+	// For a BMS image, the value is&nbsp;Ironic.
 	VirtualEnvType ImageVirtualEnvType `json:"virtual_env_type"`
 
-	//删除时间。格式为UTC时间。
+	// Specifies the time when the image was deleted.
+	// The value is in UTC format.
 	DeletedAt string `json:"deleted_at"`
 }
 
