@@ -31,7 +31,7 @@ You can also use AK/SK authentication to construct provider:
 		ProjectId:        "{projectId}",
 		AccessKey:        "{accKey}",
 		SecretKey:        "{secretKey}",
-		Domain:           "myhuaweicloud.com",
+		Domain:           "yyy.com",
 	}
 	provider, err := openstack.AuthenticatedClient(akSkOptions)
 

@@ -72,10 +72,10 @@ type Monitor struct {
 	Pools []PoolID `json:"pools"`
 
 	//heath check port range in [1,65535]. default is null.
-	MonitorPort int `json:"monitor_port"`
+	MonitorPort *int `json:"monitor_port"`
 
 	//domain name for http request
-	DomainName string `json:"domain_name"`
+	DomainName *string `json:"domain_name"`
 }
 
 // MonitorPage is the page returned by a pager when traversing over a

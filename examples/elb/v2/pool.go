@@ -8,6 +8,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
 	"github.com/gophercloud/gophercloud/pagination"
+	"encoding/json"
 )
 
 func main() {
@@ -15,12 +16,12 @@ func main() {
 	fmt.Println("main start...")
 
 	opts := aksk.AKSKOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "myhuaweicloud.com",
-		Region:           "cn-north-1",
+		Domain:           "yyy.com",
+		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
 
@@ -45,6 +46,7 @@ func main() {
 	PoolList(sc)
 	PoolGet(sc,poolId)
 	PoolUpdate(sc,poolId)
+	PoolUpdateCloseSP(sc,poolId)
 	PoolDelete(sc,poolId)
 
 
@@ -55,17 +57,20 @@ func main() {
 
 func PoolCreate(sc *gophercloud.ServiceClient) (poolId string)  {
 
-	prisistenct:=pools.SessionPersistenceRequest { Type:"HTTP_COOKIE"}
+	prisistenct:=pools.SessionPersistenceRequest {
+		Type:			"APP_COOKIE",
+		CookieName:		"test_cookie_name",
+	}
 	TrueValue:=true
 
 	opts:=pools.CreateOpts{
-		Name:"kaka new",
-		LBMethod:"ROUND_ROBIN",
-		Protocol:"HTTP",
-		LoadbalancerID:"165b6a38-5278-4569-b747-b2ee65ea84a4",
-		Description:"pool test",
-		Persistence:&prisistenct,
-		AdminStateUp:&TrueValue,
+		Name:				"kaka new",
+		LBMethod:			"ROUND_ROBIN",
+		Protocol:			"HTTP",
+		LoadbalancerID:		"6bb85e33-4953-457a-85a9-336d76125b7b",
+		Description:		"pool test",
+		Persistence:		&prisistenct,
+		AdminStateUp:		&TrueValue,
 	}
 
 	resp,err:=pools.Create(sc,opts).Extract()
@@ -80,6 +85,10 @@ func PoolCreate(sc *gophercloud.ServiceClient) (poolId string)  {
 	}
 
 	fmt.Println("pool Create success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+
 	poolId = (*resp).ID
 	return poolId
 }
@@ -119,13 +128,15 @@ func PoolGet(sc *gophercloud.ServiceClient, id string) (resp *pools.Pool)  {
 }
 
 func PoolUpdate(sc *gophercloud.ServiceClient, id string) (resp *pools.Pool) {
-
-	prisistenct:=pools.SessionPersistence {"APP_COOKIE","test_cookie"}
+	// close session persistence
+	prisistence:= &pools.SessionPersistence {
+		Type:               "HTTP_COOKIE",
+	}
 	updatOpts:=pools.UpdateOpts{
-		Name:"KAKAK A pool",
-		Description:"LEAST_CONNECTIONS",
-		LBMethod:"LEAST_CONNECTIONS",
-		Persistence:&prisistenct,
+		Name:				"KAKAK A pool",
+		Description:		"LEAST_CONNECTIONS",
+		LBMethod:			"LEAST_CONNECTIONS",
+		Persistence:		prisistence,
 	}
 
 	resp,err:=pools.Update(sc,id,updatOpts).Extract()
@@ -139,6 +150,36 @@ func PoolUpdate(sc *gophercloud.ServiceClient, id string) (resp *pools.Pool) {
 		}
 	}
 	fmt.Println("pool update success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+	return resp
+}
+
+func PoolUpdateCloseSP(sc *gophercloud.ServiceClient, id string) (resp *pools.Pool) {
+	// close session persistence
+	prisistence:= &pools.SessionPersistence {}
+	updatOpts:=pools.UpdateOpts{
+		Name:				"KAKAK A pool",
+		Description:		"LEAST_CONNECTIONS",
+		LBMethod:			"LEAST_CONNECTIONS",
+		Persistence:		prisistence,
+	}
+
+	resp,err:=pools.Update(sc,id,updatOpts).Extract()
+
+
+	if err!=nil{
+		fmt.Println(err)
+		if ue,ok:=err.(*gophercloud.UnifiedError); ok{
+			fmt.Println("ErrCode",ue.ErrCode)
+			fmt.Println("ErrMessage",ue.ErrMessage)
+		}
+	}
+	fmt.Println("pool update success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
 	return resp
 }
 

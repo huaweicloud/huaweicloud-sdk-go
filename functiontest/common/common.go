@@ -17,12 +17,12 @@ import (
 
 func AuthAKSK() (*gophercloud.ProviderClient, error) {
 	akskOptions := aksk.AKSKOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "myhuaweicloud.com",
-		Region:           "cn-north-1",
+		Domain:           "yyy.com",
+		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
 
@@ -36,7 +36,7 @@ func AuthAKSK() (*gophercloud.ProviderClient, error) {
 
 func AuthToken() (*gophercloud.ProviderClient, error) {
 	tokenOpts := token.TokenOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		Username:         "",
 		Password:         "",
 		DomainID:         "",

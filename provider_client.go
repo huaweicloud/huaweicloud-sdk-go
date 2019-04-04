@@ -201,7 +201,10 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 	if err != nil {
 		return nil, err
 	}
+	log := GetLogger()
 
+	log.Debug(fmt.Sprintf("Request method is %s,Request url is %s", req.Method, req.URL.String()))
+	log.Debug(fmt.Sprintf("Request header is %s", req.Header))
 	prereqtok := req.Header.Get("X-Auth-Token")
 	var resp *http.Response
 
@@ -241,8 +244,16 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 	//Issue the request.  原代码，注释掉
 	resp, err = client.HTTPClient.Do(req)
 	if err != nil {
+		log.Debug("Request error", err)
 		return nil, err
 	}
+	log.Debug("Response status code is %d", resp.StatusCode)
+	log.Debug("Response header is %s", resp.Header)
+	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	resp.Body.Close() //  must close
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	log.Debug("Response body is %s\n", string(bodyBytes))
 
 	// Allow default OkCodes if none explicitly set
 	if options.OkCodes == nil {
@@ -260,7 +271,7 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 	if !ok {
 		body, _ := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
-
+		log.Debug("Request failed response body is %s", string(body))
 		/*
 		    http.StatusBadRequest: //400
 		   	http.StatusUnauthorized: //401
@@ -295,7 +306,6 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 			return nil, err
 		}
 	}
-
 	return resp, nil
 }
 
@@ -315,7 +325,7 @@ func buildReq(client *ProviderClient, method, url string, options *RequestOpts) 
 		if err != nil {
 			return nil, err
 		}
-
+		GetLogger().Debug("Request body is %s", string(rendered))
 		body = bytes.NewReader(rendered)
 		contentType = &applicationJSON
 	}

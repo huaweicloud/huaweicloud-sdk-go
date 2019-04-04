@@ -1,11 +1,11 @@
 /*
-Package signer providers functions for sign http request before request huawei cloud
+Package signer providers functions for sign http request before request cloud
 Sample code:
 
 client := &http.Client{
 		Timeout: time.Duration(3 * time.Second),
 	}
-req, err := http.NewRequest("POST", "https://30030113-3657-4fb6-a7ef-90764239b038.apigw.cn-north-1.huaweicloud.com/app1?name=value", bytes.NewBuffer([]byte("demo")))
+req, err := http.NewRequest("POST", "https://30030113-3657-4fb6-a7ef-90764239b038.apigw.xxx.yyy.com/app1?name=value", bytes.NewBuffer([]byte("demo")))
 
 signOptions := signer.SignOptions{
 		AccessKey: "------------",

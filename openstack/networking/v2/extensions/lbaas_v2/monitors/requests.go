@@ -216,7 +216,7 @@ type UpdateOpts struct {
 	// is not specified, it defaults to "GET". Required for HTTP(S) types.
 	HTTPMethod string `json:"http_method,omitempty"`
 	//domain name for http request
-	DomainName string `json:"domain_name,omitempty"`
+	DomainName *string `json:"domain_name,omitempty"`
 	// Expected HTTP codes for a passing HTTP(S) Monitor. You can either specify
 	// a single status like "200", or a range like "200-202". Required for HTTP(S)
 	// types.
@@ -230,12 +230,25 @@ type UpdateOpts struct {
 	AdminStateUp *bool `json:"admin_state_up,omitempty"`
 
 	//heath check port range in [1,65535]. default is null.
-	MonitorPort int `json:"monitor_port,omitempty"`
+	MonitorPort *int `json:"monitor_port,omitempty"`
 }
 
 // ToMonitorUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToMonitorUpdateMap() (map[string]interface{}, error) {
-	return gophercloud.BuildRequestBody(opts, "healthmonitor")
+	b,err := gophercloud.BuildRequestBody(opts, "healthmonitor")
+	if err != nil {
+		return nil,err
+	}
+
+	hm := b["healthmonitor"].(map[string]interface{})
+	if hm["domain_name"] == "" {
+		hm["domain_name"] = nil
+	}
+	if hm["monitor_port"] == float64(0){
+		hm["monitor_port"] = nil
+	}
+
+	return b,err
 }
 
 // Update is an operation which modifies the attributes of the specified

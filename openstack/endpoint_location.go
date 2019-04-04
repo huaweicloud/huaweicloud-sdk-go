@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// service have same endpoint address in different location, refer to https://developer.huaweicloud.com/endpoint
+// service have same endpoint address in different location
 var endpointSchemaList = map[string]string{
 	"COMPUTE":  "https://ecs.%(region)s.%(domain)s/v2/%(projectID)s/",
 	"ECSV1.1":  "https://ecs.%(region)s.%(domain)s/v1.1/%(projectID)s/",

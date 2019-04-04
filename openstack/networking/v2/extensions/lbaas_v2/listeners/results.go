@@ -33,7 +33,7 @@ type Listener struct {
 	ProtocolPort int `json:"protocol_port"`
 
 	// The UUID of default pool. Must have compatible protocol with listener.
-	DefaultPoolID string `json:"default_pool_id"`
+	DefaultPoolID *string `json:"default_pool_id"`
 
 	// A list of load balancer IDs.
 	Loadbalancers []LoadBalancerID `json:"loadbalancers"`
@@ -46,7 +46,7 @@ type Listener struct {
 	SniContainerRefs []string `json:"sni_container_refs"`
 
 	// A reference to a Barbican container of TLS secrets.
-	DefaultTlsContainerRef string `json:"default_tls_container_ref"`
+	DefaultTlsContainerRef *string `json:"default_tls_container_ref"`
 
 	// The administrative state of the Listener. A valid value is true (UP) or false (DOWN).
 	AdminStateUp bool `json:"admin_state_up"`
@@ -57,7 +57,7 @@ type Listener struct {
 	// tags for Listener
 	Tags []string `json:"tags"`
 	// client ca cert id
-	ClientCaTlsContainerRef string `json:"client_ca_tls_container_ref"`
+	ClientCaTlsContainerRef *string `json:"client_ca_tls_container_ref"`
 	// CreatedAt is the time at which listeners has been created.
 	CreatedAt string `json:"created_at"`
 

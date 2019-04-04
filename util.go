@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"runtime"
+	"path"
+
 )
 
 // WaitFor polls a predicate function, once per second, up to a timeout limit.
@@ -136,3 +139,46 @@ func IsInStrSlice(sliceStr []string, s string) bool {
 	}
 	return false
 }
+
+
+var EnableDebug bool
+
+
+//logger struct
+type Logger struct {
+	DebugEnable bool `default:"false"`
+}
+
+func (log *Logger) Debug(format string, v ...interface{}) {
+	if log.DebugEnable {
+		msg := fmt.Sprintf("[DEBUG] "+format, v...)
+		writeMsg(msg)
+	}
+}
+
+func writeMsg(msg string) error {
+	_, file, line, ok := runtime.Caller(2)
+	if !ok {
+		file = "???"
+		line = 0
+	}
+	_, filename := path.Split(file)
+	msg = fmt.Sprintf("[%s:%s] %s", filename, strconv.FormatInt(int64(line), 10), msg)
+
+	printMsg(msg)
+	return nil
+}
+
+func printMsg(msg string) {
+	when := time.Now().Format("2006-01-02 15:04:05")
+	buf := []byte(fmt.Sprintf("[%s] ", when))
+	fmt.Println(string(append(append(buf, msg...))))
+}
+
+func GetLogger() (*Logger) {
+	log:=new(Logger)
+	log.DebugEnable=EnableDebug
+	return log
+
+}
+

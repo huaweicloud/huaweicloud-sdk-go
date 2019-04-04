@@ -52,7 +52,7 @@ func main() {
 
 func TestChangeOS(sc *gophercloud.ServiceClient) {
 	opts := cloudserversV2.ChangeOpts{
-		AdminPass: "Huawei@123",
+		AdminPass: "xxx",
 		ImageID:   "7affa924-93bf-43c1-91e4-6234dbb822ae",
 
 		//		KeyName: "kkkkkkkkkkkk",
@@ -78,7 +78,7 @@ func TestChangeOS(sc *gophercloud.ServiceClient) {
 
 func TestResetPassword(sc *gophercloud.ServiceClient) {
 	serverID := "1378c4be-8ca4-45bf-b1d9-8aaa3989c047"
-	pwd := "Huawei@123"
+	pwd := "xxx"
 	err := cloudserversV2.ResetPassword(sc, serverID, pwd).ExtractErr()
 	if err != nil {
 		fmt.Println("err:", err)

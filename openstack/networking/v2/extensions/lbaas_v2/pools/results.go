@@ -23,10 +23,10 @@ import (
 //              same Member of the Pool.
 type SessionPersistence struct {
 	// The type of persistence mode.
-	Type string `json:"type"`
+	Type string `json:"type,omitempty"`
 
 	// Name of cookie if persistence mode is set appropriately.
-	CookieName string `json:"cookie_name"`
+	CookieName string `json:"cookie_name,omitempty"`
 }
 
 // LoadBalancerID represents a load balancer.
@@ -90,7 +90,7 @@ type Pool struct {
 
 	// Indicates whether connections in the same session will be processed by the
 	// same Pool member or not.
-	Persistence SessionPersistence `json:"session_persistence"`
+	Persistence *SessionPersistence `json:"session_persistence"`
 
 	//// The load balancer provider.
 	//Provider string `json:"provider"`

@@ -12,12 +12,12 @@ import (
 func main() {
 
 	opts := aksk.AKSKOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "myhuaweicloud.com",
-		Region:           "cn-north-1",
+		Domain:           "yyy.com",
+		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
 

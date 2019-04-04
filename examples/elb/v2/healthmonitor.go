@@ -8,6 +8,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/monitors"
 	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud/pagination"
+	"encoding/json"
 )
 
 func main() {
@@ -15,15 +16,14 @@ func main() {
 	fmt.Println("main start...")
 
 	opts := aksk.AKSKOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "myhuaweicloud.com",
-		Region:           "cn-north-1",
+		Domain:           "yyy.com",
+		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
-
 
 	provider, err_auth := openstack.AuthenticatedClient(opts)
 	if err_auth != nil {
@@ -44,6 +44,7 @@ func main() {
 	id:=HealthMonitorCreate(sc)
 	HealthMonitorList(sc)
 	HealthMonitorUpdate(sc, id)
+	HealthMonitorUpdateDefault(sc, id)
 	HealthMonitorGet(sc, id)
 	HealthMonitorDelete(sc, id)
 	fmt.Println("hmid:", id)
@@ -56,18 +57,18 @@ func HealthMonitorCreate(sc *gophercloud.ServiceClient) (id string) {
 	trueValue:=true
 	//('HTTP', 'TCP', 'UDP_CONNECT')
 	opts:=monitors.CreateOpts{
-		PoolID:"13a887d0-cce3-4d2a-8961-7ad855d054c9",
-		Type:"HTTP",
-		Delay:10,
-		Timeout:10,
-		MaxRetries:3,
-		Name:"mmmmm",
-		AdminStateUp:&trueValue,
-		MonitorPort: 520,
-		URLPath: "/test",
-		HTTPMethod: "GET",
-		ExpectedCodes: "200",
-		DomainName:"www.test.com",
+		PoolID:				"7292e873-775c-4d51-8a83-62005f4f92e5",
+		Type:				"HTTP",
+		Delay:				10,
+		Timeout:			10,
+		MaxRetries:			3,
+		Name:				"mmmmm",
+		AdminStateUp:		&trueValue,
+		MonitorPort:		520,
+		URLPath: 			"/test",
+		HTTPMethod: 		"GET",
+		ExpectedCodes: 		"200",
+		DomainName:			"www.test.com",
 	}
 
 	resp,err:=monitors.Create(sc,opts).Extract()
@@ -82,7 +83,10 @@ func HealthMonitorCreate(sc *gophercloud.ServiceClient) (id string) {
 	}
 
 	fmt.Println("monitors Create success!")
-	fmt.Println(resp)
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+
 	id=(*resp).ID
 	return id
 }
@@ -123,18 +127,20 @@ func HealthMonitorGet(sc *gophercloud.ServiceClient, id string)  {
 
 }
 
-func HealthMonitorUpdate(sc *gophercloud.ServiceClient, id string)  {
+func HealthMonitorUpdateDefault(sc *gophercloud.ServiceClient, id string)  {
 	trueValue:=true
+	// set monitor port and domain name to default value
 	updatOpts:=monitors.UpdateOpts{
-		Delay:10,
-		Timeout:10,
-		MaxRetries:3,
-		Name:"mmmmm",
-		AdminStateUp:&trueValue,
-		MonitorPort: 520,
-		URLPath: "/test",
-		HTTPMethod: "GET",
-		ExpectedCodes: "200",
+		Delay:				10,
+		Timeout:			10,
+		MaxRetries:			3,
+		Name:				"mmmmm",
+		AdminStateUp:		&trueValue,
+		MonitorPort: 		new(int),
+		DomainName: 		new(string),
+		URLPath: 			"/test",
+		HTTPMethod: 		"GET",
+		ExpectedCodes: 		"200",
 	}
 
 	resp,err:=monitors.Update(sc,id,updatOpts).Extract()
@@ -148,8 +154,44 @@ func HealthMonitorUpdate(sc *gophercloud.ServiceClient, id string)  {
 		}
 	}
 	fmt.Println("monitor update success!")
-	fmt.Println(*resp)
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
 }
+
+func HealthMonitorUpdate(sc *gophercloud.ServiceClient, id string)  {
+	trueValue:=true
+	newPort := 8000
+	newDomainName := "www.newtest.com"
+	updatOpts:=monitors.UpdateOpts{
+		Delay:				10,
+		Timeout:			10,
+		MaxRetries:			3,
+		Name:				"mmmmm",
+		AdminStateUp:		&trueValue,
+		MonitorPort: 		&newPort,
+		DomainName: 		&newDomainName,
+		URLPath: 			"/test",
+		HTTPMethod: 		"GET",
+		ExpectedCodes: 		"200",
+	}
+
+	resp,err:=monitors.Update(sc,id,updatOpts).Extract()
+
+
+	if err!=nil{
+		fmt.Println(err)
+		if ue,ok:=err.(*gophercloud.UnifiedError); ok{
+			fmt.Println("ErrCode",ue.ErrCode)
+			fmt.Println("ErrMessage",ue.ErrMessage)
+		}
+	}
+	fmt.Println("monitor update success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+}
+
 
 func HealthMonitorDelete(sc *gophercloud.ServiceClient, id string)  {
 	err:=monitors.Delete(sc,id).ExtractErr()

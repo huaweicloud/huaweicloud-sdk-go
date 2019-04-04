@@ -17,6 +17,11 @@ const (
 	ProtocolTerminatedHTTPS Protocol = "TERMINATED_HTTPS"
 )
 
+// Attributes allow set to Json null
+var	StringToJsonNull = []string{
+	"default_tls_container_ref",
+	"client_ca_tls_container_ref"}
+
 // ListOptsBuilder allows extensions to add additional parameters to the
 // List request.
 type ListOptsBuilder interface {
@@ -109,12 +114,12 @@ type CreateOpts struct {
 	// A reference to a Barbican container of TLS secrets.
 	DefaultTlsContainerRef string `json:"default_tls_container_ref,omitempty"`
 
-	//// A list of references to TLS secrets.
-	//SniContainerRefs []string `json:"sni_container_refs,omitempty"`
+	// A list of references to TLS secrets.
+	SniContainerRefs []string `json:"sni_container_refs,omitempty"`
 	//
 	//
-	//// client ca cert id
-	//ClientCaTlsContainerRef string `json:"client_ca_tls_container_ref,omitempty"`
+	// client ca cert id
+	ClientCaTlsContainerRef string `json:"client_ca_tls_container_ref,omitempty"`
 }
 
 // ToListenerCreateMap builds a request body from CreateOpts.
@@ -163,17 +168,32 @@ type UpdateOpts struct {
 	ConnLimit *int `json:"connection_limit,omitempty"`
 
 	// related pool id
-	DefaultPoolID string `json:"default_pool_id,omitempty"`
+	DefaultPoolID *string `json:"default_pool_id,omitempty"`
 
 	// default container cert id
-	DefaultTlsContainerRef string `json:"default_tls_container_ref,omitempty"`
+	DefaultTlsContainerRef *string `json:"default_tls_container_ref,omitempty"`
 	// client container cert id
-	ClientCaTlsContainerRef string `json:"client_ca_tls_container_ref,omitempty"`
+	ClientCaTlsContainerRef *string `json:"client_ca_tls_container_ref,omitempty"`
+
+	// A list of references to TLS secrets.
+	SniContainerRefs *[]string `json:"sni_container_refs,omitempty"`
 }
 
 // ToListenerUpdateMap builds a request body from UpdateOpts.
 func (opts UpdateOpts) ToListenerUpdateMap() (map[string]interface{}, error) {
-	return gophercloud.BuildRequestBody(opts, "listener")
+	b,err := gophercloud.BuildRequestBody(opts, "listener")
+	if err != nil{
+		return nil,err
+	}
+
+	listener := b["listener"].(map[string]interface{})
+	for _,v := range StringToJsonNull{
+		if listener[v] == ""{
+			listener[v] = nil
+		}
+	}
+
+	return b,err
 }
 
 // Update is an operation which modifies the attributes of the specified

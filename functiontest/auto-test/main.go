@@ -84,12 +84,12 @@ func TestIAM() (*gophercloud.ProviderClient, error) {
 /************ Test AKSK **************/
 func TestAKSK() (*gophercloud.ProviderClient, error) {
 	akskOpts := aksk.AKSKOptions{
-		IdentityEndpoint: "https://iam.cn-north-1.myhwclouds.com/v3",
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
 		ProjectID:        "128a7bf965154373a7b73c89eb6b65aa",
 		AccessKey:        "ETILDMOHPYAP0V0OREKD",
 		SecretKey:        "O36HHeJ4Ol3VQbXWPcRUvDhF6iYyCsValpsMJSkU",
 		Domain:           "",
-		Region:           "cn-north-1",
+		Region:           "xxx",
 	}
 
 	return openstack.AuthenticatedClient(akskOpts)

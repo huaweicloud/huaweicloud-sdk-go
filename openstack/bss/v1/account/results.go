@@ -24,7 +24,7 @@ type ResourceDaily struct {
 
 type DailyRecord struct {
 
-	//Account type 1: HUAWEI cloud account 2: partner funding account
+	//Account type 1: cloud account 2: partner funding account
 	Type string `json:"type"`
 
 	//BpID
