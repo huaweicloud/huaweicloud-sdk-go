@@ -51,7 +51,7 @@ func main() {
 
 
 func PolicyCreate(sc *gophercloud.ServiceClient) (id string) {
-
+	adminStateUp:=true
 	opts:=policies.CreateOpts{
 		RedirectPoolID:"13a887d0-cce3-4d2a-8961-7ad855d054c9",
 		ListenerID:"bf392d78-3783-4d8d-9ec1-621e606e6074",
@@ -59,7 +59,7 @@ func PolicyCreate(sc *gophercloud.ServiceClient) (id string) {
 		Name:"asd",
 		TenantID:"601240b9c5c94059b63d484c92cfe308",
 		Description:"create test",
-		AdminStateUp:true,
+		AdminStateUp:&adminStateUp,
 		Position:50,
 	}
 

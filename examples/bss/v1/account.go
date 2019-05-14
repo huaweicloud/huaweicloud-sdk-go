@@ -35,10 +35,22 @@ func main() {
 		return
 	}
 
+	startTime := "2018-06-01"
+	endTime := "2018-06-30"
+
+	ListResourceDailyAll(sc, startTime, endTime)
+
+	customerId := ""
+	pageNo := 1
+	pageSize := 100
+	ListResourceDetailPage(sc, customerId, pageNo, pageSize)
+}
+
+func ListResourceDailyAll(client *gophercloud.ServiceClient, startTime string, endTime string) {
 	//初始化查询参数
 	reqTmp := account.ResourceDailyOpts{
-		StartTime:           "2018-06-01",
-		EndTime:             "2018-06-30",
+		StartTime:           startTime,
+		EndTime:             endTime,
 		PayMethod:           "0",
 		CloudServiceType:    "hws.service.type.ebs",
 		RegionCode:          "cn-xianhz-1",
@@ -47,7 +59,7 @@ func main() {
 	}
 
 	//根据查询参数获取消费汇总列表
-	rspTmp, err := account.ListResourceDaily(sc, reqTmp)
+	rspTmp, err := account.ListResourceDaily(client, reqTmp)
 	if err != nil {
 		fmt.Println("err:", err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -56,6 +68,7 @@ func main() {
 		}
 		return
 	}
+
 	//打印返回参数，如currency，totalRecord，totalAmount，dailyRecords等
 	fmt.Println("Succeed to get the ResourceDaily List!")
 	fmt.Println("totalRecord:", rspTmp.TotalRecord)

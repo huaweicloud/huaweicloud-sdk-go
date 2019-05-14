@@ -9,6 +9,7 @@ import (
 	v1 "github.com/gophercloud/gophercloud/openstack/blockstorage/v1/volumes"
 	"github.com/gophercloud/gophercloud/openstack/blockstorage/v2/volumes"
 	v3 "github.com/gophercloud/gophercloud/openstack/blockstorage/v3/volumes"
+	"encoding/json"
 )
 
 func main() {
@@ -32,6 +33,7 @@ func main() {
 
 	TestGetVolumes(sc)
 
+	TestGetQuotaSet(sc)
 	fmt.Println("main end...")
 }
 
@@ -50,7 +52,8 @@ func TestGetVolumes(sc *gophercloud.ServiceClient) {
 }
 
 func TestGetQuotaSet(sc *gophercloud.ServiceClient) {
-	qs, err := volumes.GetQuotaSet(sc, "054efa2069a64785a196efe56c05ee74")
+	var vLimit, vInUse, gLimit, gInUse int
+	qs, err := volumes.GetQuotaSet(sc, "128a7bf965154373a7b73c89eb6b65aa")
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -58,13 +61,58 @@ func TestGetQuotaSet(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
+	var bt volumes.BaseType
+
+	for k, v := range qs.QuoSet {
+		if k == "gigabytes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return
+				}
+				gLimit = bt.Limit
+				gInUse = bt.InUse
+			}
+		}
+
+		if k == "volumes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return
+				}
+				vLimit = bt.Limit
+				vInUse = bt.InUse
+			}
+		}
+
+	}
+
+	fmt.Println(vLimit, vInUse, gLimit, gInUse)
+	
+	for k, v := range qs.QuoSet {
+		fmt.Println("type is :", k)
+		if data, ok := v.(map[string]interface{}); ok {
+			for b1, b2 := range data {
+				fmt.Println(b1, b2)
+			}
+		} else {
+			fmt.Println("value is ", v)
+		}
+	}
 
 	fmt.Println("get quota set success!")
-	fmt.Println("id:", qs.QuoSet.Id)
-	fmt.Println("volumes:", qs.QuoSet.Volumes)
-	fmt.Println("gigabytes:", qs.QuoSet.Gigabytes)
-	fmt.Println("gigabytes.limit:", qs.QuoSet.Gigabytes["limit"])
-	fmt.Println("gigabytes.in_use:", qs.QuoSet.Gigabytes["in_use"])
+
 }
 
 func TestListVolumes(provider *gophercloud.ProviderClient) {

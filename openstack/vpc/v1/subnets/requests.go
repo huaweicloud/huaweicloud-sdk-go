@@ -18,9 +18,6 @@ type ListOpts struct {
 	//Specifies that the VPC ID is used as the filtering condition.
 	VpcID string `q:"vpc_id"`
 
-	//Specifies the tenant ID of the operator.
-	TenantID string `q:"tenant_id"`
-
 	//Specifies the number of records returned on each page.
 	//The value ranges from 0 to intmax.
 	Limit int `q:"limit"`
@@ -43,8 +40,8 @@ func (opts ListOpts) ToSubnetListQuery() (string, error) {
 // Default policy settings return only those subnets that are owned by the tenant
 // who submits the request, unless the request is submitted by a user with
 // administrative rights.
-func List(c *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
-	url := listURL(c)
+func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := listURL(client)
 	if opts != nil {
 		query, err := opts.ToSubnetListQuery()
 		if err != nil {
@@ -52,7 +49,7 @@ func List(c *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 		}
 		url += query
 	}
-	return pagination.NewPager(c, url, func(r pagination.PageResult) pagination.Page {
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
 		return SubnetPage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
@@ -175,6 +172,6 @@ func Update(client *gophercloud.ServiceClient, vpcId string, subnetId string, op
 		return
 	}
 
-	_, r.Err = client.Put(UpdateURL(client, vpcId, subnetId), b, &r.Body, &gophercloud.RequestOpts{OkCodes:[]int{200}})
+	_, r.Err = client.Put(UpdateURL(client, vpcId, subnetId), b, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
 	return
 }

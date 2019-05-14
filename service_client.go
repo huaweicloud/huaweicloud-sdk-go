@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 )
 
 // ServiceClient stores details required to interact with a specific service API implemented by a provider.
@@ -28,6 +29,22 @@ type ServiceClient struct {
 
 	// The microversion of the service to use. Set this to use a particular microversion.
 	Microversion string
+
+	lock         sync.Mutex
+}
+
+func (client *ServiceClient) SetMicroversion(microversion string) {
+	client.lock.Lock()
+	client.Microversion=microversion
+	client.lock.Unlock()
+	return
+}
+
+func (client *ServiceClient) UnsetMicroversion() {
+	client.lock.Lock()
+	client.Microversion=""
+	client.lock.Unlock()
+	return
 }
 
 // ResourceBaseURL returns the base URL of any resources used by this service. It MUST end with a /.
@@ -60,6 +77,17 @@ func (client *ServiceClient) initReqOpts(url string, JSONBody interface{}, JSONR
 
 	if client.Microversion != "" {
 		client.setMicroversionHeader(opts)
+	}
+
+	if &client.ProviderClient.AKSKOptions != nil {
+		if client.ProviderClient.AKSKOptions.SecurityToken != "" {
+			opts.MoreHeaders["X-Security-Token"] = client.ProviderClient.AKSKOptions.SecurityToken
+		}
+		if client.ProviderClient.AKSKOptions.ProjectID != "" {
+			opts.MoreHeaders["X-Project-Id"] = client.ProjectID
+		}else if client.ProviderClient.AKSKOptions.DomainID != "" {
+			opts.MoreHeaders["X-Domain-Id"] = client.DomainID
+		}
 	}
 }
 
@@ -108,6 +136,15 @@ func (client *ServiceClient) Delete(url string, opts *RequestOpts) (*http.Respon
 	return client.Request("DELETE", url, opts)
 }
 
+// Head calls `Request` with the "HEAD" HTTP verb.
+func (client *ServiceClient) Head(url string, opts *RequestOpts) (*http.Response, error) {
+	if opts == nil {
+		opts = new(RequestOpts)
+	}
+	client.initReqOpts(url, nil, nil, opts)
+	return client.Request("HEAD", url, opts)
+}
+
 func (client *ServiceClient) setMicroversionHeader(opts *RequestOpts) {
 
 	switch client.Type {
@@ -116,12 +153,12 @@ func (client *ServiceClient) setMicroversionHeader(opts *RequestOpts) {
 		if client.Microversion<= "2.26"{
 			opts.MoreHeaders["X-OpenStack-Nova-API-Version"] = client.Microversion
 		}else {
-			opts.MoreHeaders["OpenStack-API-Version"] = client.Microversion
+			opts.MoreHeaders["OpenStack-API-Version"] = client.Type + " " + client.Microversion
 		}
-	case "sharev2":
-		opts.MoreHeaders["X-OpenStack-Manila-API-Version"] = client.Microversion
-	case "volume":
-		opts.MoreHeaders["X-OpenStack-Volume-API-Version"] = client.Microversion
+	//case "sharev2":
+	//	opts.MoreHeaders["X-OpenStack-Manila-API-Version"] = client.Microversion
+	//case "volume":
+	//	opts.MoreHeaders["X-OpenStack-Volume-API-Version"] = client.Microversion
 	}
 	//
 	//if client.Type != "" {

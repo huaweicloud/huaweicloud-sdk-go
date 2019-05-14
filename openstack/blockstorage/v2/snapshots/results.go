@@ -36,6 +36,12 @@ type Snapshot struct {
 
 	// User-defined key-value pairs.
 	Metadata map[string]string `json:"metadata"`
+
+	// ID of Project
+	ProjectID string `json:"os-extended-snapshot-attributes:project_id"`
+
+	// Progress of snapshot
+	Progress string `json:"os-extended-snapshot-attributes:progress"`
 }
 
 // CreateResult contains the response body and error from a Create request.
@@ -50,6 +56,43 @@ type GetResult struct {
 
 // DeleteResult contains the response body and error from a Delete request.
 type DeleteResult struct {
+	gophercloud.ErrResult
+}
+
+type UpdateResult struct {
+	commonResult
+}
+
+// MetadataResult contains the response body and error from a Metadata request.
+type MetadataResult struct {
+	commonResult
+}
+
+// ExtractMetadata returns the metadata from a response from Metadata requests.
+func (r MetadataResult) ExtractMetadata() (map[string]interface{}, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	m := r.Body.(map[string]interface{})["metadata"]
+	return m.(map[string]interface{}), nil
+}
+
+
+type MetadataKeyResult struct {
+	commonResult
+}
+
+func (r MetadataKeyResult) ExtractMetadataKey() (map[string]interface{}, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	m := r.Body.(map[string]interface{})["meta"]
+	return m.(map[string]interface{}), nil
+}
+
+
+// DeleteMetadataResult contains the response body and error from a DeleteMetadata request.
+type DeleteMetadataKeyResult struct {
 	gophercloud.ErrResult
 }
 

@@ -60,6 +60,9 @@ type ResourceInstance struct {
 
 	//资源过期时间。
 	ExpireTime string `json:"expire_time"`
+
+	//下一次扣费策略
+	NextOperationPolicy int `json:"next_operation_policy"`
 }
 
 type commonResult struct {

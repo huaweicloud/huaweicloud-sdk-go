@@ -10,7 +10,7 @@ type UpdateOpts struct {
 }
 type Bandwidth struct {
 	Name string `json:"name,omitempty"`
-	Size int   `json:"size,omitempty"`
+	Size int    `json:"size,omitempty"`
 }
 type ExtendParam struct {
 	IsAutoPay string `json:"is_auto_pay,omitempty"`
@@ -18,6 +18,122 @@ type ExtendParam struct {
 
 func (opts UpdateOpts) ToBandWidthUpdateMap() (map[string]interface{}, error) {
 	return gophercloud.BuildRequestBody(opts, "")
+}
+
+type CreateOptsBuilder interface {
+	ToBandWidthCreateMap() (map[string]interface{}, error)
+}
+
+type CreateOpts struct {
+	Name                string `json:"name" required:"true"`
+	Size                *int   `json:"size" required:"true"`
+	EnterpriseProjectId string `json:"EnterpriseProjectId,omitempty"`
+}
+
+func (opts CreateOpts) ToBandWidthCreateMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "bandwidth")
+}
+
+func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+	b, err := opts.ToBandWidthCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(PostURL(client), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
+type BatchCreateOptsBuilder interface {
+	ToBandWidthBatchCreateMap() (map[string]interface{}, error)
+}
+
+type BatchCreateOpts struct {
+	Name  string `json:"name" required:"true"`
+	Size  *int   `json:"size" required:"true"`
+	Count *int   `json:"count" required:"true"`
+}
+
+func (opts BatchCreateOpts) ToBandWidthBatchCreateMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "bandwidth")
+}
+
+type BandWidthInsertOptsBuilder interface {
+	ToBandWidthInsertMap() (map[string]interface{}, error)
+}
+
+type BandWidthRemoveOptsBuilder interface {
+	ToBandWidthBatchRemoveMap() (map[string]interface{}, error)
+}
+
+type BandWidthInsertOpts struct {
+	PublicipInfo []PublicIpInfoID `json:"publicip_info" required:"true"`
+}
+
+func (opts BandWidthInsertOpts) ToBandWidthInsertMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "bandwidth")
+}
+
+type BandWidthRemoveOpts struct {
+	ChargeMode   string           `json:"charge_mode" required:"true"`
+	Size         *int             `json:"size" required:"true"`
+	PublicipInfo []PublicIpInfoID `json:"publicip_info" required:"true"`
+}
+
+func (opts BandWidthRemoveOpts) ToBandWidthBatchRemoveMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "bandwidth")
+}
+
+type PublicIpInfoID struct {
+	PublicIPID string `json:"publicip_id" required:"true"`
+}
+
+func Insert(client *gophercloud.ServiceClient, bandwidthID string, opts BandWidthInsertOptsBuilder) (r CreateResult) {
+	b, err := opts.ToBandWidthInsertMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(InsertURL(client, bandwidthID), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
+func Remove(client *gophercloud.ServiceClient, bandwidthID string, opts BandWidthRemoveOptsBuilder) (r DeleteResult) {
+	b, err := opts.ToBandWidthBatchRemoveMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(RemoveURL(client, bandwidthID), b, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{200, 204},
+	})
+	return
+}
+
+func BatchCreate(client *gophercloud.ServiceClient, opts BatchCreateOptsBuilder) (r BatchCreateResult) {
+	b, err := opts.ToBandWidthBatchCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(BatchPostURL(client), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200, 201},
+	})
+	return
+}
+
+func Delete(client *gophercloud.ServiceClient, bandwidthID string) (r DeleteResult) {
+	url := DeleteURL(client, bandwidthID)
+	_, r.Err = client.Delete(url, nil)
+	return
 }
 
 func Update(c *gophercloud.ServiceClient, bandwidthID string, opts UpdateOpts) (interface{}, error) {
@@ -31,7 +147,7 @@ func Update(c *gophercloud.ServiceClient, bandwidthID string, opts UpdateOpts) (
 
 	_, r.Err = c.Put(UpdateURL(c, bandwidthID), body, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
 
-	if opts.Bandwidth.Size == size ||opts.Bandwidth.Size == 0{
+	if opts.Bandwidth.Size == size || opts.Bandwidth.Size == 0 {
 		// extract bandwidth
 		return r.Extract()
 	}

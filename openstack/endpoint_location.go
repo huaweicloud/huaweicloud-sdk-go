@@ -10,6 +10,7 @@ import (
 
 	"errors"
 	"strings"
+	"os"
 )
 
 // service have same endpoint address in different location
@@ -23,10 +24,13 @@ var endpointSchemaList = map[string]string{
 	"VOLUMEV2": "https://evs.%(region)s.%(domain)s/v2/%(projectID)s/",
 	//"ANTIDDOS":      "https://antiddos.%(region)s.%(domain)s/",
 	//"BSS":           "https://bss.%(region)s.%(domain)s/",
-	"BSS":   "https://bss.cn-north-1.%(domain)s/",
-	"VPC":   "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
-	"CESV1": "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
-	"VPCV2.0":   "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
+	"BSS":     "https://bss.cn-north-1.%(domain)s/",
+	"VPC":     "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
+	"CESV1":   "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
+	"VPCV2.0": "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
+	"ASV1":    "https://as.%(region)s.%(domain)s/autoscaling-api/v1/%(projectID)s/",
+	"ASV2":    "https://as.%(region)s.%(domain)s/autoscaling-api/v2/%(projectID)s/",
+	//"DNS": "https://dns.%(region)s.%(domain)s/",
 }
 
 /*
@@ -106,6 +110,16 @@ available on your OpenStack deployment.
 func V3EndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts) (string, error) {
 	// Extract Endpoints from the catalog entries that match the requested Type, Interface,
 	// Name if provided, and Region if provided.
+
+	if opts.Type != "" {
+		ss := strings.Replace(opts.Type, "-", "_", -1)
+		key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
+		endpointFromEnv := os.Getenv(key)
+		if endpointFromEnv != "" {
+			return endpointFromEnv, nil
+		}
+	}
+
 	var endpoints = make([]tokens3.Endpoint, 0, 1)
 	for _, entry := range catalog.Entries {
 		if (entry.Type == opts.Type) && (opts.Name == "" || entry.Name == opts.Name) {
@@ -159,10 +173,24 @@ func V3EndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpt
 */
 
 func GetEndpointURLForAKSKAuth(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts, akskOptions aksk.AKSKOptions) (string, error) {
+
+	if akskOptions.Cloud != "" {
+		akskOptions.Domain = akskOptions.Cloud
+	}
+
+	if opts.Type != "" {
+		ss := strings.Replace(opts.Type, "-", "_", -1)
+		key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
+		endpointFromEnv := os.Getenv(key)
+		if endpointFromEnv != "" {
+			return endpointFromEnv, nil
+		}
+	}
+
 	endpoint, err := V3EndpointURL(catalog, opts)
 	if err != nil || endpoint == "" {
 		if akskOptions.Domain == "" {
-			return "", errors.New("ServiceDomainName can not be empty.")
+			return "", errors.New("AKSKOptions.Cloud can not be empty.")
 		}
 
 		region := opts.Region

@@ -85,7 +85,7 @@ func TestV2EndpointNone(t *testing.T) {
 		Type:         "nope",
 		Availability: gophercloud.AvailabilityPublic,
 	})
-	expected := &gophercloud.ErrEndpointNotFound{}
+	expected := gophercloud.NewSystemCommonError(gophercloud.CE_NoEndPointInCatalogCode, gophercloud.CE_NoEndPointInCatalogMessage)
 	th.CheckEquals(t, expected.Error(), actual.Error())
 }
 
@@ -194,7 +194,7 @@ func TestV3EndpointExact(t *testing.T) {
 			Name:         "same",
 			Region:       "same",
 			Availability: availability,
-		})
+		},nil)
 		th.AssertNoErr(t, err)
 		th.CheckEquals(t, expected, actual)
 	}
@@ -204,8 +204,8 @@ func TestV3EndpointNone(t *testing.T) {
 	_, actual := openstack.V3EndpointURL(&catalog3, gophercloud.EndpointOpts{
 		Type:         "nope",
 		Availability: gophercloud.AvailabilityPublic,
-	})
-	expected := &gophercloud.ErrEndpointNotFound{}
+	},nil)
+	expected := gophercloud.NewSystemCommonError(gophercloud.CE_NoEndPointInCatalogCode, gophercloud.CE_NoEndPointInCatalogMessage)
 	th.CheckEquals(t, expected.Error(), actual.Error())
 }
 
@@ -214,7 +214,7 @@ func TestV3EndpointMultiple(t *testing.T) {
 		Type:         "same",
 		Region:       "same",
 		Availability: gophercloud.AvailabilityPublic,
-	})
+	},nil)
 	if !strings.HasPrefix(err.Error(), "Discovered 2 matching endpoints:") {
 		t.Errorf("Received unexpected error: %v", err)
 	}
@@ -226,6 +226,6 @@ func TestV3EndpointBadAvailability(t *testing.T) {
 		Name:         "same",
 		Region:       "same",
 		Availability: "wat",
-	})
+	},nil)
 	th.CheckEquals(t, "Unexpected availability in endpoint query: wat", err.Error())
 }

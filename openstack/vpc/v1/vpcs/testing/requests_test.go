@@ -53,15 +53,15 @@ func TestList(t *testing.T) {
 		Limit: 2,
 	}).AllPages()
 	th.AssertNoErr(t, err)
-	vpcs,err :=vpcs.ExtractVpcs(allpages)
+	data,err :=vpcs.ExtractVpcs(allpages)
 	th.AssertNoErr(t, err)
-	th.CheckDeepEquals(t, ListResponse, vpcs)
+	th.CheckDeepEquals(t, ListResponse, data)
 }
 
 func TestDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	HandleListSuccessfully(t)
+	HandleDeleteSuccessfully(t)
 
 	vpcs.Delete(client.ServiceClient(), "7ffddb5f-6731-43d8-9476-1444aaa40bc0")
 }

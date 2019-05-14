@@ -130,6 +130,9 @@ type PublicIPUpdateResp struct {
 
 	// Specifies the bandwidth size.
 	BandwidthSize int `json:"bandwidth_size"`
+
+	// Specifies the bandwidth ID of the elastic IP address.
+	BandwidthId string `json:"bandwidth_id"`
 }
 type commonResult struct {
 	gophercloud.Result
@@ -164,7 +167,7 @@ type PublicIPPage struct {
 }
 
 func (r PublicIPPage) NextPageURL() (string, error) {
-	publicIps,err:= ExtractPublicIPs(r)
+	publicIps, err := ExtractPublicIPs(r)
 	if err != nil {
 		return "", err
 	}
@@ -172,17 +175,17 @@ func (r PublicIPPage) NextPageURL() (string, error) {
 }
 
 func ExtractPublicIPs(r pagination.Page) ([]PublicIP, error) {
-	var s struct{
+	var s struct {
 		PublicIPs []PublicIP `json:"publicips"`
 	}
-	err:=r.(PublicIPPage).ExtractInto(&s)
+	err := r.(PublicIPPage).ExtractInto(&s)
 	return s.PublicIPs, err
 }
 
 // IsEmpty checks whether a NetworkPage struct is empty.
 func (r PublicIPPage) IsEmpty() (bool, error) {
-	s,err:= ExtractPublicIPs(r)
-	return len(s)==0, err
+	s, err := ExtractPublicIPs(r)
+	return len(s) == 0, err
 }
 
 type UpdateResult struct {

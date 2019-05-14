@@ -22,8 +22,13 @@ type AKSKOptions struct {
 	// cloud service domain, example: myhwclouds.com
 	Domain string
 
+	//Cloud domain name, example: myhwclouds.com
+	Cloud string
+
 	AccessKey string //Access Key
 	SecretKey string //Secret key
+
+	SecurityToken string
 }
 
 // Implements the method of AuthOptionsProvider

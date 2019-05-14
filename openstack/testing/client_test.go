@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-
+	tokenAuth "github.com/gophercloud/gophercloud/auth/token"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	th "github.com/gophercloud/gophercloud/testhelper"
@@ -48,7 +48,7 @@ func TestAuthenticatedClientV3(t *testing.T) {
 		fmt.Fprintf(w, `{ "token": { "expires_at": "2013-02-02T18:30:59.000000Z" } }`)
 	})
 
-	options := gophercloud.AuthOptions{
+	options := tokenAuth.TokenOptions{
 		Username:         "me",
 		Password:         "secret",
 		DomainName:       "default",
@@ -153,7 +153,7 @@ func TestAuthenticatedClientV2(t *testing.T) {
 		`)
 	})
 
-	options := gophercloud.AuthOptions{
+	options := tokenAuth.TokenOptions{
 		Username:         "me",
 		Password:         "secret",
 		IdentityEndpoint: th.Endpoint(),
@@ -277,7 +277,7 @@ func TestIdentityAdminV3Client(t *testing.T) {
 	`)
 	})
 
-	options := gophercloud.AuthOptions{
+	options := tokenAuth.TokenOptions{
 		Username:         "me",
 		Password:         "secret",
 		DomainID:         "12345",
@@ -293,7 +293,7 @@ func TestIdentityAdminV3Client(t *testing.T) {
 }
 
 func testAuthenticatedClientFails(t *testing.T, endpoint string) {
-	options := gophercloud.AuthOptions{
+	options := tokenAuth.TokenOptions{
 		Username:         "me",
 		Password:         "secret",
 		DomainName:       "default",

@@ -13,6 +13,7 @@ import (
 	//"github.com/gophercloud/gophercloud/openstack/ecs/v1/cloudserversext"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/cloudservers"
 	"fmt"
+	"encoding/json"
 )
 
 func CreateServer(client *gophercloud.ServiceClient, opts servers.CreateOptsBuilder) (r servers.CreateResult) {
@@ -376,19 +377,55 @@ func checkVolumes(client *gophercloud.ServiceClient, opts bootwithscheduler.Crea
 	}
 
 	var vLimit, vInUse, gLimit, gInUse int
-	if _, ok := qs.QuoSet.Volumes["limit"]; ok {
-		vLimit = qs.QuoSet.Volumes["limit"]
-	}
-	if _, ok := qs.QuoSet.Volumes["in_use"]; ok {
-		vInUse = qs.QuoSet.Volumes["in_use"]
-	}
-	if _, ok := qs.QuoSet.Gigabytes["limit"]; ok {
-		gLimit = qs.QuoSet.Gigabytes["limit"]
-	}
-	if _, ok := qs.QuoSet.Gigabytes["in_use"]; ok {
-		gInUse = qs.QuoSet.Gigabytes["in_use"]
-	}
 
+	//if _, ok := qs.QuoSet.Volumes["limit"]; ok {
+	//	vLimit = qs.QuoSet.Volumes["limit"]
+	//}
+	//if _, ok := qs.QuoSet.Volumes["in_use"]; ok {
+	//	vInUse = qs.QuoSet.Volumes["in_use"]
+	//}
+	//if _, ok := qs.QuoSet.Gigabytes["limit"]; ok {
+	//	gLimit = qs.QuoSet.Gigabytes["limit"]
+	//}
+	//if _, ok := qs.QuoSet.Gigabytes["in_use"]; ok {
+	//	gInUse = qs.QuoSet.Gigabytes["in_use"]
+	//}
+	var bt volumes.BaseType
+
+	for k, v := range qs.QuoSet {
+		if k == "gigabytes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return err
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return err
+				}
+				gLimit = bt.Limit
+				gInUse = bt.InUse
+			}
+		}
+
+		if k == "volumes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return err
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return err
+				}
+				vLimit = bt.Limit
+				vInUse = bt.InUse
+			}
+		}
+
+	}
 	//	fmt.Println("vNeed:", vNeed)
 	//	fmt.Println("gNeed:", gNeed)
 	//	fmt.Println("vLimit:", vLimit)

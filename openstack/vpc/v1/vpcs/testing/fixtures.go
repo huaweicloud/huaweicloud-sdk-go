@@ -142,7 +142,10 @@ func HandleListSuccessfully(t *testing.T) {
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
 		w.Header().Add("Content-Type", "application/json")
-		r.ParseForm()
+		err := r.ParseForm()
+		if err != nil {
+			t.Fatalf("parse form failed: [%s]", r.Form)
+		}
 		marker := r.Form.Get("marker")
 		switch marker {
 		case "":

@@ -93,6 +93,11 @@ type ListOpts struct {
 
 	//Returns the number of results limit, an integer greater than 0. The default is 1000.
 	Limit int `q:"limit"`
+
+	AvailabilityZone string `q:"availability_zone"`
+
+	// SnapshotID will filter by a specified volume ID.
+	//SnapshotID string `q:"volume_id"`
 }
 
 // ToSnapshotListQuery formats a ListOpts into a query string.
@@ -145,9 +150,126 @@ func UpdateMetadata(client *gophercloud.ServiceClient, id string, opts UpdateMet
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Put(updateMetadataURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
+	_, r.Err = client.Put(metadataURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
 		OkCodes: []int{200},
 	})
+	return
+}
+
+func Detail(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := detailURL(client)
+	if opts != nil {
+		query, err := opts.ToSnapshotListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return SnapshotPage{pagination.SinglePageBase(r)}
+	})
+}
+
+type UpdateOptsBuilder interface {
+	ToSnapshotUpdateMap() (map[string]interface{}, error)
+}
+
+type UpdateOpts struct {
+	Name               string `json:"name,omitempty"`
+	Description        string `json:"description,omitempty"`
+	DisplayName        string `json:"display_name,omitempty"`
+	DisplayDescription string `json:"display_description,omitempty"`
+}
+
+func (opts UpdateOpts) ToSnapshotUpdateMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "snapshot")
+}
+
+func Update(client *gophercloud.ServiceClient, id string, opts UpdateOptsBuilder) (r UpdateResult) {
+	b, err := opts.ToSnapshotUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Put(updateURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
+
+// MetadataOptsBuilder allows extensions to add additional parameters to
+// the meatadata requests.
+type MetadataOptsBuilder interface {
+	ToSnapshotMetadataMap() (map[string]interface{}, error)
+}
+
+// MetadataOpts contain options for creating or updating an existing Voulme. This
+// object is passed to the volumes create and update function. For more information
+// about the parameters, see the Snapshot object.
+type MetadataOpts struct {
+	Metadata map[string]string `json:"metadata,omitempty"`
+}
+
+// ToSnapshotMetadataMap assembles a request body based on the contents of
+// an MetadataOpts.
+func (opts MetadataOpts) ToSnapshotMetadataMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "")
+}
+
+// CreateMetadata create metadata for Snapshot.
+func CreateMetadata(client *gophercloud.ServiceClient, id string, opts MetadataOptsBuilder) (r MetadataResult) {
+	b, err := opts.ToSnapshotMetadataMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(metadataURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
+
+// GetMetadata returns exist metadata of Snapshot.
+func GetMetadata(client *gophercloud.ServiceClient, id string) (r MetadataResult) {
+	_, r.Err = client.Get(metadataURL(client, id), &r.Body, nil)
+	return
+}
+
+type MetadataKeyOptsBuilder interface {
+	ToSnapshotMetadataKeyMap() (map[string]interface{}, error)
+}
+
+type MetadataKeyOpts struct {
+	Metadata map[string]string `json:"meta,omitempty"`
+}
+
+func (opts MetadataKeyOpts) ToSnapshotMetadataKeyMap() (map[string]interface{}, error) {
+	return gophercloud.BuildRequestBody(opts, "")
+}
+
+// GetMetadataKey return specific key value in metadata.
+func GetMetadataKey(client *gophercloud.ServiceClient, id, key string) (r MetadataKeyResult) {
+	_, r.Err = client.Get(metadataKeyURL(client, id, key), &r.Body, nil)
+	return
+}
+
+// UpdateMetadataKey update sepcific key to the given map key value.
+func UpdateMetadataKey(client *gophercloud.ServiceClient, id, key string, opts MetadataKeyOptsBuilder) (r MetadataKeyResult) {
+	b, err := opts.ToSnapshotMetadataKeyMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Put(metadataKeyURL(client, id, key), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
+
+// DeleteMetadataKey delete specific key in metadata
+func DeleteMetadataKey(client *gophercloud.ServiceClient, id, key string) (r DeleteMetadataKeyResult) {
+	_, r.Err = client.Delete(metadataKeyURL(client, id, key), &gophercloud.RequestOpts{OkCodes: []int{200}}, )
 	return
 }
 

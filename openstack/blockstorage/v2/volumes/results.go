@@ -137,6 +137,41 @@ func ExtractVolumes(r pagination.Page) ([]Volume, error) {
 	return s, err
 }
 
+// VolumePage is a pagination.pager that is returned from a call to the List function.
+type VolumeListPage struct {
+	pagination.SinglePageBase
+}
+
+// IsEmpty returns true if a ListResult contains no Volumes.
+func (r VolumeListPage) IsEmpty() (bool, error) {
+	volumes, err := ExtractVolumes(r)
+	return len(volumes) == 0, err
+}
+
+type VolumeList struct {
+	ID    string        `json:"id"`
+	Links []VolumeLinks `json:"links"`
+	Name  string        `json:"name"`
+}
+
+type VolumeLinks struct {
+	Href string `json:"href"`
+	Rel  string `json:"rel"`
+}
+
+// VolumeListBrief define Volumes List Brief response.
+type VolumeListBrief struct {
+	VolumeList  []VolumeList  `json:"volumes"`
+	VolumeLinks []VolumeLinks `json:"volumes_links"`
+}
+
+// ExtractVolumesBrief extracts and returns Volumes. It is used while iterating over a volumes.List call.
+func ExtractVolumesBrief(r pagination.Page) (VolumeListBrief, error) {
+	var s VolumeListBrief
+	err := (r.(VolumeListPage)).ExtractInto(&s)
+	return s, err
+}
+
 type commonResult struct {
 	gophercloud.Result
 }
@@ -176,10 +211,18 @@ type DeleteResult struct {
 	gophercloud.ErrResult
 }
 
-/*************** 自研 ********************/
+// QuotaSetInfo result contains the response body as map[string]interface{} type from a Get request.
 type QuotaSetInfo struct {
 	//查询请求返回的配额信息
-	QuoSet QuotaSet `json:"quota_set"`
+	QuoSet map[string]interface{} `json:"quota_set"`
+}
+
+//配额基本信息
+type BaseType struct {
+	Reserved  int `json:"reserved"`
+	Allocated int `json:"allocated"`
+	Limit     int `json:"limit"`
+	InUse     int `json:"in_use"`
 }
 
 //查询请求返回的配额信息
@@ -243,4 +286,90 @@ func (r commonResult) ExtractIntoQuotaSet(to interface{}) error {
 	err = json.Unmarshal(b, to)
 
 	return err
+}
+
+// MetadataResult contains the response body and error from a Metadata request.
+type MetadataResult struct {
+	commonResult
+}
+
+// ExtractMetadata returns the metadata from a response from Metadata requests.
+func (r MetadataResult) ExtractMetadata() (map[string]interface{}, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	m := r.Body.(map[string]interface{})["metadata"]
+	return m.(map[string]interface{}), nil
+}
+
+// ExtractMetadata returns the metadata from a response from Metadata requests.
+func (r MetadataResult) ExtractMeta() (map[string]interface{}, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	m := r.Body.(map[string]interface{})["meta"]
+	return m.(map[string]interface{}), nil
+}
+
+// DeleteMetadataResult contains the response body and error from a DeleteMetadata request.
+type DeleteMetadataKeyResult struct {
+	gophercloud.ErrResult
+}
+
+// ExtendSizeResult contains the response body and error from an ExtendSize request.
+type ExtendSizeResult struct {
+	gophercloud.ErrResult
+}
+
+// SetBootableResult contains the response body and error from an SetBootable request
+type SetBootableResult struct {
+	gophercloud.ErrResult
+}
+
+// SetReadOnlyResult contains the response body and error from an SetReadOnly request
+type SetReadOnlyResult struct {
+	gophercloud.ErrResult
+}
+
+type ExportVolumesResult struct {
+	gophercloud.Result
+}
+
+type OsVolumeUploadImage struct {
+	Status             string     `json:"status"`
+	Size               int        `json:"size"`
+	ID                 string     `json:"id"`
+	ImageID            string     `json:"image_id"`
+	ImageName          string     `json:"image_name"`
+	VolumeType         VolumeType `json:"volume_type"`
+	ContainerFormat    string     `json:"container_format"`
+	DiskFormat         string     `json:"disk_format"`
+	DisplayDescription string     `json:"display_description"`
+	UpdatedAt          string     `json:"updated_at"`
+}
+
+type VolumeType struct {
+	Description string    `json:"description"`
+	Deleted     bool      `json:"deleted"`
+	CreatedAt   string    `json:"created_at"`
+	UpdatedAt   string    `json:"updated_at"`
+	ExtraSpecs  ExtraSpec `json:"extra_specs"`
+	IsPublic    bool      `json:"is_public"`
+	DeletedAt   string    `json:"deleted_at"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+}
+
+type ExtraSpec struct {
+	VolumeBackendName       string `json:"volume_backend_name"`
+	AvailabilityZone        string `json:"XX:availability_zone"`
+	SoldOutAvailabilityZone string `json:"os-vendor-extended:sold_out_availability_zones"`
+}
+
+func (r ExportVolumesResult) Extract() (*OsVolumeUploadImage, error) {
+	var s struct {
+		Data OsVolumeUploadImage `json:"os-volume_upload_image"`
+	}
+	err := r.ExtractInto(&s)
+	return &s.Data, err
 }

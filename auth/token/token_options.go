@@ -409,26 +409,23 @@ func (opts *TokenOptions) ToTokenV3ScopeMap() (map[string]interface{}, error) {
 				"id": &scope.ProjectID,
 			},
 		}, nil
-	} else if scope.DomainID != "" {
-		// DomainID provided. ProjectID, ProjectName, and DomainName may not be provided.
-		if scope.DomainName != "" {
-			//return nil, ErrScopeDomainIDOrDomainName{}
+	}
 
-			err := gophercloud.NewSystemCommonError("Com.2000", "You must provide exactly one of DomainID or DomainName in a Scope with ProjectName")
-			return nil, err
-		}
+	scope.DomainID = opts.DomainID
+
+	if scope.DomainID != "" {
+		// DomainID provided. ProjectID, ProjectName, and DomainName may not be provided.
+		//if scope.DomainName != "" {
+		//	//return nil, ErrScopeDomainIDOrDomainName{}
+		//
+		//	err := gophercloud.NewSystemCommonError("Com.2000", "You must provide exactly one of DomainID or DomainName in a Scope with ProjectName")
+		//	return nil, err
+		//}
 
 		// DomainID
 		return map[string]interface{}{
 			"domain": map[string]interface{}{
 				"id": &scope.DomainID,
-			},
-		}, nil
-	} else if scope.DomainName != "" {
-		// DomainName
-		return map[string]interface{}{
-			"domain": map[string]interface{}{
-				"name": &scope.DomainName,
 			},
 		}, nil
 	}

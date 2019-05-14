@@ -17,7 +17,7 @@ type PublicIPRequest struct {
 	IpAddress string `json:"ip_address,omitempty"`
 
 	//Value range: 4, 6, respectively, to create ipv4 and ipv6, when not created ipv4 by default
-	IPVersion int `json:"ip_version"`
+	IPVersion int `json:"ip_version,omitempty"`
 }
 
 type BandWidth struct {
@@ -105,6 +105,10 @@ type ListOpts struct {
 
 	//Value range: 4, 6, respectively, to create ipv4 and ipv6, when not created ipv4 by default
 	IPVersion int `json:"ip_version"`
+
+	// enterprise_project_id
+	// You can use this field to filter the elastic public IP under an enterprise project.
+	EnterpriseProjectId string `json:"enterprise_project_id"`
 }
 
 type ListOptsBuilder interface {

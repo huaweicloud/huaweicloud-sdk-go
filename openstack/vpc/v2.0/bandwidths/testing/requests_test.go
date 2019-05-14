@@ -15,6 +15,24 @@ func ServiceClient() *gophercloud.ServiceClient {
 	return sc
 }
 
+var size = 10
+
+var requestOpts2 = bandwidths.UpdateOpts{
+	Bandwidth: bandwidths.Bandwidth{
+		Name: "test",
+		Size: size,
+	},
+	ExtendParam: &bandwidths.ExtendParam{
+		IsAutoPay: "false",
+	},
+}
+
+var requestOpts1 = bandwidths.UpdateOpts{
+	Bandwidth: bandwidths.Bandwidth{
+		Name: "test",
+	},
+}
+
 func TestUpdateBandwidthSize(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()

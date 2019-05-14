@@ -19,8 +19,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/endpoints"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/services"
 	"github.com/gophercloud/gophercloud/pagination"
-	"time"
-
 )
 
 const (
@@ -31,31 +29,6 @@ const (
 	// v3 represents Keystone v3.
 	// The version can be anything from v3 to v3.x.
 	v3 = "v3"
-)
-
-const (
-	//compute v2 microVersion
-	computeMicroVersion       = "2.26"
-	objectSstoreMicroVersion  = ""
-	networkMicroVersion       = ""
-	vpcv1MicroVersion         = ""
-	vpcv2MicroVersion         = ""
-	volumeMicroVersion        = ""
-	volumev2MicroVersion      = ""
-	volumev3MicroVersion      = ""
-	sharev2MicroVersion       = ""
-	cdnMicroVersion           = ""
-	orchestrationMicroVersion = ""
-	databaseMicroVersion      = ""
-	dnsMicroVersion           = ""
-	imageMicroVersion         = ""
-	loadBalancerMicroVersion  = ""
-	ecsMicroVersion           = ""
-	ecsv1_1MicroVersion       = ""
-	ecsv2MicroVersion         = ""
-	imageSelfDevMicroVersion  = ""
-	bssMicroVersion           = ""
-	cesMicroVersion           = ""
 )
 
 /* 重写RoundTrip，实现reauth 限制3次 */
@@ -161,17 +134,17 @@ func NewClient(endpoint, domainID, projectID string, conf *gophercloud.Config) (
 		return nil, err
 	}
 
-	if domainID == "" {
-		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "domainID")
-		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-		return nil, err
-	}
-
-	if projectID == "" {
-		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "projectID")
-		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-		return nil, err
-	}
+	//if domainID == "" {
+	//	message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "domainID")
+	//	err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+	//	return nil, err
+	//}
+	//
+	//if projectID == "" {
+	//	message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "projectID")
+	//	err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+	//	return nil, err
+	//}
 
 	u.RawQuery, u.Fragment = "", ""
 
@@ -502,48 +475,7 @@ func NewIdentityV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOp
 	}, nil
 }
 
-func getMicoreVersion(client *gophercloud.ProviderClient, url string) (versionData string) {
-
-	type Links struct {
-		Rel  string `json:"rel"`
-		Href string `json:"href"`
-		Type string `json:"type,omitempty"`
-	}
-
-	type MediaTypes struct {
-		Type string `json:"type"`
-		Base string `json:"base"`
-	}
-	type version struct {
-		MinVersion string        `json:"min_version"`
-		Links      [] Links      `json:"links"`
-		ID         string        `json:"id"`
-		Updated    time.Time     `json:"updated"`
-		Version    string        `json:"version"`
-		Status     string        `json:"status"`
-		MediaTypes [] MediaTypes `json:"media-types"`
-	}
-
-	type Versions struct {
-		Versions [] version `json:"versions"`
-	}
-
-	var to Versions
-	_, err := client.Request("GET", url, &gophercloud.RequestOpts{JSONResponse: &to, OkCodes: []int{200, 201, 300}})
-
-	if err != nil {
-		return
-	}
-
-	for _, v := range to.Versions {
-		if v.Version != "" {
-			return v.Version
-		}
-	}
-	return
-}
-
-func initClientOpts(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts, clientType string, microversion string) (*gophercloud.ServiceClient, error) {
+func initClientOpts(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts, clientType string) (*gophercloud.ServiceClient, error) {
 	sc := new(gophercloud.ServiceClient)
 	eo.ApplyDefaults(clientType)
 	url, err := client.EndpointLocator(eo)
@@ -553,41 +485,25 @@ func initClientOpts(client *gophercloud.ProviderClient, eo gophercloud.EndpointO
 	sc.ProviderClient = client
 	sc.Endpoint = url
 	sc.Type = clientType
-
-	//if clientType != "compute" {
-	//	return sc, nil
-	//}
-	//
-	//url1 := strings.Split(url, "/")
-	//base := url1[0] + "//" + url1[2]
-	//versionData := getMicoreVersion(client, base)
-	//if versionData != "" {
-	//	if microversion > versionData {
-	//		sc.Microversion = versionData
-	//	} else {
-	//		sc.Microversion = microversion
-	//	}
-	//}
-
 	return sc, nil
 }
 
 // NewObjectStorageV1 creates a ServiceClient that may be used with the v1
 // object storage package.
 func NewObjectStorageV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "object-store",objectSstoreMicroVersion )
+	return initClientOpts(client, eo, "object-store")
 }
 
 // NewComputeV2 creates a ServiceClient that may be used with the v2 compute
 // package.
 func NewComputeV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "compute", computeMicroVersion)
+	return initClientOpts(client, eo, "compute")
 }
 
 // NewNetworkV2 creates a ServiceClient that may be used with the v2 network
 // package.
 func NewNetworkV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "network",networkMicroVersion)
+	sc, err := initClientOpts(client, eo, "network")
 	sc.ResourceBase = sc.Endpoint + "v2.0/"
 	return sc, err
 }
@@ -595,46 +511,46 @@ func NewNetworkV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpt
 // NewBlockStorageV1 creates a ServiceClient that may be used to access the v1
 // block storage service.
 func NewBlockStorageV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "volume",volumeMicroVersion)
+	return initClientOpts(client, eo, "volume")
 }
 
 // NewBlockStorageV2 creates a ServiceClient that may be used to access the v2
 // block storage service.
 func NewBlockStorageV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "volumev2",volumev2MicroVersion)
+	return initClientOpts(client, eo, "volumev2")
 }
 
 // NewBlockStorageV3 creates a ServiceClient that may be used to access the v3 block storage service.
 func NewBlockStorageV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "volumev3",volumev3MicroVersion)
+	return initClientOpts(client, eo, "volumev3")
 }
 
 // NewSharedFileSystemV2 creates a ServiceClient that may be used to access the v2 shared file system service.
 func NewSharedFileSystemV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "sharev2",sharev2MicroVersion)
+	return initClientOpts(client, eo, "sharev2")
 }
 
 // NewCDNV1 creates a ServiceClient that may be used to access the OpenStack v1
 // CDN service.
 func NewCDNV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "cdn",cdnMicroVersion)
+	return initClientOpts(client, eo, "cdn")
 }
 
 // NewOrchestrationV1 creates a ServiceClient that may be used to access the v1
 // orchestration service.
 func NewOrchestrationV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "orchestration",orchestrationMicroVersion)
+	return initClientOpts(client, eo, "orchestration")
 }
 
 // NewDBV1 creates a ServiceClient that may be used to access the v1 DB service.
 func NewDBV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "database",databaseMicroVersion)
+	return initClientOpts(client, eo, "database")
 }
 
 // NewDNSV2 creates a ServiceClient that may be used to access the v2 DNS
 // service.
 func NewDNSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "dns",dnsMicroVersion)
+	sc, err := initClientOpts(client, eo, "dns")
 	sc.ResourceBase = sc.Endpoint + "v2/"
 	return sc, err
 }
@@ -642,7 +558,7 @@ func NewDNSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // NewImageServiceV2 creates a ServiceClient that may be used to access the v2
 // image service.
 func NewImageServiceV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "image",imageMicroVersion)
+	sc, err := initClientOpts(client, eo, "image")
 	sc.ResourceBase = sc.Endpoint + "v2/"
 	return sc, err
 }
@@ -650,7 +566,7 @@ func NewImageServiceV2(client *gophercloud.ProviderClient, eo gophercloud.Endpoi
 // NewLoadBalancerV2 creates a ServiceClient that may be used to access the v2
 // load balancer service.
 func NewLoadBalancerV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "load-balancer",loadBalancerMicroVersion)
+	sc, err := initClientOpts(client, eo, "load-balancer")
 	sc.ResourceBase = sc.Endpoint + "v2.0/"
 	return sc, err
 }
@@ -658,25 +574,31 @@ func NewLoadBalancerV2(client *gophercloud.ProviderClient, eo gophercloud.Endpoi
 /* 自研 */
 
 func NewECSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "ecs",ecsMicroVersion)
+	return initClientOpts(client, eo, "ecs")
 }
 
 func NewECSV1_1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "ecsv1.1",ecsv1_1MicroVersion)
+	return initClientOpts(client, eo, "ecsv1.1")
 }
 
 func NewECSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	return initClientOpts(client, eo, "ecsv2",ecsv2MicroVersion)
+	return initClientOpts(client, eo, "ecsv2")
 }
 
+//func NewIMSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+//	sc, err := initClientOpts(client, eo, "image")
+//	sc.ResourceBase = sc.Endpoint + "v1/"
+//	return sc, err
+//}
+
 func NewIMSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "image",imageSelfDevMicroVersion)
+	sc, err := initClientOpts(client, eo, "image")
 	sc.ResourceBase = sc.Endpoint + "v2/"
 	return sc, err
 }
 
 func NewBSSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "bss",bssMicroVersion)
+	sc, err := initClientOpts(client, eo, "bss")
 	sc.ResourceBase = sc.Endpoint + "v1.0/"
 	return sc, err
 }
@@ -684,16 +606,26 @@ func NewBSSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // NewNetworkV1 creates a ServiceClient that may be used with the v1 network
 // package.
 func NewVPCV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "vpc", vpcv1MicroVersion)
+	sc, err := initClientOpts(client, eo, "vpc")
 	return sc, err
 }
 
 func NewCESV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "cesv1", cesMicroVersion)
+	sc, err := initClientOpts(client, eo, "cesv1")
 	return sc, err
 }
 
 func NewVPCV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "vpcv2.0", vpcv1MicroVersion)
+	sc, err := initClientOpts(client, eo, "vpcv2.0")
+	return sc, err
+}
+
+func NewASV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "asv1")
+	return sc, err
+}
+
+func NewASV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "asv2")
 	return sc, err
 }

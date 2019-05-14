@@ -372,6 +372,10 @@ type GetMetadataResult struct {
 	MetadataResult
 }
 
+type GetConsoleLogResult struct {
+	MetadataResult
+}
+
 // ResetMetadataResult contains the result of a Reset operation. Call its
 // Extract method to interpret it as a map[string]interface.
 type ResetMetadataResult struct {
@@ -424,6 +428,15 @@ func (r MetadatumResult) Extract() (map[string]string, error) {
 	}
 	err := r.ExtractInto(&s)
 	return s.Metadatum, err
+}
+
+func (r GetConsoleLogResult) Extract() (string, error) {
+	var s struct{
+		Output string `json:"output"`
+	}
+	err := r.ExtractInto(&s)
+	return s.Output, err
+
 }
 
 // Address represents an IP address.
@@ -486,4 +499,57 @@ func ExtractNetworkAddresses(r pagination.Page) ([]Address, error) {
 	}
 
 	return s[key], err
+}
+
+type InstanceActions struct {
+	InstanceUUID string `json:"instance_uuid"`
+	UserID       string `json:"user_id"`
+	StartTime    string `json:"start_time"`
+	RequestID    string `json:"request_id"`
+	Action       string `json:"action"`
+	Message      string `json:"message"`
+	ProjectID    string `json:"project_id"`
+	UpdatedAt    string `json:"updated_at"`
+}
+
+type InstanceAction struct {
+	InstanceUUID string   `json:"instance_uuid"`
+	UserID       string   `json:"user_id"`
+	StartTime    string   `json:"start_time"`
+	RequestID    string   `json:"request_id"`
+	Action       string   `json:"action"`
+	Message      string   `json:"message"`
+	ProjectID    string   `json:"project_id"`
+	Events       []Events `json:"events"`
+}
+
+type Events struct {
+	FinishTime string `json:"finish_time"`
+	StartTime  string `json:"start_time"`
+	Traceback  string `json:"traceback"`
+	Event      string `json:"event"`
+	Result     string `json:"result"`
+}
+
+type InstanceActionResult struct {
+	gophercloud.Result
+}
+
+func (r InstanceActionResult) ExtractInstanceActionResult() (*[]InstanceActions, error) {
+	//var ia InstanceActions
+	var s struct {
+		Ia []InstanceActions `json:"instanceActions"`
+	}
+
+	err := r.ExtractInto(&s)
+	return &s.Ia, err
+}
+
+func (r InstanceActionResult) ExtractInstanceActionResultByRequestID() (*InstanceAction, error) {
+	var s struct {
+		Ia InstanceAction `json:"instanceAction"`
+	}
+
+	err := r.ExtractInto(&s)
+	return &s.Ia, err
 }

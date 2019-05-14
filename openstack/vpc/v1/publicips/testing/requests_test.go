@@ -65,7 +65,7 @@ func TestList(t *testing.T) {
 func TestDelete(t *testing.T) {
 	th.SetupHTTP()
 	defer th.TeardownHTTP()
-	HandleListSuccessfully(t)
+	HandleDeleteSuccessfully(t)
 
 	publicips.Delete(client.ServiceClient(), "7ffddb5f-6731-43d8-9476-1444aaa40bc0")
 }

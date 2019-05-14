@@ -382,8 +382,8 @@ func buildReq(client *ProviderClient, method, url string, options *RequestOpts) 
 func doReauthAndReq(client *ProviderClient, prereqtok, method, url string, options *RequestOpts) (*http.Response, error) {
 	err := client.Reauthenticate(prereqtok)
 	if err != nil {
-		fmt.Sprintf(CE_ReauthFuncErrorMessage, err.Error())
-		return nil, NewSystemCommonError(CE_ReauthFuncErrorCode, CE_ReauthFuncErrorMessage)
+		message:=fmt.Sprintf(CE_ReauthFuncErrorMessage, err.Error())
+		return nil, NewSystemCommonError(CE_ReauthFuncErrorCode, message)
 	}
 	if options.RawBody != nil {
 		if seeker, ok := options.RawBody.(io.Seeker); ok {
