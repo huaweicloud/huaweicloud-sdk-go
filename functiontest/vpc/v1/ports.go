@@ -142,7 +142,13 @@ func ListPort(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := ports.ExtractPorts(allPages)
+	result, err1 := ports.ExtractPorts(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
+
 	fmt.Printf("port: %+v\r\n", result)
 	for _, resp := range result {
 		fmt.Println("port Id is:", resp.ID)

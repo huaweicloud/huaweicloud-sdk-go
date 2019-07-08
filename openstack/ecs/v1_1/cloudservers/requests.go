@@ -168,7 +168,7 @@ type BandWidth struct {
 	//带宽（Mbit/s），取值范围为[1,300]。
 	Size int `json:"size,omitempty"`
 
-	//带宽的共享类型。PER，表示独享，WHOLE，表示独享。
+	//带宽的共享类型。PER，表示独享，WHOLE，表示共享。
 	ShareType string `json:"sharetype" required:"true"`
 
 	//带宽的计费类型。

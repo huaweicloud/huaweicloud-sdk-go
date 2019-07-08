@@ -100,24 +100,24 @@ func (opts ReinstallOpts) ToServerReinstallMap() (map[string]interface{}, error)
 	return b, err
 }
 
-//func ReinstallOS(client *gophercloud.ServiceClient, serverID string, opts ReinstallOptsBuilder) (r ChangeResult) {
-//	if serverID == "" {
-//		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "serverID")
-//		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-//		r.Err = err
-//		return
-//	}
-//	body, err := opts.ToServerReinstallMap()
-//	if err != nil {
-//		r.Err = err
-//		return
-//	}
-//
-//	_, r.Err = client.Post(reinstallOSURL(client, serverID), body, &r.Body, &gophercloud.RequestOpts{
-//		OkCodes: []int{200},
-//	})
-//	return
-//}
+func ReinstallOS(client *gophercloud.ServiceClient, serverID string, opts ReinstallOptsBuilder) (r ChangeResult) {
+	if serverID == "" {
+		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "serverID")
+		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+		r.Err = err
+		return
+	}
+	body, err := opts.ToServerReinstallMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(reinstallOSURL(client, serverID), body, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
 
 
 type ResizeOptsBuilder interface {

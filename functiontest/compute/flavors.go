@@ -70,27 +70,27 @@ func GetFlavorList(sc *gophercloud.ServiceClient) {
 
 }
 
-func GetFlavorExtraSpecsList(sc *gophercloud.ServiceClient) {
-	flavorID := "t6.xlarge.4"
-	data, err := flavors.ListExtraSpecs(sc, flavorID).Extract()
-	if err != nil {
-		fmt.Println(err)
-		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-			fmt.Println("ErrCode:", ue.ErrorCode())
-			fmt.Println("Message:", ue.Message())
-		}
-		return
-	}
-
-	fmt.Println("Get Flavor Extra Specs info success ")
-
-	for k, b := range data {
-		fmt.Printf("os_extra_specs key is %s, value is %s\n", k, b)
-		//cond:operation:status : normal;abandon;sellout ;obt;promotion;
-		if k == "cond:operation:status" {
-			fmt.Printf("flavor %s status is %s\n", flavorID, b)
-		}
-
-	}
-
-}
+//func GetFlavorExtraSpecsList(sc *gophercloud.ServiceClient) {
+//	flavorID := "t6.xlarge.4"
+//	data, err := flavors.ListExtraSpecs(sc, flavorID).Extract()
+//	if err != nil {
+//		fmt.Println(err)
+//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+//			fmt.Println("ErrCode:", ue.ErrorCode())
+//			fmt.Println("Message:", ue.Message())
+//		}
+//		return
+//	}
+//
+//	fmt.Println("Get Flavor Extra Specs info success ")
+//
+//	for k, b := range data {
+//		fmt.Printf("os_extra_specs key is %s, value is %s\n", k, b)
+//		//cond:operation:status : normal;abandon;sellout ;obt;promotion;
+//		if k == "cond:operation:status" {
+//			fmt.Printf("flavor %s status is %s\n", flavorID, b)
+//		}
+//
+//	}
+//
+//}

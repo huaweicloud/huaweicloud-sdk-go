@@ -225,10 +225,10 @@ func RemoveAccess(client *gophercloud.ServiceClient, id string, opts RemoveAcces
 }
 
 // ExtraSpecs requests all the extra-specs for the given flavor ID.
-func ListExtraSpecs(client *gophercloud.ServiceClient, flavorID string) (r ListExtraSpecsResult) {
-	_, r.Err = client.Get(extraSpecsListURL(client, flavorID), &r.Body, nil)
-	return
-}
+//func ListExtraSpecs(client *gophercloud.ServiceClient, flavorID string) (r ListExtraSpecsResult) {
+//	_, r.Err = client.Get(extraSpecsListURL(client, flavorID), &r.Body, nil)
+//	return
+//}
 
 func GetExtraSpec(client *gophercloud.ServiceClient, flavorID string, key string) (r GetExtraSpecResult) {
 	_, r.Err = client.Get(extraSpecsGetURL(client, flavorID, key), &r.Body, nil)

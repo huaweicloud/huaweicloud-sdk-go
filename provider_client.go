@@ -73,17 +73,6 @@ type ProviderClient struct {
 	AKSKOptions aksk.AKSKOptions
 }
 
-type Config struct {
-	AutoRetry    bool `default:"true"`
-	MaxRetryTime int  `default:"3"`
-}
-
-func NewConfig() (conf *Config) {
-	conf = &Config{}
-	InitStructWithDefaultTag(conf)
-	return
-}
-
 type reauthlock struct {
 	sync.RWMutex
 	reauthing bool
@@ -202,9 +191,6 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 		return nil, err
 	}
 	log := GetLogger()
-
-	log.Debug(fmt.Sprintf("Request method is %s,Request url is %s", req.Method, req.URL.String()))
-	log.Debug(fmt.Sprintf("Request header is %s", req.Header))
 	prereqtok := req.Header.Get("X-Auth-Token")
 	var resp *http.Response
 
@@ -247,6 +233,9 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 		log.Debug("Request error", err)
 		return nil, err
 	}
+
+	log.Debug("Request method is %s,Request url is %s", req.Method, url)
+	log.Debug("Request header is %s", req.Header)
 	log.Debug("Response status code is %d", resp.StatusCode)
 	log.Debug("Response header is %s", resp.Header)
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)

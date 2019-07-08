@@ -27,7 +27,7 @@ type CreateOptsBuilder interface {
 type CreateOpts struct {
 	Name                string `json:"name" required:"true"`
 	Size                *int   `json:"size" required:"true"`
-	EnterpriseProjectId string `json:"EnterpriseProjectId,omitempty"`
+	EnterpriseProjectId string `json:"enterprise_project_id,omitempty"`
 }
 
 func (opts CreateOpts) ToBandWidthCreateMap() (map[string]interface{}, error) {
@@ -137,8 +137,6 @@ func Delete(client *gophercloud.ServiceClient, bandwidthID string) (r DeleteResu
 }
 
 func Update(c *gophercloud.ServiceClient, bandwidthID string, opts UpdateOpts) (interface{}, error) {
-	// only update prepaid bandwidth
-	var size int
 	var r UpdateResult
 	body, err := opts.ToBandWidthUpdateMap()
 	if err != nil {
@@ -147,11 +145,13 @@ func Update(c *gophercloud.ServiceClient, bandwidthID string, opts UpdateOpts) (
 
 	_, r.Err = c.Put(UpdateURL(c, bandwidthID), body, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
 
-	if opts.Bandwidth.Size == size || opts.Bandwidth.Size == 0 {
-		// extract bandwidth
-		return r.Extract()
+	onDemandData, onDemandErr := r.Extract()
+	orderData, orderErr := r.ExtractOrderID()
+
+	if orderData.OrderID != "" {
+		return orderData, orderErr
 	}
-	//extract order id
-	return r.ExtractOrderID()
+
+	return onDemandData, onDemandErr
 
 }

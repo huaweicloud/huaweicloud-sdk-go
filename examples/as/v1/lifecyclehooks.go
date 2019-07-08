@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -102,7 +102,7 @@ func TestUpdateHook(client *gophercloud.ServiceClient) {
 		DefaultResult:        "CONTINUE",
 		DefaultTimeout:       &Timeout,
 		NotificationTopicUrn: "urn:smn:southchina:e428559bbe67470e8bbccb1d24073510:3",
-		NotificationMetadata: "1111111111fbgfgjjjjjjfmvvvvvvvkvcjfl;jflbmfl;mflgkfdfjdfjdfkdofk;的卫",
+		NotificationMetadata: "YourMetadata",
 	}
 	result, err := lifecyclehooks.Update(client, "31cfb1b7-823c-4358-8336-9936a8891f01", "as-SDK-test01", opts).Extract()
 	if err != nil {
@@ -164,7 +164,7 @@ func TestCreateHook(client *gophercloud.ServiceClient) {
 		DefaultResult:        "CONTINUE",
 		DefaultTimeout:       &Timeout,
 		NotificationTopicUrn: "urn:smn:southchina:e428559bbe67470e8bbccb1d24073510:3",
-		NotificationMetadata: "1111111111fbgfgjjjjjjfmvvvvvvvkvcjfl;jflbmfl;mflgkfdfjdfjdfkdofk;的卫生间防水服简欧风景搜房就送附件搜房卡刷卡费【设防磕碰卡特普通卡热盘太可怕太可怕太可怕太可怕太可怕太可怕太可怕坦卡佛尔凯特坦克堂客飞机哦刚接个给偶个苹果容减容风机盘管可认购人空空人品1111111111fbgfgjjjjjjfmvvvvvvvkvcjfl;jflbmfl;mflgkfdfjdfjdfkdofk;的卫生间防水服简欧风景搜房就送附件搜房卡刷卡太可怕坦卡",
+		NotificationMetadata: "YourMetadata",
 	}
 	result, err := lifecyclehooks.Create(client, "31cfb1b7-823c-4358-8336-9936a8891f01", opts).Extract()
 	if err != nil {

@@ -36,3 +36,57 @@ func (r MetricDatasResult) ExtractMetricDatas() ([]MetricData, error) {
 	err := r.ExtractInto(&s)
 	return s.MetricDatas, err
 }
+
+type Datapoint struct {
+	// 指标值，该字段名称与请求参数中filter使用的查询值相同。
+	Average float64 `json:"average"`
+	// 指标采集时间。
+	Timestamp int `json:"timestamp"`
+	// 指标单位
+	Unit string `json:"unit,omitempty"`
+}
+
+type EventDataInfo struct {
+	// 事件类型，例如instance_host_info。
+	Type string `json:"type"`
+	// 事件上报时间。
+	Timestamp int `json:"timestamp"`
+	// 主机配置信息。
+	Value string `json:"value"`
+}
+
+// This is a auto create Response Object
+type EventData struct {
+	Datapoints []EventDataInfo `json:"datapoints"`
+}
+
+type Metricdata struct {
+	//  指标数据列表。由于查询数据时，云监控会根据所选择的聚合粒度向前取整from参数，所以datapoints中包含的数据点有可能会多于预期。
+	Datapoints []Datapoint `json:"datapoints"`
+	// 指标名称，例如弹性云服务器监控指标中的cpu_util。
+	MetricName string `json:"metric_name"`
+}
+
+type AddMetricDataResult struct {
+	gophercloud.ErrResult
+}
+
+type GetEventDataResult struct {
+	gophercloud.Result
+}
+
+type GetResult struct {
+	gophercloud.Result
+}
+
+func (r GetEventDataResult) Extract() (*EventData, error) {
+	var s *EventData
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+func (r GetResult) Extract() (*Metricdata, error) {
+	var s *Metricdata
+	err := r.ExtractInto(&s)
+	return s, err
+}

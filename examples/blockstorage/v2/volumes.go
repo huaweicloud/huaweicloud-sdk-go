@@ -19,9 +19,9 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
-		DomainID:         "{domainID}",
+		DomainID:         "{DomainID}",
 	}
 
 	provider, err_auth := openstack.AuthenticatedClient(opts)
@@ -45,10 +45,14 @@ func main() {
 	VolumeGet(sc)
 	VolumeUpdate(sc)
 	VolumeDelete(sc)
+	VolumesListBrief(sc)
+	GetQuotaSet(sc)
+	VolumesExportAsImage(sc)
 
 	fmt.Println("main end...")
 }
 
+// create volume
 func VolumeCreate(sc *gophercloud.ServiceClient) (volumeId string) {
 	fmt.Println("start volume create...")
 	createOpts := volumes.CreateOpts{
@@ -78,6 +82,7 @@ func VolumeCreate(sc *gophercloud.ServiceClient) (volumeId string) {
 	return volumeId
 }
 
+// get volume
 func VolumeGet(sc *gophercloud.ServiceClient) {
 	id := "xxx"
 	volume, err := volumes.Get(sc, id).Extract()
@@ -95,6 +100,7 @@ func VolumeGet(sc *gophercloud.ServiceClient) {
 	fmt.Println(string(p))
 }
 
+// update volume
 func VolumeUpdate(sc *gophercloud.ServiceClient) {
 	id := "xxx"
 	updatOpts := volumes.UpdateOpts{
@@ -117,6 +123,7 @@ func VolumeUpdate(sc *gophercloud.ServiceClient) {
 
 }
 
+// delete volume
 func VolumeDelete(sc *gophercloud.ServiceClient) {
 	id := "xxx"
 	err := volumes.Delete(sc, id).ExtractErr()
@@ -133,6 +140,7 @@ func VolumeDelete(sc *gophercloud.ServiceClient) {
 	fmt.Println("volume delete success!")
 }
 
+// list volume detail
 func VolumesList(sc *gophercloud.ServiceClient) {
 
 	volumePage, err := volumes.List(sc, nil).AllPages()
@@ -158,4 +166,122 @@ func VolumesList(sc *gophercloud.ServiceClient) {
 	}
 	fmt.Println("get volume list  success!")
 
+}
+
+// list volume brief
+func VolumesListBrief(sc *gophercloud.ServiceClient) {
+	fmt.Println("start volume list...")
+	allPages, err := volumes.ListBrief(sc, volumes.ListBriefOpts{}).AllPages()
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("list volume success!")
+
+	allData, err1 := volumes.ExtractVolumesBrief(allPages)
+
+	if err1 != nil {
+		fmt.Println(err1)
+		return
+	}
+
+	for _, v := range allData.VolumeList {
+		b, _ := json.MarshalIndent(v, "", " ")
+		fmt.Println(string(b))
+	}
+
+}
+
+// get tanant quota
+func GetQuotaSet(sc *gophercloud.ServiceClient) {
+	fmt.Println("start get quota set...")
+	var vLimit, vInUse, gLimit, gInUse int
+	projectId := "xxx"
+	qs, err := volumes.GetQuotaSet(sc, projectId)
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	var bt volumes.BaseType
+
+	for k, v := range qs.QuoSet {
+		if k == "gigabytes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return
+				}
+				gLimit = bt.Limit
+				gInUse = bt.InUse
+			}
+		}
+
+		if k == "volumes" {
+			if data, ok := v.(map[string]interface{}); ok {
+				b, err := json.Marshal(data)
+
+				if err != nil {
+					return
+				}
+				err = json.Unmarshal(b, &bt)
+				if err != nil {
+					return
+				}
+				vLimit = bt.Limit
+				vInUse = bt.InUse
+			}
+		}
+
+	}
+
+	fmt.Println(vLimit, vInUse, gLimit, gInUse)
+
+	for k, v := range qs.QuoSet {
+		fmt.Println("type is :", k)
+		if data, ok := v.(map[string]interface{}); ok {
+			for b1, b2 := range data {
+				fmt.Println(b1, b2)
+			}
+		} else {
+			fmt.Println("value is ", v)
+		}
+	}
+
+	fmt.Println("get quota set success!")
+
+}
+
+// export volume to image
+func VolumesExportAsImage(sc *gophercloud.ServiceClient) {
+	fmt.Println("start volume export image...")
+	opts := volumes.ExportVolumesOpts{
+		ImageName: "xxx",
+	}
+
+	id := "xxx"
+	resp, err := volumes.ExportVolumes(sc, id, opts).Extract()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("volume export image success!")
+	fmt.Println(resp)
 }

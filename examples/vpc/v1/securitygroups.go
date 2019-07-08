@@ -17,7 +17,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -89,7 +89,7 @@ func CreateSecurityGroup(client *gophercloud.ServiceClient) {
 }
 
 func GetSecurityGroup(client *gophercloud.ServiceClient) {
-	result, err := securitygroups.Get(client, "05291b64-cdc0-43a4-8c55-75ec8571b06e").Extract()
+	result, err := securitygroups.Get(client, "xxxxxx").Extract()
 
 	if err != nil {
 		fmt.Println(err)
@@ -135,7 +135,13 @@ func ListSecurityGroup(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := securitygroups.ExtractSecurityGroups(allPages)
+	result, err1 := securitygroups.ExtractSecurityGroups(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
+
 	fmt.Printf("securitygroup: %+v\r\n", result)
 	for _, resp := range result {
 
@@ -162,7 +168,7 @@ func ListSecurityGroup(client *gophercloud.ServiceClient) {
 }
 
 func DeleteSecurityGroup(client *gophercloud.ServiceClient) {
-	resp := securitygroups.Delete(client, "a830ab5f-9282-4a32-bfd4-710bfae864d1")
+	resp := securitygroups.Delete(client, "xxxxxx")
 	if resp.Err != nil {
 		fmt.Println(resp.Err)
 		if ue, ok := resp.Err.(*gophercloud.UnifiedError); ok {

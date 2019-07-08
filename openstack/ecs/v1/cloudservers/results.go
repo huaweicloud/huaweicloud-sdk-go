@@ -2,6 +2,7 @@ package cloudservers
 
 import (
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/pagination"
 	"time"
 )
 
@@ -17,6 +18,11 @@ type Flavor struct {
 	Name  string `json:"name"`
 }
 
+// Image defines a image struct in details of a server.
+type Image struct {
+	ID string `json:"id"`
+}
+
 type SysTags struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
@@ -26,6 +32,8 @@ type OsSchedulerHints struct {
 	Group []string `json:"group"`
 }
 
+// Metadata is only used for method that requests details on a single server, by ID.
+// Because metadata struct must be a map.
 type Metadata struct {
 	ChargingMode      string `json:"charging_mode"`
 	OrderID           string `json:"metering.order_id"`
@@ -41,6 +49,7 @@ type Metadata struct {
 	LockSource        string `json:"lock_source"`
 	LockSourceID      string `json:"lock_source_id"`
 	LockScene         string `json:"lock_scene"`
+	VirtualEnvType    string `json:"virtual_env_type"`
 }
 
 type Address struct {
@@ -62,6 +71,8 @@ type SecurityGroups struct {
 	Name string `json:"name"`
 }
 
+// CloudServer is only used for method that requests details on a single server, by ID.
+// Because metadata struct must be a map.
 type CloudServer struct {
 	Status              string               `json:"status"`
 	Updated             time.Time            `json:"updated"`
@@ -85,6 +96,7 @@ type CloudServer struct {
 	Metadata            Metadata             `json:"metadata"`
 	SecurityGroups      []SecurityGroups     `json:"security_groups"`
 	KeyName             string               `json:"key_name"`
+	Image               Image                `json:"image"`
 	Progress            *int                 `json:"progress"`
 	PowerState          *int                 `json:"OS-EXT-STS:power_state"`
 	VMState             string               `json:"OS-EXT-STS:vm_state"`
@@ -105,6 +117,12 @@ type CloudServer struct {
 	HypervisorHostname  string               `json:"OS-EXT-SRV-ATTR:hypervisor_hostname"`
 	VolumeAttached      []VolumeAttached     `json:"os-extended-volumes:volumes_attached"`
 	OsSchedulerHints    OsSchedulerHints     `json:"os:scheduler_hints"`
+}
+
+// NewCloudServer defines the response from details on a single server, by ID.
+type NewCloudServer struct {
+	CloudServer
+	Metadata map[string]string `json:"metadata"`
 }
 
 // GetResult is the response from a Get operation. Call its Extract
@@ -154,8 +172,30 @@ func (r BatchChangeResult) ExtractJob() (*Job, error) {
 	return j, err
 }
 
-
 type ErrResult struct {
-
 	gophercloud.ErrResult
+}
+
+// CloudServerDetail defines struct of server detail list result.
+type CloudServerDetail struct {
+	Servers []NewCloudServer `json:"servers"`
+	Count   int              `json:"count"`
+}
+
+// CloudServerPage is a pagination.Pager that is returned from a call to the List function.
+type CloudServerPage struct {
+	pagination.OffsetPage
+}
+
+// IsEmpty returns true if a ListResult contains no services.
+func (r CloudServerPage) IsEmpty() (bool, error) {
+	data, err := ExtractCloudServers(r)
+	return len(data.Servers) == 0, err
+}
+
+// ExtractCloudServers is a function that takes a ListResult and returns the services' information.
+func ExtractCloudServers(r pagination.Page) (CloudServerDetail, error) {
+	var s CloudServerDetail
+	err := (r.(CloudServerPage)).ExtractInto(&s)
+	return s, err
 }

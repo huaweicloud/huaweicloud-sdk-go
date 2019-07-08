@@ -116,7 +116,13 @@ func ListPrivateIp(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := privateips.ExtractPrivateIps(allPages)
+	result, err1 := privateips.ExtractPrivateIps(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
+
 	fmt.Printf("privateips: %+v\r\n", result)
 	for _, resp := range result {
 		fmt.Println("PrivateIps Id is:", resp.ID)

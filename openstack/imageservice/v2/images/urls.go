@@ -49,3 +49,23 @@ func nextPageURL(currentURL string, next string) (string, error) {
 	}
 	return base.ResolveReference(rel).String(), nil
 }
+
+// putTagURL add a tag to the image
+func putTagURL(c *gophercloud.ServiceClient, imageID, tag string) string {
+	return c.ServiceURL("images", imageID, "tags", tag)
+}
+
+// deleteTagURL remove the tag from a image
+func deleteTagURL(c *gophercloud.ServiceClient, imageID, tag string) string {
+	return c.ServiceURL("images", imageID, "tags", tag)
+}
+
+// getImageSchemas generate url to get image schemas
+func getImageSchemas(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("schemas", "image")
+}
+
+// getImagesSchemas generate url to get images schemas
+func getImagesSchemas(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("schemas", "images")
+}

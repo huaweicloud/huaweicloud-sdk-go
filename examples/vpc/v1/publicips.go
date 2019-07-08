@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -56,12 +56,12 @@ func CreatePublicIP(sc *gophercloud.ServiceClient) {
 
 	resp, err := publicips.Create(sc, publicips.CreateOpts{
 		Publicip: publicips.PublicIPRequest{
-			Type: "5_bgp",
+			Type: "xxxxxx",
 			//IPVersion: 4,
 		},
 		Bandwidth: publicips.BandWidth{
-			Name:      "1t1t",
-			ShareType: "PER",
+			Name:      "xxxxxx",
+			ShareType: "xxxxxx",
 			Size:      10,
 		},
 	}).Extract()
@@ -90,7 +90,7 @@ func CreatePublicIP(sc *gophercloud.ServiceClient) {
 
 func UpdatePublicIP(sc *gophercloud.ServiceClient) {
 
-	resp, err := publicips.Update(sc, "6ffdbd50-1425-4901-9383-09993304db61", publicips.UpdateOpts{
+	resp, err := publicips.Update(sc, "xxxxxx", publicips.UpdateOpts{
 		IPVersion: 4,
 	}).Extract()
 
@@ -116,7 +116,7 @@ func UpdatePublicIP(sc *gophercloud.ServiceClient) {
 }
 
 func GetPublicIP(sc *gophercloud.ServiceClient) {
-	resp, err := publicips.Get(sc, "ef3a7d23-f22b-40a1-8559-b281defb768f").Extract()
+	resp, err := publicips.Get(sc, "xxxxxx").Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -154,9 +154,10 @@ func ListPublicIP(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	publicipList, err := publicips.ExtractPublicIPs(allPages)
-	if err != nil {
-		fmt.Println(err)
+	publicipList, err1 := publicips.ExtractPublicIPs(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
 		return
 	}
 
@@ -178,7 +179,7 @@ func ListPublicIP(sc *gophercloud.ServiceClient) {
 
 func DeletePublicIP(sc *gophercloud.ServiceClient) {
 
-	resp := publicips.Delete(sc, "0071410e-a9c5-41be-bee0-5c69db7aba31")
+	resp := publicips.Delete(sc, "xxxxxx")
 	if resp.Err != nil {
 		fmt.Println(resp.Err)
 		if ue, ok := resp.Err.(*gophercloud.UnifiedError); ok {
@@ -188,5 +189,5 @@ func DeletePublicIP(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	fmt.Println("delete success!")
+	fmt.Println("Delete success!")
 }

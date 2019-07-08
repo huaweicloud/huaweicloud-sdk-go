@@ -25,12 +25,12 @@ func TestListImage(t *testing.T) {
 	err := pager.EachPage(func(page pagination.Page) (bool, error) {
 		pages++
 		t.Logf("Page %v", page)
-		images, err := images.ExtractImages(page)
+		imageResult, err := images.ExtractImages(page)
 		if err != nil {
 			return false, err
 		}
 
-		for _, i := range images {
+		for _, i := range imageResult {
 			t.Logf("%s\t%s\t%s\t%s\t%v\t\n", i.ID, i.Name, i.Owner, i.Checksum, i.SizeBytes)
 			count++
 		}
@@ -52,9 +52,9 @@ func TestAllPagesImage(t *testing.T) {
 
 	pages, err := images.List(fakeclient.ServiceClient(), nil).AllPages()
 	th.AssertNoErr(t, err)
-	images, err := images.ExtractImages(pages)
+	imageResult, err := images.ExtractImages(pages)
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, 3, len(images))
+	th.AssertEquals(t, 3, len(imageResult))
 }
 
 func TestCreateImage(t *testing.T) {

@@ -6,5 +6,8 @@ The following services' SDK are included.
 \- VPC  
 \- ECS  
 \- EVS  
-\- Cloud Eye  
+\- CES  
 \- ELB  
+\- DNS  
+\- AS  
+\- BSS  

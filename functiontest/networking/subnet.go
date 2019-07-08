@@ -10,7 +10,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/subnets"
 )
 
-var subnetid string
+var subnetID string
 
 func main() {
 	fmt.Println("main start...")
@@ -57,7 +57,7 @@ func TestSubnetList(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	subnets, err := subnets.ExtractSubnets(allpages)
+	subnet, err := subnets.ExtractSubnets(allpages)
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -68,12 +68,12 @@ func TestSubnetList(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test get subnet list success!")
-	p, _ := json.MarshalIndent(subnets, "", " ")
+	p, _ := json.MarshalIndent(subnet, "", " ")
 	fmt.Println(string(p))
 }
 
 func TestSubnetGet(sc *gophercloud.ServiceClient) {
-	subnet, err := subnets.Get(sc, subnetid).Extract()
+	subnet, err := subnets.Get(sc, subnetID).Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -106,7 +106,7 @@ func TestSubnetCreate(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test create subnet success!")
-	subnetid=subnet.ID
+	subnetID=subnet.ID
 	p, _ := json.MarshalIndent(subnet, "", " ")
 	fmt.Println(string(p))
 }
@@ -116,7 +116,7 @@ func TestSubnetUpdate(sc *gophercloud.ServiceClient) {
 		Name:"testsubnet2",
 	}
 
-	subnet,err := subnets.Update(sc, subnetid,opts).Extract()
+	subnet,err := subnets.Update(sc, subnetID,opts).Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -132,7 +132,7 @@ func TestSubnetUpdate(sc *gophercloud.ServiceClient) {
 }
 
 func TestSubnetDelete(sc *gophercloud.ServiceClient) {
-	err := subnets.Delete(sc, subnetid).ExtractErr()
+	err := subnets.Delete(sc, subnetID).ExtractErr()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {

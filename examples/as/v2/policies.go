@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -35,14 +35,14 @@ func main() {
 	//开始测试
 	CreateGroupPoliceV2(sc)
 	ListPoliceV2(sc)
-	getPoliceV2(sc)
-	updatePoliceV2(sc)
+	GetPoliceV2(sc)
+	UpdatePoliceV2(sc)
 	ListAllPoliceV2(sc)
 	fmt.Println("main end...")
 }
 
 //--------------------------------------修改策略----------------------------------------
-func updatePoliceV2(client *gophercloud.ServiceClient) {
+func UpdatePoliceV2(client *gophercloud.ServiceClient) {
 	opts := policies.UpdateOpts{
 		ScalingPolicyName:   "12345",
 		ScalingPolicyType:   "SCHEDULED",
@@ -77,8 +77,8 @@ func updatePoliceV2(client *gophercloud.ServiceClient) {
 }
 
 //--------------------------------------查询详情----------------------------------------
-func getPoliceV2(client *gophercloud.ServiceClient) {
-	result, err := policies.Get(client, "82331ff7-e0e2-46f0-91b5-7c2b27a2e460").Extract()
+func GetPoliceV2(client *gophercloud.ServiceClient) {
+	result, err := policies.Get(client, "5cba0719-d424-46a7-9053-82ee643c3e69").Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -117,8 +117,8 @@ func ListPoliceV2(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result1List,err:= policies.ExtractPolicies(result)
-	for _, resp := range result1List.ScalingPolicies{
+	result1List, err := policies.ExtractPolicies(result)
+	for _, resp := range result1List.ScalingPolicies {
 		fmt.Println("Policy detail:")
 		fmt.Println("ScalingResourceType is:", resp.ScalingResourceType)
 		fmt.Println("ScalingPolicyId is:", resp.ScalingPolicyId)
@@ -166,8 +166,8 @@ func ListAllPoliceV2(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result1List,err:= policies.ExtractPolicies(result)
-	for _, resp := range result1List.ScalingPolicies{
+	result1List, err := policies.ExtractPolicies(result)
+	for _, resp := range result1List.ScalingPolicies {
 		fmt.Println("Policy detail:")
 		fmt.Println("ScalingResourceType is:", resp.ScalingResourceType)
 		fmt.Println("ScalingPolicyId is:", resp.ScalingPolicyId)

@@ -17,7 +17,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{DomainID}",
 	}
@@ -35,7 +35,7 @@ func main() {
 	}
 	serverId := "{serverId}"
 	newPassword := "{newPassword}"
-	//ReinstallOS(client, serverId)
+	ReinstallOS(client, serverId)
 	ChangeOS(client, serverId)
 	ResetPassword(client, serverId, newPassword)
 	fmt.Println("main end...")
@@ -43,22 +43,22 @@ func main() {
 }
 
 //Re-install server operating system (install Cloud-init)
-//func ReinstallOS(client *gophercloud.ServiceClient, serverId string) {
-//	reInstallOpts := cloudservers.ReinstallOpts{
-//		KeyName: "TestKey",
-//	}
-//	job, reinstallOSErr := cloudservers.ReinstallOS(client, serverId, reInstallOpts).ExtractJob()
-//	if reinstallOSErr != nil {
-//		fmt.Println("reinstallOSErr:", reinstallOSErr)
-//		if ue, ok := reinstallOSErr.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode:", ue.ErrorCode())
-//			fmt.Println("Message:", ue.Message())
-//		}
-//		return
-//	}
-//	fmt.Println(job)
-//	fmt.Println("servers reinstall OS success!")
-//}
+func ReinstallOS(client *gophercloud.ServiceClient, serverId string) {
+	reInstallOpts := cloudservers.ReinstallOpts{
+		KeyName: "TestKey",
+	}
+	job, reinstallOSErr := cloudservers.ReinstallOS(client, serverId, reInstallOpts).ExtractJob()
+	if reinstallOSErr != nil {
+		fmt.Println("reinstallOSErr:", reinstallOSErr)
+		if ue, ok := reinstallOSErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println(job)
+	fmt.Println("servers reinstall OS success!")
+}
 
 //Change server operating system (installing Cloud-init)
 func ChangeOS(client *gophercloud.ServiceClient, serverId string) {

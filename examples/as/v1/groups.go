@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -204,7 +204,6 @@ func TestQueryGroupList(client *gophercloud.ServiceClient) {
 		fmt.Println("ScalingGroupName is:", resp.ScalingGroupName)
 		fmt.Println("MinInstanceNumber is:", resp.MinInstanceNumber)
 		fmt.Println("MaxInstanceNumber is:", resp.MaxInstanceNumber)
-		fmt.Println("Networks is:", resp.Networks)
 		fmt.Println("IsScaling is:", resp.IsScaling)
 		fmt.Println("DesireInstanceNumber is:", resp.DesireInstanceNumber)
 		fmt.Println("CurrentInstanceNumber is:", resp.CurrentInstanceNumber)

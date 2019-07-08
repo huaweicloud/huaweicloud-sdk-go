@@ -17,7 +17,7 @@ func AuthAKSKUserList() {
 	akskOptions := aksk.AKSKOptions{
 		IdentityEndpoint: "https://iam.cn-north-1.myhuaweicloud.com/v3",
 		DomainID:         "replace-your-domainID",
-		Domain:           "myhuaweicloud.com",
+		Cloud:           "myhuaweicloud.com",
 		Region:           "cn-north-1",
 		AccessKey:        "replace-your-ak",
 		SecretKey:        "replace-your-sk",

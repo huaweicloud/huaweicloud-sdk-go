@@ -116,7 +116,12 @@ func ListBandWidth(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := bandwidths.ExtractBandWidths(allPages)
+	result, err1 := bandwidths.ExtractBandWidths(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("bandwidths: %+v\r\n", result)
 	for _, resp := range result {

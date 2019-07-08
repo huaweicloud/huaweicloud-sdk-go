@@ -40,3 +40,7 @@ func actionURL(sc *gophercloud.ServiceClient, serverID string) string {
 func batchChangeURL(sc *gophercloud.ServiceClient) string {
 	return sc.ServiceURL("cloudservers", "batch-changeos")
 }
+
+func listDetailURL(sc *gophercloud.ServiceClient) string {
+	return sc.ServiceURL("cloudservers", "detail")
+}

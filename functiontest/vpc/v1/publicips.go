@@ -154,9 +154,10 @@ func ListPublicIP(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	publicipList, err := publicips.ExtractPublicIPs(allPages)
-	if err != nil {
-		fmt.Println(err)
+	publicipList, err1 := publicips.ExtractPublicIPs(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
 		return
 	}
 

@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -181,7 +181,7 @@ func CreateAlarmPoliceV1(client *gophercloud.ServiceClient) {
 	InstanceNumber := 1
 	CoolDownTime := 200
 	opts := policies.CreateOpts{
-		ScalingPolicyName: "as-policy-sdk-alarmPolicy-发的贷款分开发开放分开发呢反馈烦恼烦恼快分分开复垦额客服诺克反馈你付款方脑壳",
+		ScalingPolicyName: "as-policy-sdk-alarmPolicy",
 		ScalingGroupId:    "04ffce3e-2424-49ef-859d-885e85ee1fde",
 		ScalingPolicyType: "ALARM",
 		AlarmId:           "al1556177913202WRqdpNnVx",

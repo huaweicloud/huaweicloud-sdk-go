@@ -37,12 +37,24 @@ type MyRoundTripper struct {
 	numReauthAttempts int
 }
 
-func newHTTPClient() http.Client {
-	return http.Client{
-		Transport: &MyRoundTripper{
-			rt: http.DefaultTransport,
-		},
+func newHTTPClient(conf *gophercloud.Config) http.Client {
+
+	hc := new(http.Client)
+
+	if conf.Timeout > 0 {
+		hc.Timeout = conf.Timeout
 	}
+
+	if conf.HttpTransport != nil {
+		hc.Transport = conf.HttpTransport
+	} else {
+		hc.Transport = &MyRoundTripper{
+			rt: http.DefaultTransport,
+		}
+	}
+
+	return *hc
+
 }
 
 func (mrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -61,9 +73,8 @@ func (mrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, err
 	return response, err
 }
 
-/*
-func NewProviderClientWithOptions(options auth.AuthOptionsProvider, conf *gophercloud.Config) (*gophercloud.ProviderClient, error) {
-	client, err := NewClient(options.GetIdentityEndpoint(), options.GetProjectId(), conf)
+func AuthenticatedClientWithOptions(options auth.AuthOptionsProvider, conf *gophercloud.Config) (*gophercloud.ProviderClient, error) {
+	client, err := NewClient(options.GetIdentityEndpoint(), options.GetDomainId(), options.GetProjectId(), conf)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +85,6 @@ func NewProviderClientWithOptions(options auth.AuthOptionsProvider, conf *gopher
 	}
 	return client, nil
 }
-*/
 
 /*
 AuthenticatedClient logs in to an OpenStack cloud found at the identity endpoint
@@ -166,7 +176,7 @@ func NewClient(endpoint, domainID, projectID string, conf *gophercloud.Config) (
 	p.ProjectID = projectID
 	p.Conf = conf
 	p.UseTokenLock()
-	p.HTTPClient = newHTTPClient() //自定义httpclient，限制reauth为3次
+	p.HTTPClient = newHTTPClient(conf) //自定义httpclient，限制reauth为3次
 
 	return p, nil
 }
@@ -419,8 +429,8 @@ func tokenAuthV3(client *gophercloud.ProviderClient, endpoint string, opts token
 			return nil
 		}
 	}
-	client.EndpointLocator = func(opts gophercloud.EndpointOpts) (string, error) {
-		return V3EndpointURL(catalog, opts)
+	client.EndpointLocator = func(endpointOpts gophercloud.EndpointOpts) (string, error) {
+		return V3ExtractEndpointURL(catalog, endpointOpts, opts)
 	}
 
 	return nil
@@ -585,11 +595,11 @@ func NewECSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 	return initClientOpts(client, eo, "ecsv2")
 }
 
-//func NewIMSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-//	sc, err := initClientOpts(client, eo, "image")
-//	sc.ResourceBase = sc.Endpoint + "v1/"
-//	return sc, err
-//}
+func NewIMSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "image")
+	sc.ResourceBase = sc.Endpoint + "v1/"
+	return sc, err
+}
 
 func NewIMSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "image")

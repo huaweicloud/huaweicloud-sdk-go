@@ -22,7 +22,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "{your AK string}",
 		SecretKey:        "{your SK string}",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{DomainID}",
 	}
@@ -40,7 +40,8 @@ func main() {
 	}
 	serverID := "{serverID}"
 	metaData := "{metaData}"
-	//length := "-1"
+	length := "-1"
+	reqID := "{reqID}"
 	ServerCreate(client)
 	ServersList(client)
 	ServerGet(client, serverID)
@@ -60,7 +61,9 @@ func main() {
 	ServerMetadataDetails(client, serverID, metaData)
 	ServerDeleteMetadata(client, serverID, metaData)
 	ServerAttachInterfaceList(client, serverID)
-	//ServerGetConsoleLog(client, serverID, length)
+	ServerGetConsoleLog(client, serverID, length)
+	ServerListInstanceActions(client, serverID)
+	ServerGetInstanceActions(client, serverID, reqID)
 	fmt.Println("main end...")
 
 }
@@ -404,16 +407,53 @@ func ServerAttachInterfaceList(client *gophercloud.ServiceClient, serverId strin
 }
 
 //ServerGetConsoleLog gets server console log
-//func ServerGetConsoleLog(sc *gophercloud.ServiceClient, serverID string, length string) {
-//	resp, err := servers.GetConsoleLog(sc, serverID, length).Extract()
-//	if err != nil {
-//		fmt.Println(err)
-//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode", ue.ErrCode)
-//			fmt.Println("ErrMessage", ue.ErrMessage)
-//		}
-//		return
-//	}
-//	fmt.Println("Server console log:", resp)
-//	fmt.Println("Server get console log success!")
-//}
+func ServerGetConsoleLog(sc *gophercloud.ServiceClient, serverID string, length string) {
+	resp, err := servers.GetConsoleLog(sc, serverID, length).Extract()
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Server console log:", resp)
+	fmt.Println("Server get console log success!")
+}
+
+//ServerListInstanceActions gets instance action list of a server
+func ServerListInstanceActions(sc *gophercloud.ServiceClient, serverID string) {
+	resp, err := servers.ListInstanceActions(sc, serverID).ExtractInstanceActionsListResult()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Server list instance actions success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+}
+
+//ServerGetInstanceActions gets instance action by request ID
+func ServerGetInstanceActions(sc *gophercloud.ServiceClient, serverID string, reqID string) {
+	resp, err := servers.GetInstanceActions(sc, serverID, reqID).ExtractInstanceActionsResult()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Server get instance actions success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+
+}

@@ -315,3 +315,32 @@ func (r ReplaceImageTags) ToImagePatchMap() map[string]interface{} {
 		"value": r.NewTags,
 	}
 }
+
+/*
+// PutTag put a tag to image
+func PutTag(client *gophercloud.ServiceClient, id, tag string) (r PutTagResult) {
+	_, r.Err = client.Put(putTagURL(client, id, tag), nil, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{204},
+	})
+	return
+}
+
+func DeleteTag(client *gophercloud.ServiceClient, id, tag string) (r DeleteTagResult) {
+	_, r.Err = client.Delete(deleteTagURL(client, id, tag), &gophercloud.RequestOpts{
+		OkCodes: []int{204},
+	})
+	return
+}
+
+// GetImageSchemas get the image schemas
+func GetImageSchemas(client *gophercloud.ServiceClient) (r ImageSchemasResult) {
+	_, r.Err = client.Get(getImageSchemas(client), &r.Body, nil)
+	return
+}
+
+// GetImagesSchemas get the image schemas
+func GetImagesSchemas(client *gophercloud.ServiceClient) (r ImagesSchemasResult) {
+	_, r.Err = client.Get(getImagesSchemas(client), &r.Body, nil)
+	return
+}
+*/

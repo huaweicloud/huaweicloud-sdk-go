@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -52,11 +52,11 @@ func main() {
 
 func CreateSecurityGroupRule(client *gophercloud.ServiceClient) {
 	result, err := securitygrouprules.Create(client, securitygrouprules.CreateOpts{
-		Description:     " SecurityGroup",
-		SecurityGroupId: "a830ab5f-9282-4a32-bfd4-710bfae864d1",
+		Description:     " xxxxxx",
+		SecurityGroupId: "xxxxxx",
 		Direction:       "egress",
 		Protocol:        "tcp",
-		RemoteIpPrefix:  "10.10.0.0/24",
+		RemoteIpPrefix:  "xxx.xxx.xxx.xxx/xx",
 	}).Extract()
 
 	if err != nil {
@@ -85,7 +85,7 @@ func CreateSecurityGroupRule(client *gophercloud.ServiceClient) {
 }
 
 func GetSecurityGroupRule(client *gophercloud.ServiceClient) {
-	result, err := securitygrouprules.Get(client, "0159cf15-7f02-40c7-90b0-dae9a2d321ef").Extract()
+	result, err := securitygrouprules.Get(client, "xxxxxx").Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -126,14 +126,10 @@ func ListSecurityGroupRule(client *gophercloud.ServiceClient) {
 		return
 	}
 
-	result, err := securitygrouprules.ExtractSecurityGroupRules(allPages)
+	result, err1 := securitygrouprules.ExtractSecurityGroupRules(allPages)
 
-	if err != nil {
-		fmt.Println(err)
-		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-			fmt.Println("ErrCode:", ue.ErrorCode())
-			fmt.Println("Message:", ue.Message())
-		}
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
 		return
 	}
 
@@ -157,7 +153,7 @@ func ListSecurityGroupRule(client *gophercloud.ServiceClient) {
 }
 
 func DeleteSecurityGroupRule(client *gophercloud.ServiceClient) {
-	resp := securitygrouprules.Delete(client, "3ddbcf95-7fe8-4161-8903-fe46ff09b1ae")
+	resp := securitygrouprules.Delete(client, "xxxxxx")
 	if resp.Err != nil {
 		fmt.Println(resp.Err)
 		if ue, ok := resp.Err.(*gophercloud.UnifiedError); ok {

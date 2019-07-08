@@ -13,8 +13,8 @@ func main() {
 
 	fmt.Println("main start...")
 
-	//provider, err := common.AuthAKSK()
-	provider, err := common.AuthToken()
+	provider, err := common.AuthAKSK()
+	//provider, err := common.AuthToken()
 	if err != nil {
 		fmt.Println("get provider client failed")
 		fmt.Println(err.Error())
@@ -38,7 +38,7 @@ func main() {
 }
 
 func TestList(sc *gophercloud.ServiceClient) {
-	allPages, err := cloudimages.List(sc, cloudimages.ListOpts{Status: "queued"}).AllPages()
+	allPages, err := cloudimages.List(sc, cloudimages.ListOpts{}).AllPages()
 	if err != nil {
 		fmt.Println("err:", err)
 		if se, ok := err.(*gophercloud.UnifiedError); ok {

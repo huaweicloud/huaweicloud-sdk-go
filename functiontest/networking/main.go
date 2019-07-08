@@ -9,7 +9,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/networks"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/ports"
-	"github.com/gophercloud/gophercloud/openstack/networking/v2/nat"
+	//"github.com/gophercloud/gophercloud/openstack/networking/v2/nat"
 )
 
 func main() {
@@ -49,40 +49,31 @@ func main() {
 	fmt.Println("main end...")
 }
 
-
-
-func TestNatGatwayCreate(sc *gophercloud.ServiceClient){
-
-
-	opts:=nat.CreateOpts{
-		Description:"thisistest",
-		Name:"newgateway",
-		Spec:"1",
-		RouterId:"2342342134",
-		InternalNetworkId:"3d34r23erd",
-	}
-
-	resp,err:=nat.CreateNatGateway(sc,opts).Extract()
-
-	if err != nil {
-		fmt.Println(err)
-		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-			fmt.Println("ErrCode:", ue.ErrorCode())
-			fmt.Println("Message:", ue.Message())
-		}
-		return
-	}
-
-	fmt.Println("Pools Create nat success!")
-	fmt.Println("member:", resp)
-}
-
-
-
-
-
-
-
+//func TestNatGatwayCreate(sc *gophercloud.ServiceClient){
+//
+//
+//	opts:=nat.CreateOpts{
+//		Description:"thisistest",
+//		Name:"newgateway",
+//		Spec:"1",
+//		RouterId:"2342342134",
+//		InternalNetworkId:"3d34r23erd",
+//	}
+//
+//	resp,err:=nat.CreateNatGateway(sc,opts).Extract()
+//
+//	if err != nil {
+//		fmt.Println(err)
+//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+//			fmt.Println("ErrCode:", ue.ErrorCode())
+//			fmt.Println("Message:", ue.Message())
+//		}
+//		return
+//	}
+//
+//	fmt.Println("Pools Create nat success!")
+//	fmt.Println("member:", resp)
+//}
 
 func TestPoolsListPorts(sc *gophercloud.ServiceClient) {
 	allPages, err := ports.List(sc, &ports.ListOpts{}).AllPages()
@@ -129,7 +120,7 @@ func TestPoolsListMembers(sc *gophercloud.ServiceClient) {
 
 	for _, m := range allMembers {
 		fmt.Println("member.ID:", m.ID)
-		fmt.Println("member.PoolID:", m.PoolID)
+		fmt.Println("member.ProtocolPort:", m.ProtocolPort)
 	}
 }
 
@@ -151,9 +142,9 @@ func TestPoolsGetMember(sc *gophercloud.ServiceClient) {
 
 func TestPoolsUpdateMember(sc *gophercloud.ServiceClient) {
 	//adminStateUp := true
-
+	weight := 5
 	opts := pools.UpdateMemberOpts{
-		Weight: 5,
+		Weight: &weight,
 		//AdminStateUp: &adminStateUp,
 	}
 

@@ -51,12 +51,12 @@ func TestMemberListSuccessfully(t *testing.T) {
 	err := pager.EachPage(func(page pagination.Page) (bool, error) {
 		pages++
 		t.Logf("Page %v", page)
-		members, err := members.ExtractMembers(page)
+		memberResult, err := members.ExtractMembers(page)
 		if err != nil {
 			return false, err
 		}
 
-		for _, i := range members {
+		for _, i := range memberResult {
 			t.Logf("%s\t%s\t%s\t%s\t\n", i.ImageID, i.MemberID, i.Status, i.Schema)
 			count++
 		}
@@ -81,12 +81,12 @@ func TestMemberListEmpty(t *testing.T) {
 	err := pager.EachPage(func(page pagination.Page) (bool, error) {
 		pages++
 		t.Logf("Page %v", page)
-		members, err := members.ExtractMembers(page)
+		memberResult, err := members.ExtractMembers(page)
 		if err != nil {
 			return false, err
 		}
 
-		for _, i := range members {
+		for _, i := range memberResult {
 			t.Logf("%s\t%s\t%s\t%s\t\n", i.ImageID, i.MemberID, i.Status, i.Schema)
 			count++
 		}

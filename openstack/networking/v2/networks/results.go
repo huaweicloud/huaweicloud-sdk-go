@@ -84,7 +84,7 @@ type Network struct {
 
 	// Specifies the physical network used by this network.
 	// This is an extended attribute.This attribute is available only to administrators.
-	ProviderPhysicalNetwork  string `json:"provider:physical_network,omitempty"`
+	ProviderPhysicalNetwork string `json:"provider:physical_network,omitempty"`
 
 	// Specifies the network type. Only the VXLAN and GENEVE networks are supported.
 	ProviderNetworkType string `json:"provider:network_type,omitempty"`
@@ -170,10 +170,10 @@ type NetworkIpAvailability struct {
 	TotalIps int `json:"total_ips"`
 
 	//子网IP使用情况的对象
-	SubnetIpAvail SubnetIpAvailabilitiy `json:"subnet_ip_availabilitiy"`
+	SubnetIpAvail []SubnetIpAvailability `json:"subnet_ip_availability"`
 }
 
-type SubnetIpAvailabilitiy struct {
+type SubnetIpAvailability struct {
 	SubnetId   string `json:"subnet_id"`
 	SubnetName string `json:"subnet_name"`
 	Cidr       string `json:"cidr"`

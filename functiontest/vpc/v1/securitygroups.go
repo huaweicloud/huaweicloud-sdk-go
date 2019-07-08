@@ -135,7 +135,13 @@ func ListSecurityGroup(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := securitygroups.ExtractSecurityGroups(allPages)
+	result, err1 := securitygroups.ExtractSecurityGroups(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
+
 	fmt.Printf("securitygroup: %+v\r\n", result)
 	for _, resp := range result {
 

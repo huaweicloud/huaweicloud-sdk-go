@@ -39,7 +39,6 @@ func (opts CreateOpts) ToPublicIPCreateMap() (map[string]interface{}, error) {
 
 func Create(c *gophercloud.ServiceClient, opts CreateOpts) (interface{}, error) {
 	var r CreateResult
-	var ex ExtendParam
 	body, err := opts.ToPublicIPCreateMap()
 	if err != nil {
 		return nil, err
@@ -49,9 +48,13 @@ func Create(c *gophercloud.ServiceClient, opts CreateOpts) (interface{}, error) 
 		OkCodes: []int{200, 201, 202, 204},
 	})
 
-	if opts.ExtendParam == ex {
-		return r.extractOnDemand()
+	onDemandData, onDemandErr := r.extractOnDemand()
+	orderData, orderErr := r.extract()
+
+	if orderData.OrderID != "" {
+		return orderData, orderErr
 	}
 
-	return r.extract()
+	return onDemandData, onDemandErr
+
 }

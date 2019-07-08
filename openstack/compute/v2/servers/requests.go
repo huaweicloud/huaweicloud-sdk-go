@@ -476,16 +476,15 @@ func Reboot(client *gophercloud.ServiceClient, id string, opts RebootOptsBuilder
 	return
 }
 
-//func GetConsoleLog(client *gophercloud.ServiceClient, id string, length string) (r GetConsoleLogResult) {
-//
-//	b := map[string]interface{}{
-//		"os-getConsoleOutput": map[string]string{
-//			"length": length,
-//		},
-//	}
-//	_, r.Err = client.Post(actionURL(client, id), b, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
-//	return
-//}
+func GetConsoleLog(client *gophercloud.ServiceClient, id string, length string) (r GetConsoleLogResult) {
+	b := map[string]interface{}{
+		"os-getConsoleOutput": map[string]string{
+			"length": length,
+		},
+	}
+	_, r.Err = client.Post(actionURL(client, id), b, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
+	return
+}
 
 // RebuildOptsBuilder allows extensions to provide additional parameters to the
 // rebuild request.
@@ -881,12 +880,12 @@ func GetPassword(client *gophercloud.ServiceClient, serverId string) (r GetPassw
 	return
 }
 
-//func GetInstanceActions(client *gophercloud.ServiceClient, serverId string) (r InstanceActionResult) {
-//	_, r.Err = client.Get(instanceActionsURL(client, serverId), &r.Body, nil)
-//	return
-//}
+func ListInstanceActions(client *gophercloud.ServiceClient, serverID string) (r InstanceActionResult) {
+	_, r.Err = client.Get(instanceActionsURL(client, serverID), &r.Body, nil)
+	return
+}
 
-//func GetInstanceActionsByRequestID(client *gophercloud.ServiceClient, serverId string, RequestId string) (r InstanceActionResult) {
-//	_, r.Err = client.Get(instanceActionsWithRequestIdURL(client, serverId, RequestId), &r.Body, nil)
-//	return
-//}
+func GetInstanceActions(client *gophercloud.ServiceClient, serverID string, RequestID string) (r InstanceActionResult) {
+	_, r.Err = client.Get(instanceActionsWithRequestIdURL(client, serverID, RequestID), &r.Body, nil)
+	return
+}

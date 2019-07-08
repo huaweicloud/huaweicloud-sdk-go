@@ -29,3 +29,13 @@ func updateMemberURL(c *gophercloud.ServiceClient, imageID string, memberID stri
 func deleteMemberURL(c *gophercloud.ServiceClient, imageID string, memberID string) string {
 	return imageMemberURL(c, imageID, memberID)
 }
+
+// getMemberSchemas generate a url to get member schemas
+func getMemberSchemas(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("schemas", "member")
+}
+
+// getMembersSchemas generate a url to get member schemas
+func getMembersSchemas(c *gophercloud.ServiceClient) string {
+	return c.ServiceURL("schemas", "members")
+}

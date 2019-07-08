@@ -535,7 +535,7 @@ type InstanceActionResult struct {
 	gophercloud.Result
 }
 
-func (r InstanceActionResult) ExtractInstanceActionResult() (*[]InstanceActions, error) {
+func (r InstanceActionResult) ExtractInstanceActionsListResult() (*[]InstanceActions, error) {
 	//var ia InstanceActions
 	var s struct {
 		Ia []InstanceActions `json:"instanceActions"`
@@ -545,7 +545,7 @@ func (r InstanceActionResult) ExtractInstanceActionResult() (*[]InstanceActions,
 	return &s.Ia, err
 }
 
-func (r InstanceActionResult) ExtractInstanceActionResultByRequestID() (*InstanceAction, error) {
+func (r InstanceActionResult) ExtractInstanceActionsResult() (*InstanceAction, error) {
 	var s struct {
 		Ia InstanceAction `json:"instanceAction"`
 	}

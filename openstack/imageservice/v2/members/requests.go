@@ -79,3 +79,18 @@ func Update(client *gophercloud.ServiceClient, imageID string, memberID string, 
 		&gophercloud.RequestOpts{OkCodes: []int{200}})
 	return
 }
+
+/*
+// GetMemberSchemas get the member schemas
+func GetMemberSchemas(client *gophercloud.ServiceClient) (r MemberSchemasResult) {
+	_, r.Err = client.Get(getMemberSchemas(client), &r.Body, nil)
+	return
+}
+
+// GetMembersSchemas get the members schemas
+func GetMembersSchemas(client *gophercloud.ServiceClient) (r MembersSchemasResult) {
+	_, r.Err = client.Get(getMembersSchemas(client), &r.Body, nil)
+	return
+}
+
+*/

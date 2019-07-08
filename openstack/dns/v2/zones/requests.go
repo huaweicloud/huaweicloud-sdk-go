@@ -1,3 +1,5 @@
+/*
+
 package zones
 
 import (
@@ -172,3 +174,230 @@ func Delete(client *gophercloud.ServiceClient, zoneID string) (r DeleteResult) {
 	})
 	return
 }
+
+
+ */
+
+package zones
+
+import (
+	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/pagination"
+)
+
+type ListOptsBuilder interface {
+	ToListQuery() (string, error)
+}
+
+type ListOpts struct {
+	// Number of resources returned on each page.Value range:
+	// 0–500.Commonly used values are 10, 20, and 50.
+	Limit string `q:"limit"`
+
+	// Start resource ID of pagination query.If the parameter is left
+	// blank, only resources on the first page are queried.
+	Marker string `q:"marker"`
+
+	// Zone type, which can be public or private.public: Public zones
+	// are queried.private: Private zones are queried.If the value is left blank, public
+	// zones are queried by default.
+	Type string `q:"type"`
+}
+
+func (opts ListOpts) ToListQuery() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
+// Query zones in list.
+func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := ListURL(client)
+	if opts != nil {
+		query, err := opts.ToListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return ListPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func Get(client *gophercloud.ServiceClient, zoneId string) (r GetResult) {
+	url := GetURL(client, zoneId)
+	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{})
+	return
+}
+
+type CreateOptsBuilder interface {
+	ToZonesCreateMap() (map[string]interface{}, error)
+}
+
+type CreateOpts struct {
+	// Mail address of the administrator managing the zone
+	Email string `json:"email,omitempty"`
+
+	// Description of the domain name, which cannot exceed 255
+	// characters
+	Description string `json:"description,omitempty"`
+
+	// Name of the zone to be created,If the domain name is ended with
+	// a dot (.), it cannot exceed 254 characters.Otherwise, the domain name cannot exceed
+	// 253 characters.
+	Name string `json:"name" required:"true"`
+
+	// Zone type. The value must be private, indicating that private
+	// network domain names accessible only to hosts in specified VPCs will be queried.
+	ZoneType string `json:"zone_type" required:"true"`
+
+	// Caching period of the SOA record set (in seconds).The default
+	// value is 300s.The value range is 300–2147483647.
+	TTL int `json:"ttl,omitempty"`
+
+	// Router information (VPC associated with the private zone)
+	Router Router `json:"router"`
+}
+
+func (opts CreateOpts) ToZonesCreateMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(&opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
+	b, err := opts.ToZonesCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(CreateURL(client), b, &r.Body, &gophercloud.RequestOpts{})
+	return
+}
+
+type UpdateOptsBuilder interface {
+	ToZonesUpdateMap() (map[string]interface{}, error)
+}
+
+type UpdateOpts struct {
+	// Mail address of the administrator managing the zone
+	Email string `json:"email,omitempty"`
+
+	// Caching period of the SOA record set (in seconds).The default
+	// value is 300s.The value range is 300–2147483647.
+	TTL int `json:"ttl,omitempty"`
+
+	// Description of the domain name, which cannot exceed 255
+	// characters
+	Description string `json:"description,omitempty"`
+}
+
+func (opts UpdateOpts) ToZonesUpdateMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(&opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func Update(client *gophercloud.ServiceClient, opts UpdateOptsBuilder, ZoneID string) (r UpdateResult) {
+	b, err := opts.ToZonesUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Patch(UpdateURL(client, ZoneID), b, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{202}})
+	return
+}
+
+func Delete(client *gophercloud.ServiceClient, zoneId string) (r DeleteResult) {
+	url := DeleteURL(client, zoneId)
+	_, r.Err = client.Delete(url, &gophercloud.RequestOpts{
+		JSONResponse: &r.Body,
+	})
+	return
+}
+
+type Router struct {
+	// Router ID (VPC ID)
+	RouterId string `json:"router_id" required:"true"`
+
+	// Region of the router (VPC).If it is left blank, the region of
+	// the project in the token takes effect by default.
+	RouterRegion string `json:"router_region,omitempty"`
+
+	// Task status.The value can be PENDING_CREATE, PENDING_DELETE,
+	// ACTIVE, or ERROR.
+	Status string `json:"status,omitempty"`
+}
+
+type AssociateRouterOpts struct {
+	// Router information (VPC associated with the zone)
+	Router Router `json:"router"`
+}
+
+type AssociateRouterOptsBuilder interface {
+	ToZonesAssociateRouterMap() (map[string]interface{}, error)
+}
+
+func (opts AssociateRouterOpts) ToZonesAssociateRouterMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(&opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+/*
+func AssociateRouter(client *gophercloud.ServiceClient, zoneId string, opts AssociateRouterOptsBuilder) (r AssociateRouterResult) {
+	b, err := opts.ToZonesAssociateRouterMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(AssociateRouterURL(client, zoneId), b, &r.Body, &gophercloud.RequestOpts{})
+	return
+}
+ */
+
+type DisassociateRouterOpts struct {
+	// Router information (VPC associated with the zone)
+	Router Router `json:"router"`
+}
+
+type DisassociateRouterOptsBuilder interface {
+	ToZonesDisassociateRouterMap() (map[string]interface{}, error)
+}
+
+func (opts DisassociateRouterOpts) ToZonesDisassociateRouterMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(&opts, "")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+/*
+func DisassociateRouter(client *gophercloud.ServiceClient, zoneId string, opts DisassociateRouterOptsBuilder) (r DisassociateRouterResult) {
+	b, err := opts.ToZonesDisassociateRouterMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	_, r.Err = client.Post(DisassociateRouterURL(client, zoneId), b, &r.Body, &gophercloud.RequestOpts{})
+	return
+}
+
+func ListNameServers(client *gophercloud.ServiceClient, zoneId string) (r ListNameServersResult) {
+	url := ListNameServersURL(client, zoneId)
+	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{})
+	return
+}
+ */

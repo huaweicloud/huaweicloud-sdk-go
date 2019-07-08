@@ -17,7 +17,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -56,7 +56,7 @@ func main() {
 func ListSubnet(sc *gophercloud.ServiceClient) {
 
 	allPages, err := subnets.List(sc, subnets.ListOpts{
-		//VpcID: "71969f1a-2527-4751-ab7f-94a435b8eacc",
+		//VpcID: "xxxxxx",
 		//Limit: 1,
 	}).AllPages()
 	if err != nil {
@@ -68,7 +68,12 @@ func ListSubnet(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	allData, _ := subnets.ExtractSubnets(allPages)
+	allData, err1 := subnets.ExtractSubnets(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("subnets: %+v\r\n", allData)
 	for _, resp := range allData {
@@ -94,10 +99,10 @@ func ListSubnet(sc *gophercloud.ServiceClient) {
 func CreateSubnet(sc *gophercloud.ServiceClient) {
 
 	resp, err := subnets.Create(sc, subnets.CreateOpts{
-		Name:      "ABC",
-		Cidr:      "192.168.1.0/24",
-		GatewayIP: "192.168.1.1",
-		VpcID:     "4bf9a3fc-ad22-44aa-8097-30b2c272b0d2",
+		Name:      "xxxxxx",
+		Cidr:      "xxx.xxx.xxx.xxx/xx",
+		GatewayIP: "xxx.xxx.xxx.xxx",
+		VpcID:     "xxxxxx",
 	}).Extract()
 	if err != nil {
 		fmt.Println(err)
@@ -127,8 +132,8 @@ func CreateSubnet(sc *gophercloud.ServiceClient) {
 
 func UpdateSubnet(sc *gophercloud.ServiceClient) {
 
-	resp, err := subnets.Update(sc, "83587a60-6f68-4beb-84e4-4360df4bbd49", "0aed2b44-b846-4d15-8047-84bbc6aaf46c", subnets.UpdateOpts{
-		Name: "ABC-baaaaaaaaaaaack",
+	resp, err := subnets.Update(sc, "xxxxxx", "xxxxxx", subnets.UpdateOpts{
+		Name: "xxxxxx",
 	}).Extract()
 
 	if err != nil {
@@ -147,7 +152,7 @@ func UpdateSubnet(sc *gophercloud.ServiceClient) {
 }
 
 func GetSubnet(sc *gophercloud.ServiceClient) {
-	resp, err := subnets.Get(sc, "008ce66f-ff4a-430c-ae7f-d9959ebcde00").Extract()
+	resp, err := subnets.Get(sc, "xxxxxx").Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -176,7 +181,7 @@ func GetSubnet(sc *gophercloud.ServiceClient) {
 
 func DeleteSubnet(sc *gophercloud.ServiceClient) {
 
-	resp := subnets.Delete(sc, "83587a60-6f68-4beb-84e4-4360df4bbd49", "0aed2b44-b846-4d15-8047-84bbc6aaf46c")
+	resp := subnets.Delete(sc, "xxxxxx", "xxxxxx")
 	if resp.Err != nil {
 		fmt.Println(resp.Err)
 		if ue, ok := resp.Err.(*gophercloud.UnifiedError); ok {
@@ -186,5 +191,5 @@ func DeleteSubnet(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	fmt.Println("delete success!")
+	fmt.Println("Delete success!")
 }

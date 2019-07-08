@@ -37,7 +37,8 @@ func main() {
 
 	//TestTestGetVolumeAttachList(sc)
 	//TestGetVolumeAttached(sc)
-	TestDeleteVolumeAttached(sc)
+	//TestDeleteVolumeAttached(sc)
+	TestDetachVolumeWithFlag(sc)
 
 	fmt.Println("main end...")
 }
@@ -105,5 +106,23 @@ func TestDeleteVolumeAttached(sc *gophercloud.ServiceClient) {
 		return
 	}
 	fmt.Println("Test server del VolumeAttached success!")
+
+}
+
+//TestDetachVolumeWithFlag tests detachment of volume with delete flag
+func TestDetachVolumeWithFlag(sc *gophercloud.ServiceClient) {
+	volumeID := "{volumeID}"
+	serverID := "{serverID}"
+	err := volumeattach.DeleteWithFlag(sc, serverID, volumeID, 0).ExtractErr()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Test server detach volume with delete flag success!")
 
 }

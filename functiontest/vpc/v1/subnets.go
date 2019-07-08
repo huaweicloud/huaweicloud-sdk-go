@@ -68,7 +68,12 @@ func ListSubnet(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	allData, _ := subnets.ExtractSubnets(allPages)
+	allData, err1 := subnets.ExtractSubnets(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("subnets: %+v\r\n", allData)
 	for _, resp := range allData {

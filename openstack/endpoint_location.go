@@ -5,6 +5,7 @@ import (
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/auth/aksk"
+	tokenAuth "github.com/gophercloud/gophercloud/auth/token"
 	tokens2 "github.com/gophercloud/gophercloud/openstack/identity/v2/tokens"
 	tokens3 "github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 
@@ -30,7 +31,7 @@ var endpointSchemaList = map[string]string{
 	"VPCV2.0": "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
 	"ASV1":    "https://as.%(region)s.%(domain)s/autoscaling-api/v1/%(projectID)s/",
 	"ASV2":    "https://as.%(region)s.%(domain)s/autoscaling-api/v2/%(projectID)s/",
-	//"DNS": "https://dns.%(region)s.%(domain)s/",
+	"DNS": "https://dns.%(region)s.%(domain)s/",
 }
 
 /*
@@ -97,6 +98,26 @@ func V2EndpointURL(catalog *tokens2.ServiceCatalog, opts gophercloud.EndpointOpt
 	return "", err
 }
 
+// Extract Endpoints from the catalog entries that match the requested Type, Interface, Name if provided, and Region if provided.
+func V3ExtractEndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts, tokenOptions tokens3.AuthOptionsBuilder) (string, error) {
+
+	if opts.Type == "" {
+		return "", errors.New("Service type can not be empty.")
+	}
+
+	ss := strings.Replace(opts.Type, "-", "_", -1)
+	key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
+	endpointFromEnv := os.Getenv(key)
+	if endpointFromEnv != "" {
+		if opts, ok := tokenOptions.(*tokenAuth.TokenOptions); ok {
+			endpointFromEnv = strings.Replace(endpointFromEnv, "%(projectID)s", opts.ProjectID, 1)
+			return endpointFromEnv, nil
+		}
+	}
+
+	return V3EndpointURL(catalog, opts)
+}
+
 /*
 V3EndpointURL discovers the endpoint URL for a specific service from a Catalog
 acquired during the v3 identity service.
@@ -108,18 +129,6 @@ will also often need to specify a Name and/or a Region depending on what's
 available on your OpenStack deployment.
 */
 func V3EndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts) (string, error) {
-	// Extract Endpoints from the catalog entries that match the requested Type, Interface,
-	// Name if provided, and Region if provided.
-
-	if opts.Type != "" {
-		ss := strings.Replace(opts.Type, "-", "_", -1)
-		key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
-		endpointFromEnv := os.Getenv(key)
-		if endpointFromEnv != "" {
-			return endpointFromEnv, nil
-		}
-	}
-
 	var endpoints = make([]tokens3.Endpoint, 0, 1)
 	for _, entry := range catalog.Entries {
 		if (entry.Type == opts.Type) && (opts.Name == "" || entry.Name == opts.Name) {
@@ -171,20 +180,24 @@ func V3EndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpt
    GetEndpointURLForAKSKAuth discovers the endpoint  from V3EndpointURL function firstly,
    if the endpoint is null then concat the service type and domain as the endpoint
 */
-
 func GetEndpointURLForAKSKAuth(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts, akskOptions aksk.AKSKOptions) (string, error) {
 
 	if akskOptions.Cloud != "" {
 		akskOptions.Domain = akskOptions.Cloud
 	}
 
-	if opts.Type != "" {
-		ss := strings.Replace(opts.Type, "-", "_", -1)
-		key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
-		endpointFromEnv := os.Getenv(key)
-		if endpointFromEnv != "" {
-			return endpointFromEnv, nil
-		}
+	if opts.Type == "" {
+		return "", errors.New("Service type can not be empty.")
+	}
+
+	ss := strings.Replace(opts.Type, "-", "_", -1)
+	key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
+	endpointFromEnv := os.Getenv(key)
+	if endpointFromEnv != "" {
+		//endpointFromEnv = strings.Replace(endpointFromEnv, "%(region)s", akskOptions.Region, 1)
+		//endpointFromEnv = strings.Replace(endpointFromEnv, "%(domain)s", akskOptions.Domain, 1)
+		endpointFromEnv = strings.Replace(endpointFromEnv, "%(projectID)s", akskOptions.ProjectID, 1)
+		return endpointFromEnv, nil
 	}
 
 	endpoint, err := V3EndpointURL(catalog, opts)

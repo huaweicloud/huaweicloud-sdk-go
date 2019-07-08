@@ -32,19 +32,21 @@ func main() {
 		fmt.Println("Failed to get the NewComputeV2 client: ", clientErr)
 		return
 	}
-	serverId := "{serverId}"
-	attachmentId := "{attachmentId }"
-	AttachvolumesList(client, serverId)
-	AttachvolumeCreate(client, serverId)
-	AttachvolumeGet(client, serverId, attachmentId)
-	AttachvolumeDelete(client, serverId, attachmentId)
+	serverID := "{serverID}"
+	attachmentID := "{attachmentID}"
+	deleteFlag := 1
+	AttachvolumesList(client, serverID)
+	AttachvolumeCreate(client, serverID)
+	AttachvolumeGet(client, serverID, attachmentID)
+	AttachvolumeDelete(client, serverID, attachmentID)
+	DetachVolumeWithDeleteFlag(client, serverID, attachmentID, deleteFlag)
 	fmt.Println("main end...")
 }
 
 //Query attachvolumes list
-func AttachvolumesList(client *gophercloud.ServiceClient, serverId string) {
+func AttachvolumesList(client *gophercloud.ServiceClient, serverID string) {
 	// Query all volumeattach list information
-	allPages, allPagesErr := volumeattach.List(client, serverId).AllPages()
+	allPages, allPagesErr := volumeattach.List(client, serverID).AllPages()
 	if allPagesErr != nil {
 		fmt.Println("allPagesErr:", allPagesErr)
 		if ue, ok := allPagesErr.(*gophercloud.UnifiedError); ok {
@@ -71,12 +73,12 @@ func AttachvolumesList(client *gophercloud.ServiceClient, serverId string) {
 }
 
 //Create attachvolume
-func AttachvolumeCreate(client *gophercloud.ServiceClient, serverId string) {
+func AttachvolumeCreate(client *gophercloud.ServiceClient, serverID string) {
 	volumeAttachOptions := volumeattach.CreateOpts{
 		Device: "/dev/sdb",
 		VolumeID: "640c1f2d-69ad-4d8a-9da8-c4b9abf83469",
 	}
-	resp, volumeAttachmentErr := volumeattach.Create(client, serverId, volumeAttachOptions).Extract()
+	resp, volumeAttachmentErr := volumeattach.Create(client, serverID, volumeAttachOptions).Extract()
 	if volumeAttachmentErr != nil {
 		fmt.Println("volumeAttachmentErr:", volumeAttachmentErr)
 		if ue, ok := volumeAttachmentErr.(*gophercloud.UnifiedError); ok {
@@ -90,8 +92,8 @@ func AttachvolumeCreate(client *gophercloud.ServiceClient, serverId string) {
 }
 
 //Get detail of the specified attachvolume
-func AttachvolumeGet(client *gophercloud.ServiceClient, serverId string, attachmentId string) {
-	volume, attachvolumesGetErr := volumeattach.Get(client, serverId,
+func AttachvolumeGet(client *gophercloud.ServiceClient, serverID string, attachmentId string) {
+	volume, attachvolumesGetErr := volumeattach.Get(client, serverID,
 		attachmentId).Extract()
 	if attachvolumesGetErr != nil {
 		fmt.Println("attachvolumesGetErr:", attachvolumesGetErr)
@@ -105,17 +107,33 @@ func AttachvolumeGet(client *gophercloud.ServiceClient, serverId string, attachm
 	fmt.Println("attachvolume detail is " + string(volumeJson))
 }
 
-//Delete attachvolume
-func AttachvolumeDelete(client *gophercloud.ServiceClient, serverId string, attachmentId string) {
-	attachvolumesDetachErr := volumeattach.Delete(client, serverId,
-		attachmentId).ExtractErr()
-	if attachvolumesDetachErr != nil {
-		fmt.Println("attachvolumesDetachErr:", attachvolumesDetachErr)
-		if ue, ok := attachvolumesDetachErr.(*gophercloud.UnifiedError); ok {
+//AttachvolumeDelete requests detachment of volume on server
+func AttachvolumeDelete(client *gophercloud.ServiceClient, serverID string, attachmentID string) {
+	attachVolumesDetachErr := volumeattach.Delete(client, serverID,
+		attachmentID).ExtractErr()
+	if attachVolumesDetachErr != nil {
+		fmt.Println("attachVolumesDetachErr:", attachVolumesDetachErr)
+		if ue, ok := attachVolumesDetachErr.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
 			fmt.Println("Message:", ue.Message())
 		}
 		return
 	}
-	fmt.Println("attachvolume delete success!")
+	fmt.Println("Server detach volume success!")
+}
+
+//DetachVolumeWithDeleteFlag requests enforce detachment of volume with delete flag 1
+func DetachVolumeWithDeleteFlag(sc *gophercloud.ServiceClient, serverID string, volumeID string, deleteFlag int) {
+	err := volumeattach.DeleteWithFlag(sc, serverID, volumeID, deleteFlag).ExtractErr()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Server detach volume with delete flag success!")
+
 }

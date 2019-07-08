@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"bytes"
 	"encoding/json"
-
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
+	//"github.com/gophercloud/gophercloud/openstack/imageservice/v2/members"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/imagedata"
 )
 
@@ -43,6 +43,12 @@ func main() {
 	TestDownload(sc)
 	TestDelete(sc)
 
+	//TestCreateTag(sc)
+	//TestDeleteTag(sc)
+	//TestGetimageSchemas(sc)
+	//TestGetiamgesSchemas(sc)
+	//TestGetmemberSchemas(sc)
+	//TestGetmembersSchemas(sc)
 	fmt.Println("main end...")
 }
 
@@ -170,4 +176,115 @@ func TestDownload(sc *gophercloud.ServiceClient) {
 	fmt.Println("Test download image success!")
 	os.Remove("./testimages.qcow2")
 }
+/*
+func TestCreateTag(sc *gophercloud.ServiceClient) {
+	id := "9a09b059-b393-419f-b91b-30e66bf5bd1a"
+	tag := "sfsd"
+	err := images.PutTag(sc, id, tag).ExtractErr()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
 
+	fmt.Println("Test TestCreateTag success!")
+}
+func TestDeleteTag(sc *gophercloud.ServiceClient) {
+	id := "9a09b059-b393-419f-b91b-30e66bf5bd1a"
+	tag := "sfsd"
+	err := images.DeleteTag(sc, id, tag).ExtractErr()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("Test TestDeleteTag success!")
+
+}
+func TestGetimageSchemas(sc *gophercloud.ServiceClient) {
+	imageSchemas, err := images.GetImageSchemas(sc).Extract()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, e := json.MarshalIndent(imageSchemas, "", " ")
+
+	if err != nil {
+		fmt.Println(e)
+		return
+	}
+
+	fmt.Println("Test TestGetSchemas success!")
+	fmt.Println(string(b))
+}
+func TestGetiamgesSchemas(sc *gophercloud.ServiceClient) {
+	imageSchemas, err := images.GetImagesSchemas(sc).Extract()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, e := json.MarshalIndent(imageSchemas, "", " ")
+
+	if err != nil {
+		fmt.Println(e)
+		return
+	}
+
+	fmt.Println("Test TestGetSchema success!")
+	fmt.Println(string(b))
+}
+
+func TestGetmemberSchemas(sc *gophercloud.ServiceClient) {
+	MemberSchemas, err := members.GetMemberSchemas(sc).Extract()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, e := json.MarshalIndent(MemberSchemas, "", " ")
+
+	if err != nil {
+		fmt.Println(e)
+		return
+	}
+
+	fmt.Println("Test TestGetmemberSchemas success!")
+	fmt.Println(string(b))
+}
+func TestGetmembersSchemas(sc *gophercloud.ServiceClient) {
+	MemberSchemas, err := members.GetMembersSchemas(sc).Extract()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, e := json.MarshalIndent(MemberSchemas, "", " ")
+
+	if err != nil {
+		fmt.Println(e)
+		return
+	}
+
+	fmt.Println("Test TestGetmembersSchemas success!")
+	fmt.Println(string(b))
+}
+*/

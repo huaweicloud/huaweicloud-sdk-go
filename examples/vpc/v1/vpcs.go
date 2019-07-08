@@ -17,7 +17,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -77,9 +77,9 @@ func CreateVPC(sc *gophercloud.ServiceClient) {
 
 func UpdateVPC(sc *gophercloud.ServiceClient) {
 
-	resp, err := vpcs.Update(sc, "1ce9a242-f01d-4fb0-9bfd-17bdc6b65853", vpcs.UpdateOpts{
-		Name: "ABC-back",
-		Cidr: "192.168.0.0/24",
+	resp, err := vpcs.Update(sc, "xxxxxx", vpcs.UpdateOpts{
+		Name: "xxxxxx",
+		Cidr: "xxx.xxx.xxx.xxx/xx",
 	}).Extract()
 
 	if err != nil {
@@ -102,7 +102,7 @@ func UpdateVPC(sc *gophercloud.ServiceClient) {
 }
 
 func GetVPC(sc *gophercloud.ServiceClient) {
-	resp, err := vpcs.Get(sc, "1ce9a242-f01d-4fb0-9bfd-17bdc6b65853").Extract()
+	resp, err := vpcs.Get(sc, "xxxxxx").Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -138,7 +138,12 @@ func ListVPC(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	vpcList, err := vpcs.ExtractVpcs(allpages)
+	vpcList, err1 := vpcs.ExtractVpcs(allpages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("vpc: %+v\r\n", vpcList)
 	for _, resp := range vpcList {
@@ -156,7 +161,7 @@ func ListVPC(sc *gophercloud.ServiceClient) {
 
 func DeleteVPC(sc *gophercloud.ServiceClient) {
 
-	resp := vpcs.Delete(sc, "1ce9a242-f01d-4fb0-9bfd-17bdc6b65853")
+	resp := vpcs.Delete(sc, "xxxxxx")
 	if resp.Err != nil {
 		fmt.Println(resp.Err)
 		if ue, ok := resp.Err.(*gophercloud.UnifiedError); ok {
@@ -166,5 +171,5 @@ func DeleteVPC(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	fmt.Println("delete success!")
+	fmt.Println("Delete success!")
 }

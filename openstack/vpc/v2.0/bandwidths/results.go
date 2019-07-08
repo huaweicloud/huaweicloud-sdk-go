@@ -103,6 +103,9 @@ type BandWidth struct {
 
 	// Enterprise project id
 	EnterpriseProjectID string `json:"enterprise_project_id"`
+
+	// Status
+	Status string `json:"status"`
 }
 
 type PublicIpinfo struct {

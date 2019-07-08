@@ -138,7 +138,12 @@ func ListVPC(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	vpcList, err := vpcs.ExtractVpcs(allpages)
+	vpcList, err1 := vpcs.ExtractVpcs(allpages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("vpc: %+v\r\n", vpcList)
 	for _, resp := range vpcList {

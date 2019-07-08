@@ -7,7 +7,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	cloudserversV2 "github.com/gophercloud/gophercloud/openstack/ecs/v2/cloudservers"
 
-	//"encoding/json"
 )
 
 func main() {
@@ -30,8 +29,8 @@ func main() {
 	}
 
 	//TestResetPassword(sc)
-	TestChangeOS(sc)
-	//TestReinstallOS(sc)
+	//TestChangeOS(sc)
+	TestReinstallOS(sc)
 	//TestResizeFlavor(sc)
 
 	fmt.Println("main end...")
@@ -79,28 +78,28 @@ func TestResetPassword(sc *gophercloud.ServiceClient) {
 	fmt.Println("reset password success!")
 }
 
-//func TestReinstallOS(sc *gophercloud.ServiceClient) {
-//	serverID := "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a"
-//	opts := cloudserversV2.ReinstallOpts{
-//		AdminPass: "asdf",
-//		UserID:    "aef",
-//	}
-//
-//	job, err := cloudserversV2.ReinstallOS(sc, serverID, opts).ExtractJob()
-//	if err != nil {
-//		fmt.Println("err:", err)
-//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode:", ue.ErrorCode())
-//			fmt.Println("Message:", ue.Message())
-//		}
-//		return
-//	}
-//
-//	fmt.Println("jobID:", job.ID)
-//
-//	fmt.Println(" TestReinstallOS success!")
-//}
-//
+func TestReinstallOS(sc *gophercloud.ServiceClient) {
+	serverID := "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a"
+	opts := cloudserversV2.ReinstallOpts{
+		AdminPass: "asdf",
+		UserID:    "aef",
+	}
+
+	job, err := cloudserversV2.ReinstallOS(sc, serverID, opts).ExtractJob()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("jobID:", job.ID)
+
+	fmt.Println(" TestReinstallOS success!")
+}
+
 //func TestResizeFlavor(sc *gophercloud.ServiceClient) {
 //
 //	opts := cloudserversV2.ResizeOpts{

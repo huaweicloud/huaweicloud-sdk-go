@@ -4,20 +4,21 @@ import (
 	"fmt"
 	"github.com/gophercloud/gophercloud/functiontest/common"
 
+	"encoding/json"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/cloudservers"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/cloudserversext"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/job"
-	"encoding/json"
+	"github.com/gophercloud/gophercloud/pagination"
 	"time"
 )
 
 func main() {
 	fmt.Println("main start...")
 
-	//provider, err := common.AuthToken()
-	provider, err := common.AuthAKSK()
+	provider, err := common.AuthToken()
+	//provider, err := common.AuthAKSK()
 	if err != nil {
 		fmt.Println("get provider client failed")
 		fmt.Println(err.Error())
@@ -36,7 +37,9 @@ func main() {
 	//TestGetEcsAutoRecovery(sc)
 	//TestConfigEcsAutoRecovery(sc)
 	//TestAddServerOnMonitorList(sc)
-	TestBatchChangeOS(sc)
+	//TestBatchChangeOS(sc)
+	TestListDetailOnePage(sc)
+	//TestListDetailAllPages(sc)
 	fmt.Println("main end...")
 
 }
@@ -85,31 +88,31 @@ func TestGetEcsExtbyOrderId(sc *gophercloud.ServiceClient) {
 	}
 }
 
-//func TestGetEcsAutoRecovery(sc *gophercloud.ServiceClient) {
-//	//2c2cd6a9-c501-42a9-a679-53518e6757cc
-//	resp, err := cloudservers.GetServerRecoveryStatus(sc, "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a").Extract()
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//	b, err := json.MarshalIndent(*resp, "", " ")
-//
-//	if err != nil {
-//
-//		fmt.Println(err)
-//	}
-//	fmt.Println(string(b))
-//
-//}
-//
-//func TestConfigEcsAutoRecovery(sc *gophercloud.ServiceClient) {
-//	//2c2cd6a9-c501-42a9-a679-53518e6757cc
-//	err := cloudservers.ConfigServerRecovery(sc, "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a", "true").ExtractErr()
-//	if err != nil {
-//		fmt.Println(err)
-//	}
-//	fmt.Println(" TestConfigEcsAutoRecovery success!")
-//}
-//
+func TestGetEcsAutoRecovery(sc *gophercloud.ServiceClient) {
+	//2c2cd6a9-c501-42a9-a679-53518e6757cc
+	resp, err := cloudservers.GetServerRecoveryStatus(sc, "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a").Extract()
+	if err != nil {
+		fmt.Println(err)
+	}
+	b, err := json.MarshalIndent(*resp, "", " ")
+
+	if err != nil {
+
+		fmt.Println(err)
+	}
+	fmt.Println(string(b))
+
+}
+
+func TestConfigEcsAutoRecovery(sc *gophercloud.ServiceClient) {
+	//2c2cd6a9-c501-42a9-a679-53518e6757cc
+	err := cloudservers.ConfigServerRecovery(sc, "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a", "true").ExtractErr()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(" TestConfigEcsAutoRecovery success!")
+}
+
 //func TestAddServerOnMonitorList(sc *gophercloud.ServiceClient) {
 //	//2c2cd6a9-c501-42a9-a679-53518e6757cc
 //	err := cloudservers.AddServerOnMonitorList(sc, "2e8c5857-45d2-4f92-bd1c-14fd815f5a5a").ExtractErr()
@@ -150,13 +153,13 @@ func TestBatchChangeOS(sc *gophercloud.ServiceClient) {
 
 	for {
 		time.Sleep(time.Duration(20) * time.Second)
-		jobRst,jobErr := job.GetJobResult(sc, jobObj.ID)
-		if jobErr != nil{
+		jobRst, jobErr := job.GetJobResult(sc, jobObj.ID)
+		if jobErr != nil {
 			fmt.Println(jobErr.Error())
 			return
 		}
 
-		jsJob,_ := json.MarshalIndent(jobRst,"","   ")
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
 		fmt.Println(string(jsJob))
 
 		if jobRst.Status == "SUCCESS" {
@@ -167,4 +170,89 @@ func TestBatchChangeOS(sc *gophercloud.ServiceClient) {
 			break
 		}
 	}
+}
+
+// TestListDetailOnePage requests one page data of server list details by pagination.
+func TestListDetailOnePage(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.ListOpts{
+		Limit:               1,
+		Offset:              1,
+		Name:                "test",
+		Flavor:              "s3.small.1",
+		Status:              "SHUTOFF",
+		Tags:                "onePage",
+		NotTags:             "now",
+		EnterpriseProjectID: "0",
+	}
+	err := cloudservers.ListDetail(sc, opts).EachPage(func(page pagination.Page) (bool, error) {
+		resp, pageErr := cloudservers.ExtractCloudServers(page)
+		if pageErr != nil {
+			fmt.Println(pageErr)
+			if ue, ok := pageErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return false, pageErr
+		}
+
+		fmt.Println("Resp Count is :", resp.Count)
+		for _, v := range resp.Servers {
+			jsServer, _ := json.MarshalIndent(v, "", "   ")
+			fmt.Println("Server info is :", string(jsServer))
+			fmt.Println("Server id is :", v.ID)
+			vpcID, ok := v.Metadata["vpc_id"]
+			if ok {
+				fmt.Println("Server vpc id is :", vpcID)
+			}
+		}
+		// When returns false, current page of data will be returned.
+		// Otherwise,when true,all pages of data will be returned.
+		return false, nil
+	})
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+}
+
+// TestListDetailAllPages requests all pages data of server list details by pagination.
+func TestListDetailAllPages(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.ListOpts{
+		Limit:   1,
+		Offset:  1,
+		Name:    "test",
+		Flavor:  "s3.small.1",
+		Status:  "SHUTOFF",
+		Tags:    "testkey=testvalue",
+		NotTags: "now",
+		//ReservationID: "123",
+		EnterpriseProjectID: "0",
+	}
+	page, err := cloudservers.ListDetail(sc, opts).AllPages()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	resp, pageErr := cloudservers.ExtractCloudServers(page)
+	if pageErr != nil {
+		fmt.Println(pageErr)
+		if ue, ok := pageErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("Resp Count is :", len(resp.Servers))
+	for _, v := range resp.Servers {
+		jsServer, _ := json.MarshalIndent(v, "", "   ")
+		fmt.Println("Server info is :", string(jsServer))
+	}
+
 }

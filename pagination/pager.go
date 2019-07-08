@@ -1,7 +1,7 @@
 package pagination
 
 import (
-	"errors"
+	//"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -10,10 +10,10 @@ import (
 	"github.com/gophercloud/gophercloud"
 )
 
-var (
-	// ErrPageNotAvailable is returned from a Pager when a next or previous page is requested, but does not exist.
-	ErrPageNotAvailable = errors.New("The requested page does not exist.")
-)
+//var (
+//	// ErrPageNotAvailable is returned from a Pager when a next or previous page is requested, but does not exist.
+//	ErrPageNotAvailable = errors.New("The requested page does not exist.")
+//)
 
 // Page must be satisfied by the result type of any resource collection.
 // It allows clients to interact with the resource uniformly, regardless of whether or not or how it's paginated.
@@ -40,6 +40,8 @@ type Pager struct {
 	initialURL string
 
 	createPage func(r PageResult) Page
+
+	firstPage Page
 
 	Err error
 
@@ -89,9 +91,18 @@ func (p Pager) EachPage(handler func(Page) (bool, error)) error {
 	}
 	currentURL := p.initialURL
 	for {
-		currentPage, err := p.fetchNextPage(currentURL)
-		if err != nil {
-			return err
+		var currentPage Page
+
+		// if first page has already been fetched, no need to fetch it again
+		if p.firstPage != nil {
+			currentPage = p.firstPage
+			p.firstPage = nil
+		} else {
+			var err error
+			currentPage, err = p.fetchNextPage(currentURL)
+			if err != nil {
+				return err
+			}
 		}
 
 		empty, err := currentPage.IsEmpty()
@@ -128,23 +139,26 @@ func (p Pager) AllPages() (Page, error) {
 	// body will contain the final concatenated Page body.
 	var body reflect.Value
 
-	// Grab a test page to ascertain the page body type.
-	testPage, err := p.fetchNextPage(p.initialURL)
+	// Grab a first page to ascertain the page body type.
+	firstPage, err := p.fetchNextPage(p.initialURL)
 	if err != nil {
 		return nil, err
 	}
 	// Store the page type so we can use reflection to create a new mega-page of
 	// that type.
-	pageType := reflect.TypeOf(testPage)
+	pageType := reflect.TypeOf(firstPage)
 
-	// if it's a single page, just return the testPage (first page)
+	// if it's a single page, just return the firstPage (first page)
 	if _, found := pageType.FieldByName("SinglePageBase"); found {
-		return testPage, nil
+		return firstPage, nil
 	}
+
+	// store the first page to avoid getting it twice
+	p.firstPage = firstPage
 
 	// Switch on the page body type. Recognized types are `map[string]interface{}`,
 	// `[]byte`, and `[]interface{}`.
-	switch pb := testPage.GetBody().(type) {
+	switch pb := firstPage.GetBody().(type) {
 	case map[string]interface{}:
 		// key is the map key for the page body if the body type is `map[string]interface{}`.
 		var key string

@@ -32,5 +32,5 @@ func TestGetAPIVersion(t *testing.T) {
 	actual, err := apiversions.Get(client.ServiceClient(), "v2").Extract()
 	th.AssertNoErr(t, err)
 
-	th.AssertDeepEquals(t, ManilaAPIVersion2Result, *actual)
+	th.AssertDeepEquals(t, ManilaAPIVersion2Result, actual)
 }

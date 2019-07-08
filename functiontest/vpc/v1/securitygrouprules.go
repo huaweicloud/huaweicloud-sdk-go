@@ -72,6 +72,7 @@ func CreateSecurityGroupRule(client *gophercloud.ServiceClient) {
 	fmt.Println("securityGroupRule Description is:", result.Description)
 	fmt.Println("securityGroupRule Direction is:", result.Direction)
 	fmt.Println("securityGroupRule EtherType is:", result.Ethertype)
+	//if PortRangeMax and PortRangeMin are nil,means null in the API documentation
 	if result.PortRangeMax != nil {
 		fmt.Println("securityGroupRule PortRangeMax is:", *result.PortRangeMax)
 		fmt.Println("securityGroupRule PortRangeMin is:", *result.PortRangeMin)
@@ -125,14 +126,10 @@ func ListSecurityGroupRule(client *gophercloud.ServiceClient) {
 		return
 	}
 
-	result, err := securitygrouprules.ExtractSecurityGroupRules(allPages)
+	result, err1 := securitygrouprules.ExtractSecurityGroupRules(allPages)
 
-	if err != nil {
-		fmt.Println(err)
-		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-			fmt.Println("ErrCode:", ue.ErrorCode())
-			fmt.Println("Message:", ue.Message())
-		}
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
 		return
 	}
 
@@ -141,6 +138,7 @@ func ListSecurityGroupRule(client *gophercloud.ServiceClient) {
 		fmt.Println("securityGroupRule Description is:", resp.Description)
 		fmt.Println("securityGroupRule Direction is:", resp.Direction)
 		fmt.Println("securityGroupRule EtherType is:", resp.Ethertype)
+		//if PortRangeMax and PortRangeMin are nil,means null in the API documentation
 		if resp.PortRangeMax != nil {
 			fmt.Println("securityGroupRule PortRangeMax is:", *resp.PortRangeMax)
 			fmt.Println("securityGroupRule PortRangeMin is:", *resp.PortRangeMin)

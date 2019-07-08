@@ -44,9 +44,9 @@ func main() {
 	//TestServerGet(sc)
 	//TestServerUpdate(sc)
 	//TestServerDelete(sc)
-	//TestServerActions(sc)
-	//TestServerActionsByRequestId(sc)
-	//TestServerGetConsoleLog(sc)
+	TestServerListInstanceActions(sc)
+	TestServerGetInstanceActions(sc)
+	TestServerGetConsoleLog(sc)
 
 	fmt.Println("main end...")
 }
@@ -234,61 +234,60 @@ func TestServerDelete(sc *gophercloud.ServiceClient) {
 	fmt.Println("Test server delete success!")
 }
 
-//func TestServerActions(sc *gophercloud.ServiceClient) {
-//	id := "4a5e7286-8da5-4bf8-9658-88f5fc604d2e"
-//
-//	resp, err := servers.GetInstanceActions(sc, id).ExtractInstanceActionResult()
-//
-//	if err != nil {
-//		fmt.Println(err)
-//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode", ue.ErrCode)
-//			fmt.Println("ErrMessage", ue.ErrMessage)
-//		}
-//		return
-//	}
-//	fmt.Println("Test server get ServerActions success!")
-//
-//	p, _ := json.MarshalIndent(*resp, "", " ")
-//	fmt.Println(string(p))
-//
-//}
+func TestServerListInstanceActions(sc *gophercloud.ServiceClient) {
+	id := "4a5e7286-8da5-4bf8-9658-88f5fc604d2e"
 
-//func TestServerActionsByRequestId(sc *gophercloud.ServiceClient) {
-//	id := "4a5e7286-8da5-4bf8-9658-88f5fc604d2e"
-//	reqId := "req-d21d1fee-3fae-4691-bead-bee607700000"
-//	resp, err := servers.GetInstanceActionsByRequestID(sc, id, reqId).ExtractInstanceActionResultByRequestID()
-//
-//	if err != nil {
-//		fmt.Println(err)
-//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode", ue.ErrCode)
-//			fmt.Println("ErrMessage", ue.ErrMessage)
-//		}
-//		return
-//	}
-//	fmt.Println("Test server get ServerActionsByRequestId success!")
-//
-//	p, _ := json.MarshalIndent(*resp, "", " ")
-//	fmt.Println(string(p))
-//
-//}
-//
-//
-//func TestServerGetConsoleLog(sc *gophercloud.ServiceClient) {
-//	id := "a447418b-7d79-4f9d-82e1-17380b78ee2c"
-//
-//	resp,err := servers.GetConsoleLog(sc, id,"20").Extract()
-//
-//	if err != nil {
-//		fmt.Println(err)
-//		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-//			fmt.Println("ErrCode", ue.ErrCode)
-//			fmt.Println("ErrMessage", ue.ErrMessage)
-//		}
-//		return
-//	}
-//	fmt.Println(resp)
-//	fmt.Println("Test server get TestServerGetConsoleLog success!")
-//
-//}
+	resp, err := servers.ListInstanceActions(sc, id).ExtractInstanceActionsListResult()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Test server get ServerActions success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+
+}
+
+func TestServerGetInstanceActions(sc *gophercloud.ServiceClient) {
+	id := "4a5e7286-8da5-4bf8-9658-88f5fc604d2e"
+	reqId := "req-d21d1fee-3fae-4691-bead-bee607700000"
+	resp, err := servers.GetInstanceActions(sc, id, reqId).ExtractInstanceActionsResult()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println("Test server get ServerActionsByRequestId success!")
+
+	p, _ := json.MarshalIndent(*resp, "", " ")
+	fmt.Println(string(p))
+
+}
+
+func TestServerGetConsoleLog(sc *gophercloud.ServiceClient) {
+	id := "a447418b-7d79-4f9d-82e1-17380b78ee2c"
+
+	resp,err := servers.GetConsoleLog(sc, id,"20").Extract()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode", ue.ErrCode)
+			fmt.Println("ErrMessage", ue.ErrMessage)
+		}
+		return
+	}
+	fmt.Println(resp)
+	fmt.Println("Test server get TestServerGetConsoleLog success!")
+
+}

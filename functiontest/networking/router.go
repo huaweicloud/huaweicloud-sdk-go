@@ -61,7 +61,7 @@ func TestRouterList(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	routers, err := routers.ExtractRouters(allpages)
+	router, err := routers.ExtractRouters(allpages)
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -72,7 +72,7 @@ func TestRouterList(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test get router list success!")
-	p, _ := json.MarshalIndent(routers, "", " ")
+	p, _ := json.MarshalIndent(router, "", " ")
 	fmt.Println(string(p))
 }
 

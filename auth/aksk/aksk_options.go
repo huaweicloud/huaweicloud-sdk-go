@@ -19,10 +19,10 @@ type AKSKOptions struct {
 	// region
 	Region string
 
-	// cloud service domain, example: myhwclouds.com
+	//Cloud name
 	Domain string
 
-	//Cloud domain name, example: myhwclouds.com
+	//Cloud name
 	Cloud string
 
 	AccessKey string //Access Key

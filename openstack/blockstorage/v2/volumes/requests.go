@@ -407,7 +407,7 @@ func UpdateMetadataKey(client *gophercloud.ServiceClient, id, key string, opts M
 // DeleteMetadataKey delete specific key in metadata
 func DeleteMetadataKey(client *gophercloud.ServiceClient, id, key string) (r DeleteMetadataKeyResult) {
 	_, r.Err = client.Delete(metadataKeyURL(client, id, key), &gophercloud.RequestOpts{
-		OkCodes:[]int{200},
+		OkCodes: []int{200},
 	})
 	return
 }
@@ -534,7 +534,7 @@ func ExportVolumes(client *gophercloud.ServiceClient, id string, opts ExportVolu
 		r.Err = err
 		return
 	}
-	_, r.Err = client.Post(actionURL(client, id), b, nil, &gophercloud.RequestOpts{
+	_, r.Err = client.Post(actionURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
 		OkCodes: []int{202},
 	})
 	return

@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -49,7 +49,7 @@ func main() {
 }
 
 func UpdateBandWidth(client *gophercloud.ServiceClient) {
-	result, err := bandwidths.Update(client, "00d7dedc-75aa-47aa-9c2f-f1c1f49bed19", bandwidths.UpdateOpts{
+	result, err := bandwidths.Update(client, "xxxxxx", bandwidths.UpdateOpts{
 		Size: 10,
 	}).Extract()
 
@@ -77,7 +77,7 @@ func UpdateBandWidth(client *gophercloud.ServiceClient) {
 }
 
 func GetBandWidth(client *gophercloud.ServiceClient) {
-	result, err := bandwidths.Get(client, "00d7dedc-75aa-47aa-9c2f-f1c1f49bed19").Extract()
+	result, err := bandwidths.Get(client, "xxxxxx").Extract()
 
 	if err != nil {
 		fmt.Println(err)
@@ -116,7 +116,12 @@ func ListBandWidth(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := bandwidths.ExtractBandWidths(allPages)
+	result, err1 := bandwidths.ExtractBandWidths(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
 
 	fmt.Printf("bandwidths: %+v\r\n", result)
 	for _, resp := range result {

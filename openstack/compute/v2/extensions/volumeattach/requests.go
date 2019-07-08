@@ -58,3 +58,10 @@ func Delete(client *gophercloud.ServiceClient, serverID, attachmentID string) (r
 	_, r.Err = client.Delete(deleteURL(client, serverID, attachmentID), nil)
 	return
 }
+
+// DeleteWithFlag requests the deletion of a previous stored VolumeAttachment
+// with delete type flag from the server.
+func DeleteWithFlag(client *gophercloud.ServiceClient, serverID, volumeID string, deleteFlag int) (r DeleteResult) {
+	_, r.Err = client.Delete(deleteWithFlagURL(client, serverID, volumeID, deleteFlag), nil)
+	return
+}

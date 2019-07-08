@@ -16,7 +16,7 @@ func main() {
 		ProjectID:        "{ProjectID}",
 		AccessKey:        "your AK string",
 		SecretKey:        "your SK string",
-		Domain:           "yyy.com",
+		Cloud:            "yyy.com",
 		Region:           "xxx",
 		DomainID:         "{domainID}",
 	}
@@ -53,8 +53,8 @@ func main() {
 func CreatePort(client *gophercloud.ServiceClient) {
 
 	result, err := ports.Create(client, ports.CreateOpts{
-		Name:      "kakport",
-		NetworkId: "dd7ab438-f0ed-468a-8d29-0f8522ad132a",
+		Name:      "xxxxxx",
+		NetworkId: "xxxxxx",
 	}).Extract()
 
 	if err != nil {
@@ -80,8 +80,8 @@ func CreatePort(client *gophercloud.ServiceClient) {
 
 func UpdatePort(client *gophercloud.ServiceClient) {
 
-	result, err := ports.Update(client, "a96ba238-4b7f-4928-8aac-f23d81b1d111", ports.UpdateOpts{
-		Name: "ModifiedPort",
+	result, err := ports.Update(client, "xxxxxx", ports.UpdateOpts{
+		Name: "xxxxxx",
 	}).Extract()
 
 	if err != nil {
@@ -106,7 +106,7 @@ func UpdatePort(client *gophercloud.ServiceClient) {
 
 func GetPort(client *gophercloud.ServiceClient) {
 
-	result, err := ports.Get(client, "016ed520-3cfb-4e2c-919d-ce5eb1071aac").Extract()
+	result, err := ports.Get(client, "xxxxxx").Extract()
 
 	if err != nil {
 		fmt.Println(err)
@@ -142,7 +142,13 @@ func ListPort(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	result, err := ports.ExtractPorts(allPages)
+	result, err1 := ports.ExtractPorts(allPages)
+
+	if err1 != nil {
+		fmt.Println("err1:", err1.Error())
+		return
+	}
+
 	fmt.Printf("port: %+v\r\n", result)
 	for _, resp := range result {
 		fmt.Println("port Id is:", resp.ID)
@@ -157,7 +163,7 @@ func ListPort(client *gophercloud.ServiceClient) {
 }
 
 func DeletePort(client *gophercloud.ServiceClient) {
-	err := ports.Delete(client, "a96ba238-4b7f-4928-8aac-f23d81b1d111").ExtractErr()
+	err := ports.Delete(client, "xxxxxx").ExtractErr()
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
