@@ -130,7 +130,7 @@ func TestList(t *testing.T) {
 		count++
 		actual, err := zones.ExtractList(page)
 		th.AssertNoErr(t, err)
-		th.CheckDeepEquals(t, ExpectedZonesSlice, actual)
+		th.CheckDeepEquals(t, ExpectedZonesSlice, actual.Zones)
 
 		return true, nil
 	})
@@ -155,7 +155,7 @@ func TestGet(t *testing.T) {
 	defer th.TeardownHTTP()
 	HandleGetSuccessfully(t)
 
-	actual, err := zones.Get(client.ServiceClient(), "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3").Extract()
+	actual, err := zones.Get(client.ServiceClient(), "ff8080825b8fc86c015b94bc6f8712c3").Extract()
 	th.AssertNoErr(t, err)
 	th.CheckDeepEquals(t, &FirstZone, actual)
 }
@@ -169,6 +169,11 @@ func TestCreate(t *testing.T) {
 		Name:        "example.org.",
 		Email:       "joe@example.org",
 		Description: "This is an example zone.",
+		ZoneType:    "PRIMARY",
+		Router: zones.RouterCreateOpts{
+			RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
+			RouterRegion: "xx",
+		},
 	}
 
 	actual, err := zones.Create(client.ServiceClient(), createOpts).Extract()
@@ -181,7 +186,7 @@ func TestDelete(t *testing.T) {
 	defer th.TeardownHTTP()
 	HandleDeleteSuccessfully(t)
 
-	DeletedZone := CreatedZone
+	DeletedZone := FirstZone
 	DeletedZone.Status = "PENDING"
 	DeletedZone.Description = "Updated Description"
 

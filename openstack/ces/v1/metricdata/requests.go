@@ -54,78 +54,76 @@ func BatchQuery(client *gophercloud.ServiceClient, opts BatchQueryOptsBuilder) (
 		return
 	}
 	_, r.Err = client.Post(batchQueryMetricDataURL(client), b, &r.Body, &gophercloud.RequestOpts{
-		OkCodes: []int{200},})
+		OkCodes: []int{200}})
 	return
 }
 
 type AddMetricDataOpts []AddMetricDataItem
 
 type GetEventDataOpts struct {
-	// Ö¸±êµÄÎ¬¶È£¬Ä¿Ç°×î´óÖ§³Ö3¸öÎ¬¶È£¬Î¬¶È±àºÅ´Ó0¿ªÊ¼£»Î¬¶È¸ñÊ½Îªdim.{i}=key,value²Î¿¼µ¯ĞÔÔÆ·şÎñÆ÷Î¬¶È¡£ÀıÈçdim.0=instance_id,i-12345
+	// æŒ‡æ ‡çš„ç»´åº¦ï¼Œç›®å‰æœ€å¤§æ”¯æŒ3ä¸ªç»´åº¦ï¼Œç»´åº¦ç¼–å·ä»0å¼€å§‹ï¼›ç»´åº¦æ ¼å¼ä¸ºdim.{i}=key,valueå‚è€ƒå¼¹æ€§äº‘æœåŠ¡å™¨ç»´åº¦ã€‚ä¾‹å¦‚dim.0=instance_id,i-12345
 	Dim0 string `q:"dim.0,required"`
 	Dim1 string `q:"dim.1"`
 	Dim2 string `q:"dim.2"`
-	// ²éÑ¯Êı¾İÆğÊ¼Ê±¼ä£¬UNIXÊ±¼ä´Á£¬µ¥Î»ºÁÃë¡£
-	From int `q:"from,required"`
-	// Ö¸±êÃüÃû¿Õ¼ä£¬ÀıÈçµ¯ĞÔÔÆ·şÎñÆ÷ÃüÃû¿Õ¼ä¡£
+	// æŸ¥è¯¢æ•°æ®èµ·å§‹æ—¶é—´ï¼ŒUNIXæ—¶é—´æˆ³ï¼Œå•ä½æ¯«ç§’ã€‚
+	From string `q:"from,required"`
+	// æŒ‡æ ‡å‘½åç©ºé—´ï¼Œä¾‹å¦‚å¼¹æ€§äº‘æœåŠ¡å™¨å‘½åç©ºé—´ã€‚
 	Namespace string `q:"namespace,required"`
-	// ²éÑ¯Êı¾İ½ØÖ¹Ê±¼äUNIXÊ±¼ä´Á£¬µ¥Î»ºÁÃë¡£from±ØĞëĞ¡ÓÚto¡£
-	To int `q:"to,required"`
-	// ÊÂ¼şÀàĞÍ£¬Ö»ÔÊĞí×ÖÄ¸¡¢ÏÂ»®Ïß¡¢ÖĞ»®Ïß£¬×ÖÄ¸¿ªÍ·£¬³¤¶È²»³¬¹ı64£¬Èçinstance_host_info¡£
+	// æŸ¥è¯¢æ•°æ®æˆªæ­¢æ—¶é—´UNIXæ—¶é—´æˆ³ï¼Œå•ä½æ¯«ç§’ã€‚fromå¿…é¡»å°äºtoã€‚
+	To string `q:"to,required"`
+	// äº‹ä»¶ç±»å‹ï¼Œåªå…è®¸å­—æ¯ã€ä¸‹åˆ’çº¿ã€ä¸­åˆ’çº¿ï¼Œå­—æ¯å¼€å¤´ï¼Œé•¿åº¦ä¸è¶…è¿‡64ï¼Œå¦‚instance_host_infoã€‚
 	Type string `q:"type,required"`
 }
 
 type GetOpts struct {
-	// Ö¸±êµÄÎ¬¶È£¬Ä¿Ç°×î´óÖ§³Ö3¸öÎ¬¶È£¬Î¬¶È±àºÅ´Ó0¿ªÊ¼£»Î¬¶È¸ñÊ½Îªdim.{i}=key,value£¬×î´óÖµÎª256¡£  ÀıÈçdim.0=instance_id,i-12345
+	// æŒ‡æ ‡çš„ç»´åº¦ï¼Œç›®å‰æœ€å¤§æ”¯æŒ3ä¸ªç»´åº¦ï¼Œç»´åº¦ç¼–å·ä»0å¼€å§‹ï¼›ç»´åº¦æ ¼å¼ä¸ºdim.{i}=key,valueï¼Œæœ€å¤§å€¼ä¸º256ã€‚  ä¾‹å¦‚dim.0=instance_id,i-12345
 	Dim0 string `q:"dim.0,required"`
 	Dim1 string `q:"dim.1"`
 	Dim2 string `q:"dim.2"`
-	// Êı¾İ¾ÛºÏ·½Ê½¡£  Ö§³ÖµÄÖµÎªmax, min, average, sum, variance¡£
+	// æ•°æ®èšåˆæ–¹å¼ã€‚  æ”¯æŒçš„å€¼ä¸ºmax, min, average, sum, varianceã€‚
 	Filter string `q:"filter,required"`
-	// ²éÑ¯Êı¾İÆğÊ¼Ê±¼ä£¬UNIXÊ±¼ä´Á£¬µ¥Î»ºÁÃë¡£½¨ÒéfromµÄÖµÏà¶ÔÓÚµ±Ç°Ê±¼äÏòÇ°Æ«ÒÆÖÁÉÙ1¸öÖÜÆÚ¡£ÓÉÓÚ¾ÛºÏÔËËãµÄ¹ı³ÌÊÇ½«Ò»¸ö¾ÛºÏÖÜÆÚ·¶Î§ÄÚµÄÊı¾İµã¾ÛºÏµ½ÖÜÆÚÆğÊ¼±ß½çÉÏ£¬Èç¹û½«fromºÍtoµÄ·¶Î§ÉèÖÃÔÚ¾ÛºÏÖÜÆÚÄÚ£¬»áÒòÎª¾ÛºÏÎ´Íê³É¶øÔì³É²éÑ¯Êı¾İÎª¿Õ£¬ËùÒÔ½¨Òéfrom²ÎÊıÏà¶ÔÓÚµ±Ç°Ê±¼äÏòÇ°Æ«ÒÆÖÁÉÙ1¸öÖÜÆÚ¡£ÒÔ5·ÖÖÓ¾ÛºÏÖÜÆÚÎªÀı£º¼ÙÉèµ±Ç°Ê±¼äµãÎª10:35£¬10:30~10:35Ö®¼äµÄÔ­Ê¼Êı¾İ»á±»¾ÛºÏµ½10:30Õâ¸öµãÉÏ£¬ËùÒÔ²éÑ¯5·ÖÖÓÊı¾İµãÊ±from²ÎÊıÓ¦Îª10:30»òÖ®Ç°¡£ÔÆ¼à¿Ø»á¸ù¾İËùÑ¡ÔñµÄ¾ÛºÏÁ£¶ÈÏòÇ°È¡Õûfrom²ÎÊı¡£
-	From int `q:"from,required"`
-	// Ö¸±êÃû³Æ£¬ÀıÈçµ¯ĞÔÔÆ·şÎñÆ÷¼à¿ØÖ¸±êÖĞµÄcpu_util¡£
+	// æŸ¥è¯¢æ•°æ®èµ·å§‹æ—¶é—´ï¼ŒUNIXæ—¶é—´æˆ³ï¼Œå•ä½æ¯«ç§’ã€‚å»ºè®®fromçš„å€¼ç›¸å¯¹äºå½“å‰æ—¶é—´å‘å‰åç§»è‡³å°‘1ä¸ªå‘¨æœŸã€‚ç”±äºèšåˆè¿ç®—çš„è¿‡ç¨‹æ˜¯å°†ä¸€ä¸ªèšåˆå‘¨æœŸèŒƒå›´å†…çš„æ•°æ®ç‚¹èšåˆåˆ°å‘¨æœŸèµ·å§‹è¾¹ç•Œä¸Šï¼Œå¦‚æœå°†fromå’Œtoçš„èŒƒå›´è®¾ç½®åœ¨èšåˆå‘¨æœŸå†…ï¼Œä¼šå› ä¸ºèšåˆæœªå®Œæˆè€Œé€ æˆæŸ¥è¯¢æ•°æ®ä¸ºç©ºï¼Œæ‰€ä»¥å»ºè®®fromå‚æ•°ç›¸å¯¹äºå½“å‰æ—¶é—´å‘å‰åç§»è‡³å°‘1ä¸ªå‘¨æœŸã€‚ä»¥5åˆ†é’Ÿèšåˆå‘¨æœŸä¸ºä¾‹ï¼šå‡è®¾å½“å‰æ—¶é—´ç‚¹ä¸º10:35ï¼Œ10:30~10:35ä¹‹é—´çš„åŸå§‹æ•°æ®ä¼šè¢«èšåˆåˆ°10:30è¿™ä¸ªç‚¹ä¸Šï¼Œæ‰€ä»¥æŸ¥è¯¢5åˆ†é’Ÿæ•°æ®ç‚¹æ—¶fromå‚æ•°åº”ä¸º10:30æˆ–ä¹‹å‰ã€‚äº‘ç›‘æ§ä¼šæ ¹æ®æ‰€é€‰æ‹©çš„èšåˆç²’åº¦å‘å‰å–æ•´fromå‚æ•°ã€‚
+	From string `q:"from,required"`
+	// æŒ‡æ ‡åç§°ï¼Œä¾‹å¦‚å¼¹æ€§äº‘æœåŠ¡å™¨ç›‘æ§æŒ‡æ ‡ä¸­çš„cpu_utilã€‚
 	MetricName string `q:"metric_name,required"`
-	// Ö¸±êÃüÃû¿Õ¼ä¡£
+	// æŒ‡æ ‡å‘½åç©ºé—´ã€‚
 	Namespace string `q:"namespace,required"`
-	// ¼à¿ØÊı¾İÁ£¶È¡£  È¡Öµ·¶Î§£º  1£¬ÊµÊ±Êı¾İ 300£¬5·ÖÖÓÁ£¶È 1200£¬20·ÖÖÓÁ£¶È 3600£¬1Ğ¡Ê±Á£¶È 14400£¬4Ğ¡Ê±Á£¶È 86400£¬1ÌìÁ£¶È
-	Period int `q:"period,required"`
-	// ²éÑ¯Êı¾İ½ØÖ¹Ê±¼äUNIXÊ±¼ä´Á£¬µ¥Î»ºÁÃë¡£from±ØĞëĞ¡ÓÚto¡£
-	To int `q:"to,required"`
+	// ç›‘æ§æ•°æ®ç²’åº¦ã€‚  å–å€¼èŒƒå›´ï¼š  1ï¼Œå®æ—¶æ•°æ® 300ï¼Œ5åˆ†é’Ÿç²’åº¦ 1200ï¼Œ20åˆ†é’Ÿç²’åº¦ 3600ï¼Œ1å°æ—¶ç²’åº¦ 14400ï¼Œ4å°æ—¶ç²’åº¦ 86400ï¼Œ1å¤©ç²’åº¦
+	Period string `q:"period,required"`
+	// æŸ¥è¯¢æ•°æ®æˆªæ­¢æ—¶é—´UNIXæ—¶é—´æˆ³ï¼Œå•ä½æ¯«ç§’ã€‚fromå¿…é¡»å°äºtoã€‚
+	To string `q:"to,required"`
 }
 
 type AddMetricDataItem struct {
-	// Ö¸±êÊı¾İ¡£
+	// æŒ‡æ ‡æ•°æ®ã€‚
 	Metric MetricInfo `json:"metric" required:"true"`
-	// Êı¾İµÄÓĞĞ§ÆÚ£¬³¬³ö¸ÃÓĞĞ§ÆÚÔò×Ô¶¯É¾³ı¸ÃÊı¾İ£¬µ¥Î»Ãë£¬×î´óÖµ604800¡£
+	// æ•°æ®çš„æœ‰æ•ˆæœŸï¼Œè¶…å‡ºè¯¥æœ‰æ•ˆæœŸåˆ™è‡ªåŠ¨åˆ é™¤è¯¥æ•°æ®ï¼Œå•ä½ç§’ï¼Œæœ€å¤§å€¼604800ã€‚
 	Ttl int `json:"ttl" required:"true"`
-	// Êı¾İÊÕ¼¯Ê±¼ä  UNIXÊ±¼ä´Á£¬µ¥Î»ºÁÃë¡£  ËµÃ÷£º ÒòÎª¿Í»§¶Ëµ½·şÎñÆ÷¶ËÓĞÑÓÊ±£¬Òò´Ë²åÈëÊı¾İµÄÊ±¼ä´ÁÓ¦¸ÃÔÚ[µ±Ç°Ê±¼ä-3Ìì+20Ãë£¬µ±Ç°Ê±¼ä+10·ÖÖÓ-20Ãë]Çø¼äÄÚ£¬±£Ö¤µ½´ï·şÎñÆ÷Ê±²»»áÒòÎª´«ÊäÊ±ÑÓÔì³ÉÊı¾İ²»ÄÜ²åÈëÊı¾İ¿â¡£
+	// æ•°æ®æ”¶é›†æ—¶é—´  UNIXæ—¶é—´æˆ³ï¼Œå•ä½æ¯«ç§’ã€‚  è¯´æ˜ï¼š å› ä¸ºå®¢æˆ·ç«¯åˆ°æœåŠ¡å™¨ç«¯æœ‰å»¶æ—¶ï¼Œå› æ­¤æ’å…¥æ•°æ®çš„æ—¶é—´æˆ³åº”è¯¥åœ¨[å½“å‰æ—¶é—´-3å¤©+20ç§’ï¼Œå½“å‰æ—¶é—´+10åˆ†é’Ÿ-20ç§’]åŒºé—´å†…ï¼Œä¿è¯åˆ°è¾¾æœåŠ¡å™¨æ—¶ä¸ä¼šå› ä¸ºä¼ è¾“æ—¶å»¶é€ æˆæ•°æ®ä¸èƒ½æ’å…¥æ•°æ®åº“ã€‚
 	CollectTime int `json:"collect_time" required:"true"`
-	// Ö¸±êÊı¾İµÄÖµ¡£
+	// æŒ‡æ ‡æ•°æ®çš„å€¼ã€‚
 	Value float64 `json:"value" required:"true"`
-	// Êı¾İµÄµ¥Î»¡£
+	// æ•°æ®çš„å•ä½ã€‚
 	Unit string `json:"unit,omitempty"`
-	// Êı¾İµÄÀàĞÍ£¬Ö»ÄÜÊÇ\"int\"»ò\"float\"
+	// æ•°æ®çš„ç±»å‹ï¼Œåªèƒ½æ˜¯\"int\"æˆ–\"float\"
 	Type string `json:"type,omitempty"`
 }
 
-// Ö¸±êĞÅÏ¢
+// æŒ‡æ ‡ä¿¡æ¯
 type MetricInfo struct {
-	// Ö¸±êÎ¬¶È
+	// æŒ‡æ ‡ç»´åº¦
 	Dimensions []MetricsDimension `json:"dimensions" required:"true"`
-	// Ö¸±êÃû³Æ£¬±ØĞëÒÔ×ÖÄ¸¿ªÍ·£¬Ö»ÄÜ°üº¬0-9/a-z/A-Z/_£¬³¤¶È×î¶ÌÎª1£¬×î´óÎª64¡£  ¾ßÌåÖ¸±êÃûÇë²Î¼û²éÑ¯Ö¸±êÁĞ±íÖĞ²éÑ¯³öµÄÖ¸±êÃû¡£
+	// æŒ‡æ ‡åç§°ï¼Œå¿…é¡»ä»¥å­—æ¯å¼€å¤´ï¼Œåªèƒ½åŒ…å«0-9/a-z/A-Z/_ï¼Œé•¿åº¦æœ€çŸ­ä¸º1ï¼Œæœ€å¤§ä¸º64ã€‚  å…·ä½“æŒ‡æ ‡åè¯·å‚è§æŸ¥è¯¢æŒ‡æ ‡åˆ—è¡¨ä¸­æŸ¥è¯¢å‡ºçš„æŒ‡æ ‡åã€‚
 	MetricName string `json:"metric_name" required:"true"`
-	// Ö¸±êÃüÃû¿Õ¼ä£¬£¬ÀıÈçµ¯ĞÔÔÆ·şÎñÆ÷ÃüÃû¿Õ¼ä¡£¸ñÊ½Îªservice.item£»serviceºÍitem±ØĞëÊÇ×Ö·û´®£¬±ØĞëÒÔ×ÖÄ¸¿ªÍ·£¬Ö»ÄÜ°üº¬0-9/a-z/A-Z/_£¬×Ü³¤¶È×î¶ÌÎª3£¬×î´óÎª32¡£ËµÃ÷£º µ±alarm_typeÎª£¨EVENT.SYS| EVENT.CUSTOM£©Ê±ÔÊĞíÎª¿Õ¡£
+	// æŒ‡æ ‡å‘½åç©ºé—´ï¼Œï¼Œä¾‹å¦‚å¼¹æ€§äº‘æœåŠ¡å™¨å‘½åç©ºé—´ã€‚æ ¼å¼ä¸ºservice.itemï¼›serviceå’Œitemå¿…é¡»æ˜¯å­—ç¬¦ä¸²ï¼Œå¿…é¡»ä»¥å­—æ¯å¼€å¤´ï¼Œåªèƒ½åŒ…å«0-9/a-z/A-Z/_ï¼Œæ€»é•¿åº¦æœ€çŸ­ä¸º3ï¼Œæœ€å¤§ä¸º32ã€‚è¯´æ˜ï¼š å½“alarm_typeä¸ºï¼ˆEVENT.SYS| EVENT.CUSTOMï¼‰æ—¶å…è®¸ä¸ºç©ºã€‚
 	Namespace string `json:"namespace" required:"true"`
-	// Ö¸±êµ¥Î»
-	Unit string `json:"unit,omitempty"`
 }
 
-// Ö¸±êÎ¬¶È
+// æŒ‡æ ‡ç»´åº¦
 type MetricsDimension struct {
-	// Î¬¶ÈÃû
+	// ç»´åº¦å
 	Name string `json:"name,omitempty"`
-	// Î¬¶ÈÖµ
+	// ç»´åº¦å€¼
 	Value string `json:"value,omitempty"`
 }
 
@@ -149,7 +147,6 @@ func (opts AddMetricDataOpts) ToAddMetricDataMap() ([]map[string]interface{}, er
 	return newOpts, nil
 }
 
-/*
 func AddMetricData(client *gophercloud.ServiceClient, opts AddMetricDataOptsBuilder) (r AddMetricDataResult) {
 	b, err := opts.ToAddMetricDataMap()
 	if err != nil {
@@ -157,13 +154,11 @@ func AddMetricData(client *gophercloud.ServiceClient, opts AddMetricDataOptsBuil
 		return
 	}
 
-	_, r.Err = client.Post(addMetricDataURL(client), b, &r.Body, &gophercloud.RequestOpts{
+	_, r.Err = client.Post(addMetricDataURL(client), b, nil, &gophercloud.RequestOpts{
 		OkCodes: []int{201},
 	})
-
 	return
 }
-
 
 func GetEventData(client *gophercloud.ServiceClient, opts GetEventDataOpts) (r GetEventDataResult) {
 	q, err := gophercloud.BuildQueryString(&opts)
@@ -192,4 +187,3 @@ func Get(client *gophercloud.ServiceClient, opts GetOpts) (r GetResult) {
 
 	return
 }
-*/

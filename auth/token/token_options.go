@@ -1,3 +1,6 @@
+/*
+Package token providers functions for initial http request body before request cloud.
+*/
 package token
 
 import (

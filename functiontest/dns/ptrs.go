@@ -1,12 +1,11 @@
 package main
 
-/*
 import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/dns/v2/ptrs"
 )
@@ -69,7 +68,7 @@ func TestListPtr(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	listptrs, err := ptrs.ExtractList(resp)
+	listptrs, err := ptrs.ExtractPtrs(resp)
 
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -89,12 +88,10 @@ func TestListPtr(sc *gophercloud.ServiceClient) {
 }
 
 func TestRestorePtr(sc *gophercloud.ServiceClient) {
-	opts := ptrs.RestoreOpts{
-		Ptrdname: "www.kaka.com",
-	}
+
 	regionID := "southchina"
 	fip := "bfa4116c-7347-4b54-929a-38d64be3dbd5"
-	resp, err := ptrs.Restore(sc, regionID, fip, opts).Extract()
+	err := ptrs.Restore(sc, regionID, fip).ExtractErr()
 
 	if err != nil {
 		fmt.Println(err)
@@ -105,8 +102,6 @@ func TestRestorePtr(sc *gophercloud.ServiceClient) {
 		return
 	}
 	fmt.Println("Test TestRestorePtr success!")
-	b, _ := json.MarshalIndent(resp, "", " ")
-	fmt.Println(string(b))
 }
 
 func TestSetupPtr(sc *gophercloud.ServiceClient) {
@@ -130,4 +125,23 @@ func TestSetupPtr(sc *gophercloud.ServiceClient) {
 	fmt.Println(string(b))
 }
 
- */
+func TestUpdatePtr(sc *gophercloud.ServiceClient) {
+	opts := ptrs.UpdateOpts{
+		Ptrdname: "www.aaa.com",
+	}
+	region := "northchina"
+	fip := "bfa4116c-7347-4b54-929a-38d64be3dbd5"
+	resp, err := ptrs.Update(sc, region, fip, opts).Extract()
+
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("Test TestUpdatePtr success!")
+	b, _ := json.MarshalIndent(resp, "", " ")
+	fmt.Println(string(b))
+}

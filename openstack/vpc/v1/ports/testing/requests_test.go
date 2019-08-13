@@ -48,11 +48,11 @@ func TestList(t *testing.T) {
 	defer th.TeardownHTTP()
 	HandleListSuccessfully(t)
 
-	actual, err := ports.List(client.ServiceClient(), ports.ListOpts{
-		Limit: 3,
-	}).AllPages()
+	pageData, err := ports.List(client.ServiceClient(), ports.ListOpts{}).AllPages()
 	th.AssertNoErr(t, err)
-	th.CheckDeepEquals(t, &ListResponse, actual)
+	actual, err := ports.ExtractPorts(pageData)
+	th.AssertNoErr(t, err)
+	th.CheckDeepEquals(t, ListResponse, actual)
 }
 
 func TestDelete(t *testing.T) {

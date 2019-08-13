@@ -2,7 +2,7 @@ package alarms
 
 import (
 	"github.com/gophercloud/gophercloud"
-	//"github.com/gophercloud/gophercloud/pagination"
+	"github.com/gophercloud/gophercloud/pagination"
 )
 
 type ListOpts struct {
@@ -26,6 +26,7 @@ type Condition struct {
 	Period             int    `json:"period"  required:"true"`
 	Unit               string `json:"unit,omitempty"`
 	Value              int    `json:"value"  required:"true"`
+	SuppressDuration   int    `json:"suppress_duration,omitempty"`
 }
 
 type CreateOpts struct {
@@ -91,7 +92,6 @@ type UpdateOptsBuilder interface {
 	ToUpdateMap() (map[string]interface{}, error)
 }
 
-/*
 func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
 	b, err := opts.ToCreateMap()
 	if err != nil {
@@ -141,10 +141,8 @@ func Update(client *gophercloud.ServiceClient, alarmId string, opts UpdateOptsBu
 		return
 	}
 
-	_, r.Err = client.Put(updateURL(client, alarmId), b, &r.Body, &gophercloud.RequestOpts{
+	_, r.Err = client.Put(updateURL(client, alarmId), b, nil, &gophercloud.RequestOpts{
 		OkCodes: []int{204},
 	})
-
 	return
 }
-*/

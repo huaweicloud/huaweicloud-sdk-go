@@ -9,10 +9,6 @@ type commonResult struct {
 	gophercloud.Result
 }
 
-type Link struct {
-	Self string `json:"self"`
-}
-
 type Metadata struct {
 	// Total number of resources
 	TotalCount int `json:"total_count"`
@@ -58,23 +54,23 @@ func (r GetResult) Extract() (*FloatingIp, error) {
 	return &response, err
 }
 
-type ListPage struct {
+type PtrPage struct {
 	pagination.LinkedPageBase
 }
 
-func (r ListPage) IsEmpty() (bool, error) {
-	response, err := ExtractList(r)
+func (r PtrPage) IsEmpty() (bool, error) {
+	response, err := ExtractPtrs(r)
 	return len(response.Floatingips) == 0, err
 }
 
-func ExtractList(r pagination.Page) (*ListResponse, error) {
+func ExtractPtrs(r pagination.Page) (*ListPtrResponse, error) {
 
-	var list ListResponse
-	err := (r.(ListPage)).ExtractInto(&list)
+	var list ListPtrResponse
+	err := (r.(PtrPage)).ExtractInto(&list)
 	return &list, err
 }
 
-type ListResponse struct {
+type ListPtrResponse struct {
 	// Link of the current resource or other related resources.When a
 	// response is broken into pages, a next link is provided to retrieve all results.
 	Links Link `json:"links"`
@@ -86,14 +82,12 @@ type ListResponse struct {
 	Floatingips []FloatingIp `json:"floatingips"`
 }
 
-type RestoreResult struct {
-	gophercloud.ErrResult
+type DeletePtrResponse struct {
+	Ptrdname string `json:"ptrdname"`
 }
 
-func (r RestoreResult) Extract() (*FloatingIp, error) {
-	var response FloatingIp
-	err := r.ExtractInto(&response)
-	return &response, err
+type RestoreResult struct {
+	gophercloud.ErrResult
 }
 
 type SetupResult struct {
@@ -104,4 +98,11 @@ func (r SetupResult) Extract() (*FloatingIp, error) {
 	var response FloatingIp
 	err := r.ExtractInto(&response)
 	return &response, err
+}
+
+type Link struct {
+	Href string `json:"href"`
+	Rel  string `json:"rel"`
+	Self string `json:"self"`
+	Next string `json:"next"`
 }

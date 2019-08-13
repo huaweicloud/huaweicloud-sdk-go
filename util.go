@@ -10,7 +10,6 @@ import (
 	"time"
 	"runtime"
 	"path"
-
 )
 
 // WaitFor polls a predicate function, once per second, up to a timeout limit.
@@ -52,7 +51,7 @@ func WaitFor(timeout int, predicate func() (bool, error)) error {
 			if result.Success {
 				return nil
 			}
-		// If the predicate has not finished by the timeout, cancel it.
+			// If the predicate has not finished by the timeout, cancel it.
 		case <-time.After(time.Duration(timeout) * time.Second):
 			return fmt.Errorf("A timeout occurred")
 		}
@@ -106,6 +105,7 @@ func NormalizePathURL(basePath, rawPath string) (string, error) {
 
 }
 
+// InitStructWithDefaultTag,Initialize the structure instance using the structure tag.
 func InitStructWithDefaultTag(bean interface{}) {
 	configType := reflect.TypeOf(bean)
 	for i := 0; i < configType.Elem().NumField(); i++ {
@@ -131,6 +131,7 @@ func InitStructWithDefaultTag(bean interface{}) {
 	}
 }
 
+// IsInStrSlice, Determine if the string is in the array.
 func IsInStrSlice(sliceStr []string, s string) bool {
 	for _, v := range sliceStr {
 		if v == s {
@@ -140,15 +141,15 @@ func IsInStrSlice(sliceStr []string, s string) bool {
 	return false
 }
 
-
+// EnableDebug, SDK log switch defaults value is false.
 var EnableDebug bool
 
-
-//logger struct
+// Logger, define the logger struct.
 type Logger struct {
 	DebugEnable bool `default:"false"`
 }
 
+// Debug, Format the log information and print the information to the console.
 func (log *Logger) Debug(format string, v ...interface{}) {
 	if log.DebugEnable {
 		msg := fmt.Sprintf("[DEBUG] "+format, v...)
@@ -169,16 +170,16 @@ func writeMsg(msg string) error {
 	return nil
 }
 
+//printMsg
 func printMsg(msg string) {
 	when := time.Now().Format("2006-01-02 15:04:05")
 	buf := []byte(fmt.Sprintf("[%s] ", when))
 	fmt.Println(string(append(append(buf, msg...))))
 }
 
+// GetLogger ,Return log initialization structure instance.
 func GetLogger() (*Logger) {
-	log:=new(Logger)
-	log.DebugEnable=EnableDebug
+	log := new(Logger)
+	log.DebugEnable = EnableDebug
 	return log
-
 }
-

@@ -1,14 +1,11 @@
 package main
 
-
 import (
 	"fmt"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
-	"github.com/gophercloud/gophercloud/auth/aksk"
-	"github.com/gophercloud/gophercloud/pagination"
-
 )
 
 func main() {
@@ -88,10 +85,19 @@ func MemberCreate(sc *gophercloud.ServiceClient, poolId string) (memId string) {
 }
 
 
-func MemberList(sc *gophercloud.ServiceClient, poolId string) (allPages pagination.Page) {
+func MemberList(sc *gophercloud.ServiceClient, poolId string) (allMembers []pools.Member) {
 
 	allPages, err := pools.ListMembers(sc, poolId, pools.ListMembersOpts{}).AllPages()
-		if err != nil {
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	allMembers, err = pools.ExtractMembers(allPages)
+	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -101,7 +107,7 @@ func MemberList(sc *gophercloud.ServiceClient, poolId string) (allPages paginati
 	}
 
 	fmt.Println("Test member List success!")
-	return  allPages
+	return allMembers
 
 }
 

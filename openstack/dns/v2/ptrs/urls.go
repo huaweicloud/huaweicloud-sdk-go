@@ -19,3 +19,7 @@ func RestoreURL(c *gophercloud.ServiceClient, region string, floatingipId string
 func SetupURL(c *gophercloud.ServiceClient, region string, floatingipId string) string {
 	return c.ServiceURL("reverse", "floatingips", region+":"+floatingipId)
 }
+
+func UpdateURL(c *gophercloud.ServiceClient, region string, floatingipId string) string {
+	return c.ServiceURL("reverse", "floatingips", region+":"+floatingipId)
+}

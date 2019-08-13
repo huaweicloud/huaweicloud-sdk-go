@@ -13,7 +13,6 @@ import (
 func main() {
 
 	fmt.Println("main start...")
-
 	provider, err := common.AuthAKSK()
 	//provider, err := common.AuthToken()
 	if err != nil {
@@ -26,7 +25,6 @@ func main() {
 	}
 
 	sc, err := openstack.NewCESV1(provider, gophercloud.EndpointOpts{})
-
 	if err != nil {
 		fmt.Println("get ces client failed")
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -36,14 +34,14 @@ func main() {
 		return
 	}
 
-	TestBatchQueryMetricDatas(sc)
-	//TestGetMetricData(sc)
-	//TestGetEventData(sc)
-	//TestAddMetricData(sc)
+	TestBatchQueryMetricData(sc)
+	TestGetMetricData(sc)
+	TestGetEventData(sc)
+	TestAddMetricData(sc)
 	fmt.Println("main end...")
 }
 
-func TestBatchQueryMetricDatas(sc *gophercloud.ServiceClient) {
+func TestBatchQueryMetricData(sc *gophercloud.ServiceClient) {
 	opts := metricdata.BatchQueryOpts{
 		Metrics: []metricdata.Metric{
 			{
@@ -62,7 +60,7 @@ func TestBatchQueryMetricDatas(sc *gophercloud.ServiceClient) {
 		Period: "1",
 		Filter: "average",
 	}
-	metricdatas, err := metricdata.BatchQuery(sc, opts).ExtractMetricDatas()
+	metricData, err := metricdata.BatchQuery(sc, opts).ExtractMetricDatas()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -73,22 +71,21 @@ func TestBatchQueryMetricDatas(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test batch query metric data success！")
-	p, _ := json.MarshalIndent(metricdatas, "", " ")
+	p, _ := json.MarshalIndent(metricData, "", " ")
 	fmt.Println(string(p))
 }
 
-/*
 func TestGetMetricData(sc *gophercloud.ServiceClient) {
 	opts := metricdata.GetOpts{
-		Namespace: "SYS.ECS",
+		Namespace:  "SYS.ECS",
 		MetricName: "cpu_util",
-		From:   1548041969418,
-		To:     1548052769418,
-		Period: 3600,
-		Filter: "average",
-		Dim0:"instance_id,070c1ed3-176a-446e-8eff-b116b529b4b7",
+		From:       "1548041969418",
+		To:         "1548052769418",
+		Period:     "3600",
+		Filter:     "average",
+		Dim0:       "instance_id,070c1ed3-176a-446e-8eff-b116b529b4b7",
 	}
-	metricdatas, err := metricdata.Get(sc, opts).Extract()
+	metricData, err := metricdata.Get(sc, opts).Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -99,28 +96,28 @@ func TestGetMetricData(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test Get metric data success！")
-	p, _ := json.MarshalIndent(metricdatas, "", " ")
+	p, _ := json.MarshalIndent(metricData, "", " ")
 	fmt.Println(string(p))
 }
 
 func TestAddMetricData(sc *gophercloud.ServiceClient) {
 	opts := metricdata.AddMetricDataOpts{
 		{
-			Metric:metricdata.MetricInfo{
-				Namespace:"MINE.APP",
-				Dimensions:[]metricdata.MetricsDimension{
+			Metric: metricdata.MetricInfo{
+				Namespace: "MINE.APP",
+				Dimensions: []metricdata.MetricsDimension{
 					{
-						Name:"instance_id",
-						Value:"33328f02-3814-422e-b688-bfdba93d4050",
+						Name:  "instance_id",
+						Value: "33328f02-3814-422e-b688-bfdba93d4050",
 					},
 				},
-				MetricName:"cpu_util",
+				MetricName: "cpu_util",
 			},
-			Ttl:172800,
-			CollectTime:1463598260000,
-			Value:60,
-			Unit:"%",
-			Type:"int",
+			Ttl:         172800,
+			CollectTime: 1564645793000,
+			Value:       60,
+			Unit:        "%",
+			Type:        "int",
 		},
 	}
 	err := metricdata.AddMetricData(sc, opts).ExtractErr()
@@ -139,12 +136,12 @@ func TestAddMetricData(sc *gophercloud.ServiceClient) {
 func TestGetEventData(sc *gophercloud.ServiceClient) {
 	opts := metricdata.GetEventDataOpts{
 		Namespace: "SYS.ECS",
-		From:   1548041969418,
-		To:     1548052769418,
-		Dim0:"instance_id,070c1ed3-176a-446e-8eff-b116b529b4b7",
-		Type:"instance_host_info",
+		From:      "1548041969418",
+		To:        "1548052769418",
+		Dim0:      "instance_id,070c1ed3-176a-446e-8eff-b116b529b4b7",
+		Type:      "instance_host_info",
 	}
-	eventdata, err := metricdata.GetEventData(sc, opts).Extract()
+	eventData, err := metricdata.GetEventData(sc, opts).Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -155,7 +152,6 @@ func TestGetEventData(sc *gophercloud.ServiceClient) {
 	}
 
 	fmt.Println("Test Get event data success！")
-	p, _ := json.MarshalIndent(eventdata, "", " ")
+	p, _ := json.MarshalIndent(eventData, "", " ")
 	fmt.Println(string(p))
 }
-*/

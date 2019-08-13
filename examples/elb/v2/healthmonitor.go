@@ -7,7 +7,6 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/monitors"
 	"github.com/gophercloud/gophercloud/auth/aksk"
-	"github.com/gophercloud/gophercloud/pagination"
 	"encoding/json"
 )
 
@@ -92,9 +91,19 @@ func HealthMonitorCreate(sc *gophercloud.ServiceClient) (id string) {
 }
 
 
-func HealthMonitorList(sc *gophercloud.ServiceClient) (allPages pagination.Page) {
+func HealthMonitorList(sc *gophercloud.ServiceClient) (allHealthmonitors []monitors.Monitor) {
 	allPages, err := monitors.List(sc,monitors.ListOpts{}).AllPages()
-		if err != nil {
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	allHealthmonitors, err = monitors.ExtractMonitors(allPages)
+	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -104,8 +113,7 @@ func HealthMonitorList(sc *gophercloud.ServiceClient) (allPages pagination.Page)
 	}
 
 	fmt.Println("Test monitor List success!")
-	fmt.Println(allPages)
-	return  allPages
+	return allHealthmonitors
 
 }
 

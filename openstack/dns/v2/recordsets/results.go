@@ -1,9 +1,6 @@
 package recordsets
 
 import (
-	"encoding/json"
-	"time"
-
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/pagination"
 )
@@ -46,22 +43,20 @@ type UpdateResult struct {
 // DeleteResult is result of a Delete operation. Call its ExtractErr method to
 // determine if the operation succeeded or failed.
 type DeleteResult struct {
-	gophercloud.ErrResult
+	commonResult
 }
 
 // IsEmpty returns true if the page contains no results.
 func (r RecordSetPage) IsEmpty() (bool, error) {
-	s, err := ExtractRecordSets(r)
-	return len(s) == 0, err
+	response, err := ExtractRecordSets(r)
+	return len(response.Recordsets) == 0, err
 }
 
 // ExtractRecordSets extracts a slice of RecordSets from a List result.
-func ExtractRecordSets(r pagination.Page) ([]RecordSet, error) {
-	var s struct {
-		RecordSets []RecordSet `json:"recordsets"`
-	}
-	err := (r.(RecordSetPage)).ExtractInto(&s)
-	return s.RecordSets, err
+func ExtractRecordSets(r pagination.Page) (*ListRecordsetResponse, error) {
+	var list ListRecordsetResponse
+	err := (r.(RecordSetPage)).ExtractInto(&list)
+	return &list, err
 }
 
 // RecordSet represents a DNS Record Set.
@@ -93,55 +88,43 @@ type RecordSet struct {
 	// Status is the status of the recordset.
 	Status string `json:"status"`
 
-	// Action is the current action in progress of the recordset.
-	Action string `json:"action"`
-
 	// Description is the description of the recordset.
 	Description string `json:"description"`
 
-	// Version is the revision of the recordset.
-	Version int `json:"version"`
-
 	// CreatedAt is the date when the recordset was created.
-	CreatedAt time.Time `json:"-"`
+	CreatedAt string `json:"create_at"`
 
 	// UpdatedAt is the date when the recordset was updated.
-	UpdatedAt time.Time `json:"-"`
+	UpdatedAt string `json:"update_at"`
+
+	// default means recordset is default
+	Default bool `json:"default"`
 
 	// Links includes HTTP references to the itself,
 	// useful for passing along to other APIs that might want a recordset
 	// reference.
-	Links []gophercloud.Link `json:"-"`
+	Links Link `json:"links"`
 }
 
-func (r *RecordSet) UnmarshalJSON(b []byte) error {
-	type tmp RecordSet
-	var s struct {
-		tmp
-		CreatedAt gophercloud.JSONRFC3339MilliNoZ `json:"created_at"`
-		UpdatedAt gophercloud.JSONRFC3339MilliNoZ `json:"updated_at"`
-		Links     map[string]interface{}          `json:"links"`
-	}
-	err := json.Unmarshal(b, &s)
-	if err != nil {
-		return err
-	}
-	*r = RecordSet(s.tmp)
+type Link struct {
+	Href string `json:"href"`
+	Rel  string `json:"rel"`
+	Self string `json:"self"`
+	Next string `json:"next"`
+}
 
-	r.CreatedAt = time.Time(s.CreatedAt)
-	r.UpdatedAt = time.Time(s.UpdatedAt)
+type ListRecordsetResponse struct {
+	// Link of the current resource or other related resources.When a
+	// response is broken into pages, a next link is provided to retrieve all results.
+	Links Link `json:"links"`
+	// Zone list object
+	Recordsets []RecordSet `json:"recordsets"`
 
-	if s.Links != nil {
-		for rel, href := range s.Links {
-			if v, ok := href.(string); ok {
-				link := gophercloud.Link{
-					Rel:  rel,
-					Href: v,
-				}
-				r.Links = append(r.Links, link)
-			}
-		}
-	}
+	// Number of resources that meet the filter condition
+	Metadata Metadata `json:"metadata"`
+}
 
-	return err
+type Metadata struct {
+	// Total number of resources
+	TotalCount int `json:"total_count"`
 }

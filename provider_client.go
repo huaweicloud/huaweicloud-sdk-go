@@ -57,15 +57,21 @@ type ProviderClient struct {
 	// authentication functions for different Identity service versions.
 	ReauthFunc func() error
 
+	// mut is a mutex for the client. It protects read and write access to client attributes such as getting
+	// and setting the TokenID.
 	mut *sync.RWMutex
 
+	// reauthmut is a mutex for reauthentication it attempts to ensure that only one reauthentication
+	// attempt happens at one time.
 	reauthmut *reauthlock
 
-	/************自研参数************/
+	// DomainID
 	DomainID string
 
+	// ProjectID
 	ProjectID string
 
+	// Conf define the configs parameter of the provider client
 	Conf *Config
 
 	// AKSKAuthOptions provides the value for AK/SK authentication, it should be nil if you use token authentication,
@@ -73,11 +79,13 @@ type ProviderClient struct {
 	AKSKOptions aksk.AKSKOptions
 }
 
+// reauthlock represents a set of attributes used to help in the reauthentication process.
 type reauthlock struct {
 	sync.RWMutex
 	reauthing bool
 }
 
+//GetProjectID,Implement the GetProjectID() interface, return client projectID.
 func (client *ProviderClient) GetProjectID() string {
 	return client.ProjectID
 }

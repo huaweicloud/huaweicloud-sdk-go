@@ -170,7 +170,7 @@ func (r *Zone) UnmarshalJSON(b []byte) error {
 
 
 
- */
+*/
 
 package zones
 
@@ -204,32 +204,28 @@ type UpdateResult struct {
 // DeleteResult is the result of a Delete request. Call its ExtractErr method
 // to determine if the request succeeded or failed.
 type DeleteResult struct {
-	gophercloud.ErrResult
+	commonResult
 }
 
-type ListPage struct {
+type ZonePage struct {
 	pagination.LinkedPageBase
 }
 
-func (r ListPage) IsEmpty() (bool, error) {
-	response, err := ExtractList(r)
+func (r ZonePage) IsEmpty() (bool, error) {
+	response, err := ExtractZones(r)
 	return len(response.Zones) == 0, err
 }
 
-func ExtractList(r pagination.Page) (*ListResponse, error) {
-	var list ListResponse
-	err := (r.(ListPage)).ExtractInto(&list)
+func ExtractZones(r pagination.Page) (*ListZoneResponse, error) {
+	var list ListZoneResponse
+	err := (r.(ZonePage)).ExtractInto(&list)
 	return &list, err
 }
 
-type LinkSelf struct {
-	Self string `json:"self"`
-}
-
-type ListResponse struct {
+type ListZoneResponse struct {
 	// Link of the current resource or other related resources.When a
 	// response is broken into pages, a next link is provided to retrieve all results.
-	Links LinkSelf `json:"links"`
+	Links Link `json:"links"`
 	// Zone list object
 	Zones []Zone `json:"zones"`
 
@@ -252,17 +248,71 @@ type ListNameServersResponse struct {
 	Nameservers []NameServer `json:"nameservers"`
 }
 
-type Link struct {
-	//
-	Self string `json:"self"`
-
-	//
-	Next string `json:"next"`
-}
-
 type Metadata struct {
 	// Total number of resources
 	TotalCount int `json:"total_count"`
+}
+
+// ZoneCreateResponse,The response of the zone creation.
+type ZoneCreateResponse struct {
+	// Zone ID, which is a UUID used to identify the zone
+	ID string `json:"id"`
+
+	// Zone name
+	Name string `json:"name"`
+
+	// Zone description
+	Description string `json:"description"`
+
+	// Mail address of the administrator managing the zone
+	Email string `json:"email"`
+
+	// Zone type, which can be  or
+	ZoneType string `json:"zone_type"`
+
+	// TTL value of the SOA record set in the zone
+	TTL int `json:"ttl"`
+
+	// Serial number in the SOA record set in the zone, which
+	// identifies the change on the primary DNS server
+	Serial int `json:"serial"`
+
+	// Resource status.The value can be PENDING_CREATE, ACTIVE,
+	// PENDING_DELETE, or ERROR.
+	Status string `json:"status"`
+
+	// Number of record sets in the zone
+	RecordNum int `json:"record_num"`
+
+	// Pool ID of the zone, which is assigned by the system
+	PoolId string `json:"pool_id"`
+
+	// Project ID of the zone
+	ProjectId string `json:"project_id"`
+
+	// Time when the zone was created
+	CreatedAt string `json:"created_at"`
+
+	// Time when the zone was updated
+	UpdatedAt string `json:"updated_at"`
+
+	// Link of the current resource or other related resources.When a
+	// response is broken into pages, a next link is provided to retrieve all results.
+	Links Link `json:"links"`
+
+	// Master DNS servers, from which the slave servers get DNS
+	// information
+	Masters []string `json:"masters"`
+
+	// Routers (VPCs associated with the zone)
+	Router AssociateRouterResponse `json:"router"`
+}
+
+type Link struct {
+	Href string `json:"href"`
+	Rel  string `json:"rel"`
+	Self string `json:"self"`
+	Next string `json:"next"`
 }
 
 type Zone struct {
@@ -316,7 +366,7 @@ type Zone struct {
 	Masters []string `json:"masters"`
 
 	// Routers (VPCs associated with the zone)
-	Routers []Router `json:"routers"`
+	Routers []AssociateRouterResponse `json:"routers"`
 }
 
 type NameServer struct {
@@ -338,11 +388,13 @@ func (r AssociateRouterResult) Extract() (*AssociateRouterResponse, error) {
 	return &response, err
 }
 
+//Router, Router (VPC) information associated with the private zone.
 type AssociateRouterResponse struct {
 	// Router ID (VPC ID)
 	RouterId string `json:"router_id"`
 
-	// Region of the router (VPC)
+	// Region of the router (VPC).If it is left blank, the region of
+	// the project in the token takes effect by default.
 	RouterRegion string `json:"router_region"`
 
 	// Task status.The value can be PENDING_CREATE, PENDING_DELETE,
@@ -350,8 +402,22 @@ type AssociateRouterResponse struct {
 	Status string `json:"status"`
 }
 
-func (r CreateResult) Extract() (*Zone, error) {
-	var response Zone
+//Router, Router (VPC) information associated with the private zone.
+type DisassociateRouterResponse struct {
+	// Router ID (VPC ID)
+	RouterId string `json:"router_id"`
+
+	// Region of the router (VPC).If it is left blank, the region of
+	// the project in the token takes effect by default.
+	RouterRegion string `json:"router_region"`
+
+	// Task status.The value can be PENDING_CREATE, PENDING_DELETE,
+	// ACTIVE, or ERROR.
+	Status string `json:"status"`
+}
+
+func (r CreateResult) Extract() (*ZoneCreateResponse, error) {
+	var response ZoneCreateResponse
 	err := r.ExtractInto(&response)
 	return &response, err
 }
@@ -376,18 +442,6 @@ func (r DisassociateRouterResult) Extract() (*DisassociateRouterResponse, error)
 	var response DisassociateRouterResponse
 	err := r.ExtractInto(&response)
 	return &response, err
-}
-
-type DisassociateRouterResponse struct {
-	// Router ID (VPC ID)
-	RouterId string `json:"router_id"`
-
-	// Region of the router (VPC)
-	RouterRegion string `json:"router_region"`
-
-	// Task status.The value can be PENDING_CREATE, PENDING_DELETE,
-	// ACTIVE, or ERROR.
-	Status string `json:"status"`
 }
 
 func (r GetResult) Extract() (*Zone, error) {

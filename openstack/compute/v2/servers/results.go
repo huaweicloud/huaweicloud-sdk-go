@@ -152,6 +152,9 @@ type Server struct {
 	//availbility zone
 	AvailbiltyZone string `json:"OS-EXT-AZ:availability_zone"`
 
+	// host
+	Host string `json:"OS-EXT-SRV-ATTR:host"`
+
 	// task state
 	TaskState string `json:"OS-EXT-STS:task_state"`
 

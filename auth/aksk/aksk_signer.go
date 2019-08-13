@@ -1,19 +1,5 @@
 /*
-Package signer providers functions for sign http request before request cloud
-Sample code:
-
-client := &http.Client{
-		Timeout: time.Duration(3 * time.Second),
-	}
-req, err := http.NewRequest("POST", "https://30030113-3657-4fb6-a7ef-90764239b038.apigw.xxx.yyy.com/app1?name=value", bytes.NewBuffer([]byte("demo")))
-
-signOptions := signer.SignOptions{
-		AccessKey: "------------",
-		SecretKey: "------------",
-	}
-
-signer.Sign(req, signOptions)
-resp, err := client.Do(req)
+Package signer providers functions for sign http request before request cloud.
 */
 package aksk
 
@@ -54,7 +40,23 @@ func init() {
 	}
 }
 
-// SignOptions represents the options during signing http request, it is concurency safely
+/*
+SignOptions represents the options during signing http request, it is concurrency safely.
+Sample code:
+
+	client := &http.Client{
+		Timeout: time.Duration(3 * time.Second),
+	}
+	req, err := http.NewRequest("POST", "https://30030113-3657-4fb6-a7ef-90764239b038.apigw.xxx.yyy.com/app1?name=value",bytes.NewBuffer([]byte("demo")))
+
+	signOptions := signer.SignOptions{
+		AccessKey: "------------",
+		SecretKey: "------------",
+	}
+
+	signer.Sign(req, signOptions)
+	resp, err := client.Do(req)
+*/
 type SignOptions struct {
 	AccessKey           string //Access Key
 	SecretKey           string //Secret key
@@ -66,19 +68,19 @@ type SignOptions struct {
 	TimeOffsetInseconds int64  // TimeOffsetInseconds is used for adjust x-sdk-date if set its value
 }
 
-// StringBuilder wraps bytes.Buffer to implement a high performance string builder
+// StringBuilder wraps bytes.Buffer to implement a high performance string builder.
 type StringBuilder struct {
 	builder bytes.Buffer //string storage
 }
 
-// reqSignParams represents the option values used for signing http request
+// reqSignParams represents the option values used for signing http request.
 type reqSignParams struct {
 	SignOptions
 	RequestTime time.Time
 	Req         *http.Request
 }
 
-// signKeyCacheEntry represents the cache entry of sign key
+// signKeyCacheEntry represents the cache entry of sign key.
 type signKeyCacheEntry struct {
 	Key                    []byte // sign key
 	NumberOfDaysSinceEpoch int64  // number of days since epoch
@@ -96,7 +98,7 @@ var spaceRegexp = regexp.MustCompile(`\s+`)
 // cache sign key
 var cache = NewCache(300)
 
-//Sign manipulates the http.Request instance with some required authentication headers for SK/SK auth
+//Sign manipulates the http.Request instance with some required authentication headers for SK/SK auth.
 func Sign(req *http.Request, signOptions SignOptions) {
 	signOptions.AccessKey = strings.TrimSpace(signOptions.AccessKey)
 	signOptions.SecretKey = strings.TrimSpace(signOptions.SecretKey)
@@ -157,7 +159,7 @@ func deriveSigningKey(signParam reqSignParams) []byte {
 
 		signKey := buildSignKey(signParam)
 		signKeyStr, _ := json.Marshal(signKeyCacheEntry{
-			Key: signKey,
+			Key:                    signKey,
 			NumberOfDaysSinceEpoch: signParam.getDaysSinceEpon(),
 		})
 		cache.Add(cacheKey, string(signKeyStr))
@@ -177,14 +179,14 @@ func buildSignKey(signParam reqSignParams) []byte {
 	return computeSignature("sdk_request", kService, signParam.SignAlgorithm)
 }
 
-//HmacSha256 implements the  Keyed-Hash Message Authentication Code computation
+//HmacSha256 implements the  Keyed-Hash Message Authentication Code computation.
 func HmacSha256(data string, key []byte) []byte {
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(data))
 	return mac.Sum(nil)
 }
 
-// HashSha256 is a wrapper for sha256 implementation
+// HashSha256 is a wrapper for sha256 implementation.
 func HashSha256(msg []byte) []byte {
 	sh256 := sha256.New()
 	sh256.Write(msg)

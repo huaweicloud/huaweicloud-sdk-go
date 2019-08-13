@@ -6,12 +6,13 @@ import (
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/auth/token"
+	"github.com/gophercloud/gophercloud/auth/aksk"
 )
 
-var nilOptions = token.TokenOptions{}
-
+var nilTokenOptions = token.TokenOptions{}
+var nilAKSKOptions = aksk.AKSKOptions{}
 /*
-AuthOptionsFromEnv fills out an identity.AuthOptions structure with the
+TokenOptionsFromEnv fills out an token.TokenOptions structure with the
 settings found on the various OpenStack OS_* environment variables.
 
 The following variables provide sources of truth: OS_AUTH_URL, OS_USERNAME,
@@ -28,7 +29,7 @@ still be referred as "tenant" in Gophercloud.
 To use this function, first set the OS_* environment variables (for example,
 by sourcing an `openrc` file), then:
 
-	opts, err := openstack.AuthOptionsFromEnv()
+	opts, err := openstack.TokenOptionsFromEnv()
 	provider, err := openstack.AuthenticatedClient(opts)
 */
 func TokenOptionsFromEnv() (token.TokenOptions, error) {
@@ -54,25 +55,19 @@ func TokenOptionsFromEnv() (token.TokenOptions, error) {
 	if authURL == "" {
 		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "authURL")
 		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-		return nilOptions, err
-		//err := gophercloud.ErrMissingInput{Argument: "authURL"}
-		//return nilOptions, err
+		return nilTokenOptions, err
 	}
 
 	if username == "" && userID == "" {
 		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "username")
 		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-		return nilOptions, err
-		//err := gophercloud.ErrMissingInput{Argument: "username"}
-		//return nilOptions, err
+		return nilTokenOptions, err
 	}
 
 	if password == "" {
 		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "password")
 		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
-		return nilOptions, err
-		//err := gophercloud.ErrMissingInput{Argument: "password"}
-		//return nilOptions, err
+		return nilTokenOptions, err
 	}
 
 	to := token.TokenOptions{
@@ -87,4 +82,52 @@ func TokenOptionsFromEnv() (token.TokenOptions, error) {
 	}
 
 	return to, nil
+}
+
+func AKSKOptionsFromEnv() (aksk.AKSKOptions, error) {
+
+	authURL := os.Getenv("HWCLOUD_AUTH_URL")
+	ak := os.Getenv("HWCLOUD_ACCESS_KEY")
+	sk := os.Getenv("HWCLOUD_SECRET_KEY")
+	seToken := os.Getenv("HWCLOUD_ACCESS_KEY_STS_TOKEN")
+	projectID := os.Getenv("HWCLOUD_PROJECT_ID")
+	domainID := os.Getenv("HWCLOUD_DOMAIN_ID")
+	region := os.Getenv("HWCLOUD_REGION")
+	cloudName := os.Getenv("HWCLOUD_DOMAIN_NAME")
+
+	// If HWCLOUD_CLOUD_NAME is set, overwrite HWCLOUD_DOMAIN_NAME with the value.
+	if v := os.Getenv("HWCLOUD_CLOUD_NAME"); v != "" {
+		cloudName = v
+	}
+
+	if authURL == "" {
+		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "authURL")
+		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+		return nilAKSKOptions, err
+	}
+
+	if ak == "" {
+		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "AccessKey")
+		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+		return nilAKSKOptions, err
+	}
+
+	if sk == "" {
+		message := fmt.Sprintf(gophercloud.CE_MissingInputMessage, "SecretKey")
+		err := gophercloud.NewSystemCommonError(gophercloud.CE_MissingInputCode, message)
+		return nilAKSKOptions, err
+	}
+
+	akskOptions := aksk.AKSKOptions{
+		IdentityEndpoint: authURL,
+		AccessKey:        ak,
+		SecretKey:        sk,
+		SecurityToken:    seToken,
+		ProjectID:        projectID,
+		DomainID:         domainID,
+		Region:           region,
+		Cloud:            cloudName,
+	}
+
+	return akskOptions, nil
 }

@@ -31,12 +31,16 @@ const (
 	v3 = "v3"
 )
 
-/* 重写RoundTrip，实现reauth 限制3次 */
+// MyRoundTripper, Rewrite RoundTrip to achieve reauth limit 3 times
 type MyRoundTripper struct {
-	rt                http.RoundTripper
+	// http.RoundTripper interface.
+	rt http.RoundTripper
+
+	// numReauthAttempts, http client Reauth times.
 	numReauthAttempts int
 }
 
+//Initialize httpclient according to the config parameter.
 func newHTTPClient(conf *gophercloud.Config) http.Client {
 
 	hc := new(http.Client)
@@ -57,6 +61,7 @@ func newHTTPClient(conf *gophercloud.Config) http.Client {
 
 }
 
+//RoundTrip,Implement the RoundTrip interface function.The reauth default setting is three times.
 func (mrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, error) {
 	response, err := mrt.rt.RoundTrip(request)
 	if response == nil {
@@ -73,6 +78,19 @@ func (mrt *MyRoundTripper) RoundTrip(request *http.Request) (*http.Response, err
 	return response, err
 }
 
+/*
+Initialize the provider client based on the incoming config configuration，and returns a Provider Client
+instance that's ready to request SDK service API.
+
+Example of Creating a Service Client with options
+
+	conf := gophercloud.NewConfig()
+	ao, err := openstack.AuthOptionsFromEnv()
+	provider, err := openstack.AuthenticatedClientWithOptions(ao,conf)
+	client, err := openstack.NewNetworkV2(client, gophercloud.EndpointOpts{
+		Region: os.Getenv("OS_REGION_NAME"),
+	})
+*/
 func AuthenticatedClientWithOptions(options auth.AuthOptionsProvider, conf *gophercloud.Config) (*gophercloud.ProviderClient, error) {
 	client, err := NewClient(options.GetIdentityEndpoint(), options.GetDomainId(), options.GetProjectId(), conf)
 	if err != nil {
@@ -244,7 +262,7 @@ func akskAuthV3(client *gophercloud.ProviderClient, endpoint string, options aks
 	v3Client.AKSKOptions = options
 
 	var entries = make([]tokens3.CatalogEntry, 0, 1)
-	serviceListErr:=services.List(v3Client, services.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
+	serviceListErr := services.List(v3Client, services.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
 		serviceLst, err := services.ExtractServices(page)
 		if err != nil {
 			return false, err
@@ -262,11 +280,11 @@ func akskAuthV3(client *gophercloud.ProviderClient, endpoint string, options aks
 		return true, nil
 	})
 
-	if serviceListErr!=nil{
+	if serviceListErr != nil {
 		return serviceListErr
 	}
 
-	endpointListErr:=endpoints.List(v3Client, endpoints.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
+	endpointListErr := endpoints.List(v3Client, endpoints.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
 		endpointList, err := endpoints.ExtractEndpoints(page)
 		if err != nil {
 			return false, err
@@ -274,7 +292,6 @@ func akskAuthV3(client *gophercloud.ProviderClient, endpoint string, options aks
 
 		for _, endpoint := range endpointList {
 			entry := getEntryByServiceId(entries, endpoint.ServiceID)
-
 
 			if entry != nil {
 				entry.Endpoints = append(entry.Endpoints, tokens3.Endpoint{
@@ -295,7 +312,7 @@ func akskAuthV3(client *gophercloud.ProviderClient, endpoint string, options aks
 		return true, nil
 	})
 
-	if endpointListErr!=nil{
+	if endpointListErr != nil {
 		return endpointListErr
 	}
 
@@ -581,16 +598,20 @@ func NewLoadBalancerV2(client *gophercloud.ProviderClient, eo gophercloud.Endpoi
 	return sc, err
 }
 
-/* 自研 */
-
+// NewECSV1 creates a ServiceClient that may be used to access the v1
+// ecs service.
 func NewECSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	return initClientOpts(client, eo, "ecs")
 }
 
+// NewECSV1_1 creates a ServiceClient that may be used to access the v1.1
+// ecs service.
 func NewECSV1_1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	return initClientOpts(client, eo, "ecsv1.1")
 }
 
+// NewECSV2 creates a ServiceClient that may be used to access the v2
+// ecs service.
 func NewECSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	return initClientOpts(client, eo, "ecsv2")
 }
@@ -601,40 +622,52 @@ func NewIMSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 	return sc, err
 }
 
+// NewIMSV2 creates a ServiceClient that may be used to access the v2
+// image service.
 func NewIMSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "image")
 	sc.ResourceBase = sc.Endpoint + "v2/"
 	return sc, err
 }
 
+// NewBSSV1 creates a ServiceClient that may be used to access the v1.0
+// BSS service.
 func NewBSSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "bss")
 	sc.ResourceBase = sc.Endpoint + "v1.0/"
 	return sc, err
 }
 
-// NewNetworkV1 creates a ServiceClient that may be used with the v1 network
+// NewVPCV1 creates a ServiceClient that may be used with the v1 network
 // package.
 func NewVPCV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "vpc")
 	return sc, err
 }
 
+// NewCESV1 creates a ServiceClient that may be used with the v1 cloud eye service
+// package.
 func NewCESV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "cesv1")
 	return sc, err
 }
 
+// NewVPCV2 creates a ServiceClient that may be used with the v2.0 vpc
+// package.
 func NewVPCV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "vpcv2.0")
 	return sc, err
 }
 
+// NewASV1 creates a ServiceClient that may be used with the v1 as
+// package.
 func NewASV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "asv1")
 	return sc, err
 }
 
+// NewASV2 creates a ServiceClient that may be used with the v2 as
+// package.
 func NewASV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "asv2")
 	return sc, err

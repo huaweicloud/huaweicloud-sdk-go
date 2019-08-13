@@ -84,13 +84,51 @@ func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (jobId, o
 	}
 
 	job, errJob := r.ExtractJob()
+	if errJob != nil {
+		err = errJob
+		return
+	}
 	order, errOrder := r.ExtractOrder()
-	if errJob != nil && errOrder != nil {
+	if errOrder != nil {
+		err = errOrder
 		return
 	}
 
 	jobId = job.Id
 	orderId = order.Id
+	return
+}
+
+// CreateServer requests a server to be provisioned to the user in the current tenant with response entity.
+func CreateServer(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (createResult CreateCloudServerResponse, err error) {
+	var r CreateResult
+	reqBody, err := opts.ToServerCreateMap()
+	if err != nil {
+		return
+	}
+
+	_, err = client.Post(createURL(client), reqBody, &r.Body, &gophercloud.RequestOpts{OkCodes: []int{200}})
+	if err != nil {
+		return
+	}
+	job, errJob := r.ExtractJob()
+	if errJob != nil {
+		err = errJob
+		return
+	}
+	order, errOrder := r.ExtractOrder()
+	if errOrder != nil {
+		err = errOrder
+		return
+	}
+	server, errServer := r.ExtractServer()
+	if errServer != nil {
+		err = errServer
+		return
+	}
+	createResult = CreateCloudServerResponse{Job:job,
+		        Order:order,
+		        Server:server}
 	return
 }
 

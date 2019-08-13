@@ -10,8 +10,21 @@ type Job struct {
 	Id string `json:"job_id"`
 }
 
+//Order struct is an orderId structure returned when you create a server
 type Order struct {
 	Id string `json:"order_id"`
+}
+
+//Server struct is a serverIds structure returned when you create a server
+type Server struct {
+	IDs []string `json:"serverIds"`
+}
+
+//CreateCloudServerResponse is a structure for creating server return values
+type CreateCloudServerResponse struct {
+	Job Job
+	Server Server
+	Order Order
 }
 
 //根据jobId查询job的结构
@@ -110,6 +123,13 @@ func (r commonResult) ExtractOrder() (Order, error) {
 	var o Order
 	err := r.ExtractInto(&o)
 	return o, err
+}
+
+//ExtractServer is used to extract server struct in response
+func (r commonResult) ExtractServer() (Server, error) {
+	var s Server
+	err := r.ExtractInto(&s)
+	return s, err
 }
 
 func (r commonResult) ExtractJobResult() (JobResult, error) {

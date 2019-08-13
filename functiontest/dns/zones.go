@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/dns/v2/zones"
 )
@@ -43,8 +43,7 @@ func TestCreateZone(sc *gophercloud.ServiceClient) {
 	opts := zones.CreateOpts{
 		Name:     "kaka",
 		ZoneType: "private",
-		Router: zones.Router{
-			Status:   "asdf",
+		Router: zones.RouterCreateOpts{
 			RouterId: "90de16ce-3bd5-42e8-a6b3-d275d26ceb33",
 		},
 	}
@@ -97,7 +96,7 @@ func TestListZone(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	rs, err := zones.ExtractList(resp)
+	rs, err := zones.ExtractZones(resp)
 
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -118,7 +117,7 @@ func TestListZone(sc *gophercloud.ServiceClient) {
 func TestDeleteZone(sc *gophercloud.ServiceClient) {
 	zoneId := "ff808082695bc23301695c3853d60bab"
 
-	err := zones.Delete(sc, zoneId).ExtractErr()
+	response, err := zones.Delete(sc, zoneId).Extract()
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -126,12 +125,12 @@ func TestDeleteZone(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-
+	b, _ := json.MarshalIndent(response, "", " ")
+	fmt.Println(string(b))
 	fmt.Println("Test TestDeleteZone success!")
 
 }
 
-/*
 func TestListNameServerZone(sc *gophercloud.ServiceClient) {
 	zoneId := "4011a19d695bc22f01695c0d084e0690"
 
@@ -195,7 +194,6 @@ func TestDisAssociateZone(sc *gophercloud.ServiceClient) {
 	fmt.Println(string(b))
 }
 
-*/
 func TestUpdateZone(sc *gophercloud.ServiceClient) {
 	opts := zones.UpdateOpts{
 		TTL: 900,

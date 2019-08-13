@@ -1,14 +1,12 @@
 package main
 
-
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
-	"github.com/gophercloud/gophercloud/pagination"
-	"encoding/json"
 )
 
 func main() {
@@ -94,9 +92,19 @@ func PoolCreate(sc *gophercloud.ServiceClient) (poolId string)  {
 }
 
 
-func PoolList(sc *gophercloud.ServiceClient)(allPages pagination.Page)  {
+func PoolList(sc *gophercloud.ServiceClient)(allPools []pools.Pool) {
 	allPages, err := pools.List(sc,pools.ListOpts{}).AllPages()
-		if err != nil {
+	if err != nil {
+		fmt.Println(err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	allPools, err = pools.ExtractPools(allPages)
+	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -106,7 +114,7 @@ func PoolList(sc *gophercloud.ServiceClient)(allPages pagination.Page)  {
 	}
 
 	fmt.Println("Test pool List success!")
-	return allPages
+	return allPools
 
 }
 

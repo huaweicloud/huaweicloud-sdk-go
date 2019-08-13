@@ -86,7 +86,10 @@ const PostUpdateListenerBody = `
 `
 
 var (
-	ListenerWeb = listeners.Listener{
+	poolID1         = "fad389a3-9a4a-4762-a365-8c7038508b5d"
+	poolID2         = "41efe233-7591-43c5-9cf7-923964759f9e"
+	TlsContainerRef = "2c433435-20de-4411-84ae-9cc8917def76"
+	ListenerWeb     = listeners.Listener{
 		ID:                     "db902c0c-d5ff-4753-b465-668ad9656918",
 		TenantID:               "310df60f-2a10-4ee5-9554-98393092194c",
 		Name:                   "web",
@@ -94,9 +97,9 @@ var (
 		Loadbalancers:          []listeners.LoadBalancerID{{ID: "53306cda-815d-4354-9444-59e09da9c3c5"}},
 		Protocol:               "HTTP",
 		ProtocolPort:           80,
-		DefaultPoolID:          "fad389a3-9a4a-4762-a365-8c7038508b5d",
+		DefaultPoolID:          &poolID1,
 		AdminStateUp:           true,
-		DefaultTlsContainerRef: "2c433435-20de-4411-84ae-9cc8917def76",
+		DefaultTlsContainerRef: &TlsContainerRef,
 		SniContainerRefs:       []string{"3d328d82-2547-4921-ac2f-61c3b452b5ff", "b3cfd7e3-8c19-455c-8ebb-d78dfd8f7e7d"},
 	}
 	ListenerDb = listeners.Listener{
@@ -107,10 +110,10 @@ var (
 		Loadbalancers:          []listeners.LoadBalancerID{{ID: "79e05663-7f03-45d2-a092-8b94062f22ab"}},
 		Protocol:               "TCP",
 		ProtocolPort:           3306,
-		DefaultPoolID:          "41efe233-7591-43c5-9cf7-923964759f9e",
+		DefaultPoolID:          &poolID2,
 		ConnLimit:              2000,
 		AdminStateUp:           true,
-		DefaultTlsContainerRef: "2c433435-20de-4411-84ae-9cc8917def76",
+		DefaultTlsContainerRef: &TlsContainerRef,
 		SniContainerRefs:       []string{"3d328d82-2547-4921-ac2f-61c3b452b5ff", "b3cfd7e3-8c19-455c-8ebb-d78dfd8f7e7d"},
 	}
 	ListenerUpdated = listeners.Listener{
@@ -121,10 +124,10 @@ var (
 		Loadbalancers:          []listeners.LoadBalancerID{{ID: "79e05663-7f03-45d2-a092-8b94062f22ab"}},
 		Protocol:               "TCP",
 		ProtocolPort:           3306,
-		DefaultPoolID:          "41efe233-7591-43c5-9cf7-923964759f9e",
+		DefaultPoolID:          &poolID2,
 		ConnLimit:              1000,
 		AdminStateUp:           true,
-		DefaultTlsContainerRef: "2c433435-20de-4411-84ae-9cc8917def76",
+		DefaultTlsContainerRef: &TlsContainerRef,
 		SniContainerRefs:       []string{"3d328d82-2547-4921-ac2f-61c3b452b5ff", "b3cfd7e3-8c19-455c-8ebb-d78dfd8f7e7d"},
 	}
 )

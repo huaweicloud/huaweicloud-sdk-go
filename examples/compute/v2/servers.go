@@ -33,7 +33,7 @@ func main() {
 		return
 	}
 	//Init service client
-	client, clientErr := openstack.NewECSV2(provider, gophercloud.EndpointOpts{})
+	client, clientErr := openstack.NewComputeV2(provider, gophercloud.EndpointOpts{})
 	if clientErr != nil {
 		fmt.Println("Failed to get the NewComputeV2 client: ", clientErr)
 		return
@@ -44,6 +44,7 @@ func main() {
 	reqID := "{reqID}"
 	ServerCreate(client)
 	ServersList(client)
+	ServersListV247(client)
 	ServerGet(client, serverID)
 	ServerUpdate(client, serverID)
 	ServerDelete(client, serverID)
@@ -126,6 +127,40 @@ func ServersList(client *gophercloud.ServiceClient) {
 	for _, server := range allServers {
 		serverJson, _ := json.MarshalIndent(server, "", " ")
 		fmt.Println(string(serverJson))
+	}
+}
+
+// ServersListV247 requests server details list with microversion 2.47
+func ServersListV247(client *gophercloud.ServiceClient) {
+	client.SetMicroversion("2.47")
+	defer client.UnsetMicroversion()
+	// Query all servers list information
+	allPages, allPagesErr := servers.List(client, servers.ListOpts{}).AllPages()
+	if allPagesErr != nil {
+		fmt.Println("allPagesErr:", allPagesErr)
+		if ue, ok := allPagesErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	// Transform servers structure
+	allServers, allServersErr := servers.ExtractServers(allPages)
+	if allServersErr != nil {
+		fmt.Println("allServersErr:", allServersErr)
+		return
+	}
+	fmt.Println("Servers list is :")
+	for _, server := range allServers {
+		serverJson, _ := json.MarshalIndent(server, "", " ")
+		fmt.Println("Server info is :", string(serverJson))
+
+		if vcpus, ok := server.Flavor["vcpus"].(float64); ok {
+			fmt.Println("Flavor cpu is :", vcpus)
+		}
+		if ram, ok := server.Flavor["ram"].(float64); ok {
+			fmt.Println("Flavor ram is :", ram)
+		}
 	}
 }
 

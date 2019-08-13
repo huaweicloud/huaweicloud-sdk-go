@@ -11,6 +11,10 @@ type ListOptsBuilder interface {
 	ToRecordSetListQuery() (string, error)
 }
 
+type ListByZoneOptsBuilder interface {
+	ToRecordSetListByZoneQuery() (string, error)
+}
+
 // ListOpts allows the filtering and sorting of paginated collections through
 // the API. Filtering is achieved by passing in struct field values that map to
 // the server attributes you want to see returned. Marker and Limit are used
@@ -18,20 +22,18 @@ type ListOptsBuilder interface {
 // https://developer.openstack.org/api-ref/dns/
 type ListOpts struct {
 	// Integer value for the limit of values to return.
-	Limit int `q:"limit"`
-
+	Limit  int `q:"limit"`
+	Offset int `q:"offset"`
 	// UUID of the recordset at which you want to set a marker.
-	Marker string `q:"marker"`
-
-	Data        string `q:"data"`
-	Description string `q:"description"`
-	Name        string `q:"name"`
-	SortDir     string `q:"sort_dir"`
-	SortKey     string `q:"sort_key"`
-	Status      string `q:"status"`
-	TTL         int    `q:"ttl"`
-	Type        string `q:"type"`
-	ZoneID      string `q:"zone_id"`
+	Marker   string `q:"marker"`
+	Name     string `q:"name"`
+	SortDir  string `q:"sort_dir"`
+	SortKey  string `q:"sort_key"`
+	Status   string `q:"status"`
+	Type     string `q:"type"`
+	Id       string `q:"id"`
+	ZoneType string `q:"zone_type"`
+	Records  string `q:"records"`
 }
 
 // ToRecordSetListQuery formats a ListOpts into a query string.
@@ -40,9 +42,40 @@ func (opts ListOpts) ToRecordSetListQuery() (string, error) {
 	return q.String(), err
 }
 
+type ListByZoneOpts struct {
+	// Integer value for the limit of values to return.
+	Limit  int `q:"limit"`
+	Offset int `q:"offset"`
+	// UUID of the recordset at which you want to set a marker.
+	Marker  string `q:"marker"`
+	SortDir string `q:"sort_dir"`
+	SortKey string `q:"sort_key"`
+}
+
+// ToRecordSetListByZoneQuery formats a ListOpts into a query string.
+func (opts ListByZoneOpts) ToRecordSetListByZoneQuery() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
 // ListByZone implements the recordset list request.
-func ListByZone(client *gophercloud.ServiceClient, zoneID string, opts ListOptsBuilder) pagination.Pager {
+func ListByZone(client *gophercloud.ServiceClient, zoneID string, opts ListByZoneOptsBuilder) pagination.Pager {
 	url := baseURL(client, zoneID)
+	if opts != nil {
+		query, err := opts.ToRecordSetListByZoneQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return RecordSetPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// List implements the recordset list request.
+func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+	url := listURL(client)
 	if opts != nil {
 		query, err := opts.ToRecordSetListQuery()
 		if err != nil {
@@ -160,7 +193,7 @@ func Update(client *gophercloud.ServiceClient, zoneID string, rrsetID string, op
 // Delete removes an existing RecordSet.
 func Delete(client *gophercloud.ServiceClient, zoneID string, rrsetID string) (r DeleteResult) {
 	_, r.Err = client.Delete(rrsetURL(client, zoneID, rrsetID), &gophercloud.RequestOpts{
-		OkCodes: []int{202},
+		OkCodes: []int{202}, JSONResponse: &r.Body,
 	})
 	return
 }

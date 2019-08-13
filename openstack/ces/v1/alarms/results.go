@@ -2,7 +2,7 @@ package alarms
 
 import (
 	"github.com/gophercloud/gophercloud"
-    	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/gophercloud/gophercloud/pagination"
 )
 
 type CreateAlarm struct {
@@ -11,7 +11,7 @@ type CreateAlarm struct {
 
 type Alarms struct {
 	MetricAlarms []MetricAlarms `json:"metric_alarms"`
-	MetaData MetaData `json:"meta_data"`
+	MetaData     MetaData       `json:"meta_data"`
 }
 
 type Alarm struct {
@@ -86,8 +86,8 @@ func ExtractAlarms(r pagination.Page) (Alarms, error) {
 	s.MetricAlarms = make([]MetricAlarms, 0)
 	err := (r.(AlarmsPage)).ExtractInto(&s)
 	if s.MetaData.Count == 0 {
-		s.MetaData.Count= len(s.MetricAlarms)
-		s.MetaData.Total=len(s.MetricAlarms)
+		s.MetaData.Count = len(s.MetricAlarms)
+		s.MetaData.Total = len(s.MetricAlarms)
 	}
 	return s, err
 }
@@ -103,7 +103,7 @@ func (r GetResult) Extract() (*Alarm, error) {
 }
 
 func (r AlarmsPage) NextPageURL() (string, error) {
-	alarms,err:= ExtractAlarms(r)
+	alarms, err := ExtractAlarms(r)
 	if err != nil {
 		return "", err
 	}
@@ -112,8 +112,8 @@ func (r AlarmsPage) NextPageURL() (string, error) {
 
 // IsEmpty checks whether a NetworkPage struct is empty.
 func (r AlarmsPage) IsEmpty() (bool, error) {
-	s,err:= ExtractAlarms(r)
-	return len(s.MetricAlarms)==0, err
+	s, err := ExtractAlarms(r)
+	return len(s.MetricAlarms) == 0, err
 }
 
 /*
@@ -126,10 +126,10 @@ It attempts to extract the "start" URL from slice of Link structs, or
 func (r AlarmsPage) WrapNextPageURL(start string) (string, error) {
 	limit := r.URL.Query().Get("limit")
 	if limit == "" {
-		return "",nil
+		return "", nil
 	}
 	uq := r.URL.Query()
-	uq.Set("start",start)
-	r.URL.RawQuery=uq.Encode()
-	return r.URL.String(),nil
+	uq.Set("start", start)
+	r.URL.RawQuery = uq.Encode()
+	return r.URL.String(), nil
 }

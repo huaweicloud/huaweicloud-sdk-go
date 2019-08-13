@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/functiontest/common"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/dns/v2/recordsets"
 )
@@ -33,6 +33,7 @@ func main() {
 	TestUpdateRecordSetsByZone(sc)
 	//TestDeleteRecordSetsByZone(sc)
 	//TestListRecordSetsByZone(sc)
+	//TestListRecordSets
 
 	fmt.Println("main end...")
 }
@@ -82,9 +83,9 @@ func TestUpdateRecordSetsByZone(sc *gophercloud.ServiceClient) {
 	zoneId := "4011afa2695c457701695c49a0f7007c"
 	rrd := "4011afa2695c457701695c54dd780177"
 	updateOpts := recordsets.UpdateOpts{
-		TTL:1098,
-		Description:"imaok",
-		Records: []string{"192.168.10.200"},
+		TTL:         1098,
+		Description: "imaok",
+		Records:     []string{"192.168.10.200"},
 	}
 
 	resp, err := recordsets.Update(sc, zoneId, rrd, updateOpts).Extract()
@@ -105,7 +106,7 @@ func TestDeleteRecordSetsByZone(sc *gophercloud.ServiceClient) {
 	zoneId := "4011afa2695c457701695c49a0f7007c"
 	rrd := "asdfasdfas"
 
-	err := recordsets.Delete(sc, zoneId, rrd).ExtractErr()
+	response, err := recordsets.Delete(sc, zoneId, rrd).Extract()
 	if err != nil {
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
 			fmt.Println("ErrCode:", ue.ErrorCode())
@@ -113,15 +114,15 @@ func TestDeleteRecordSetsByZone(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-
+	b, _ := json.MarshalIndent(response, "", " ")
+	fmt.Println(string(b))
 	fmt.Println("Test TestDeleteRecordSetsByZone success!")
 
 }
 
 func TestListRecordSetsByZone(sc *gophercloud.ServiceClient) {
 	zoneId := "4011afa2695c457701695c49a0f7007c"
-	opts := recordsets.ListOpts{
-	}
+	opts := recordsets.ListByZoneOpts{}
 
 	resp, err := recordsets.ListByZone(sc, zoneId, opts).AllPages()
 
@@ -143,7 +144,41 @@ func TestListRecordSetsByZone(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	for _, d := range rs {
+	for _, d := range rs.Recordsets {
+
+		b, _ := json.MarshalIndent(d, "", " ")
+		fmt.Println(string(b))
+	}
+
+	fmt.Println("Test TestListRecordSetsByZone success!")
+}
+
+func TestListRecordSets(sc *gophercloud.ServiceClient) {
+	opts := recordsets.ListOpts{
+		Type: "A",
+	}
+
+	resp, err := recordsets.List(sc, opts).AllPages()
+
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	rs, err := recordsets.ExtractRecordSets(resp)
+
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	for _, d := range rs.Recordsets {
 
 		b, _ := json.MarshalIndent(d, "", " ")
 		fmt.Println(string(b))

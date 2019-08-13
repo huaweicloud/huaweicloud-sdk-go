@@ -176,7 +176,7 @@ func Delete(client *gophercloud.ServiceClient, zoneID string) (r DeleteResult) {
 }
 
 
- */
+*/
 
 package zones
 
@@ -192,7 +192,7 @@ type ListOptsBuilder interface {
 type ListOpts struct {
 	// Number of resources returned on each page.Value range:
 	// 0–500.Commonly used values are 10, 20, and 50.
-	Limit string `q:"limit"`
+	Limit int `q:"limit"`
 
 	// Start resource ID of pagination query.If the parameter is left
 	// blank, only resources on the first page are queried.
@@ -221,7 +221,7 @@ func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pa
 	}
 
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
-		return ListPage{pagination.LinkedPageBase{PageResult: r}}
+		return ZonePage{pagination.LinkedPageBase{PageResult: r}}
 	})
 }
 
@@ -257,7 +257,7 @@ type CreateOpts struct {
 	TTL int `json:"ttl,omitempty"`
 
 	// Router information (VPC associated with the private zone)
-	Router Router `json:"router"`
+	Router RouterCreateOpts `json:"router"`
 }
 
 func (opts CreateOpts) ToZonesCreateMap() (map[string]interface{}, error) {
@@ -323,6 +323,17 @@ func Delete(client *gophercloud.ServiceClient, zoneId string) (r DeleteResult) {
 	return
 }
 
+//RouterCreateOpts,the parameters of the zone create, Router (VPC) information associated with the private zone.
+type RouterCreateOpts struct {
+	// Router ID (VPC ID)
+	RouterId string `json:"router_id" required:"true"`
+
+	// Region of the router (VPC).If it is left blank, the region of
+	// the project in the token takes effect by default.
+	RouterRegion string `json:"router_region,omitempty"`
+}
+
+//Router, Router (VPC) information associated with the private zone.
 type Router struct {
 	// Router ID (VPC ID)
 	RouterId string `json:"router_id" required:"true"`
@@ -330,10 +341,6 @@ type Router struct {
 	// Region of the router (VPC).If it is left blank, the region of
 	// the project in the token takes effect by default.
 	RouterRegion string `json:"router_region,omitempty"`
-
-	// Task status.The value can be PENDING_CREATE, PENDING_DELETE,
-	// ACTIVE, or ERROR.
-	Status string `json:"status,omitempty"`
 }
 
 type AssociateRouterOpts struct {
@@ -353,7 +360,6 @@ func (opts AssociateRouterOpts) ToZonesAssociateRouterMap() (map[string]interfac
 	return b, nil
 }
 
-/*
 func AssociateRouter(client *gophercloud.ServiceClient, zoneId string, opts AssociateRouterOptsBuilder) (r AssociateRouterResult) {
 	b, err := opts.ToZonesAssociateRouterMap()
 	if err != nil {
@@ -364,7 +370,6 @@ func AssociateRouter(client *gophercloud.ServiceClient, zoneId string, opts Asso
 	_, r.Err = client.Post(AssociateRouterURL(client, zoneId), b, &r.Body, &gophercloud.RequestOpts{})
 	return
 }
- */
 
 type DisassociateRouterOpts struct {
 	// Router information (VPC associated with the zone)
@@ -383,7 +388,6 @@ func (opts DisassociateRouterOpts) ToZonesDisassociateRouterMap() (map[string]in
 	return b, nil
 }
 
-/*
 func DisassociateRouter(client *gophercloud.ServiceClient, zoneId string, opts DisassociateRouterOptsBuilder) (r DisassociateRouterResult) {
 	b, err := opts.ToZonesDisassociateRouterMap()
 	if err != nil {
@@ -400,4 +404,3 @@ func ListNameServers(client *gophercloud.ServiceClient, zoneId string) (r ListNa
 	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{})
 	return
 }
- */

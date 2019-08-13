@@ -31,15 +31,17 @@ type AKSKOptions struct {
 	SecurityToken string
 }
 
-// Implements the method of AuthOptionsProvider
+// GetIdentityEndpoint,Implements the method of AuthOptionsProvider
 func (opts AKSKOptions) GetIdentityEndpoint() string {
 	return opts.IdentityEndpoint
 }
 
+//GetProjectId, Implements the method of AuthOptionsProvider
 func (opts AKSKOptions) GetProjectId() string {
 	return opts.ProjectID
 }
 
+// GetDomainId,Implements the method of AuthOptionsProvider
 func (opts AKSKOptions) GetDomainId() string {
 	return opts.DomainID
 }

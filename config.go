@@ -5,8 +5,19 @@ import (
 	"net/http"
 )
 
+// Config define the configs parameter of the provider client .
 type Config struct {
+	// Timeout specifies a time limit for requests made by this
+	// Client. The timeout includes connection time, any
+	// redirects, and reading the response body. The timer remains
+	// running after Get, Head, Post, or Do return and will
+	// interrupt reading of the Response.Body.
+	//
+	// A Timeout of zero means no timeout.
 	Timeout       time.Duration   `default:"10000000000"`
+	// Transport specifies the mechanism by which individual
+	// HTTP requests are made.
+	// If nil, DefaultTransport is used.
 	HttpTransport *http.Transport `default:""`
 	//AutoRetry         bool            `default:"true"`
 	//MaxRetryTime      int             `default:"3"`
@@ -16,17 +27,20 @@ type Config struct {
 	//GoRoutinePoolSize int             `default:"5"`
 }
 
+//NewConfig return Config instance with its default tag.
 func NewConfig() (config *Config) {
 	config = &Config{}
 	InitStructWithDefaultTag(config)
 	return
 }
 
+// WithTimeout customizes the http connection timeout.
 func (c *Config) WithTimeout(timeout time.Duration) *Config {
 	c.Timeout = timeout
 	return c
 }
 
+// WithHttpTransport customizes the http transport.
 func (c *Config) WithHttpTransport(httpTransport *http.Transport) *Config {
 	c.HttpTransport = httpTransport
 	return c

@@ -30,19 +30,22 @@ type ServiceClient struct {
 	// The microversion of the service to use. Set this to use a particular microversion.
 	Microversion string
 
-	lock         sync.Mutex
+	// lock,The service needs to be locked when setting the micro version.
+	lock sync.Mutex
 }
 
+// SetMicroversion,Set the service micro version field.
 func (client *ServiceClient) SetMicroversion(microversion string) {
 	client.lock.Lock()
-	client.Microversion=microversion
+	client.Microversion = microversion
 	client.lock.Unlock()
 	return
 }
 
+// UnsetMicroversion,Unset the service micro version field.
 func (client *ServiceClient) UnsetMicroversion() {
 	client.lock.Lock()
-	client.Microversion=""
+	client.Microversion = ""
 	client.lock.Unlock()
 	return
 }
@@ -85,7 +88,7 @@ func (client *ServiceClient) initReqOpts(url string, JSONBody interface{}, JSONR
 		}
 		if client.ProviderClient.AKSKOptions.ProjectID != "" {
 			opts.MoreHeaders["X-Project-Id"] = client.ProjectID
-		}else if client.ProviderClient.AKSKOptions.DomainID != "" {
+		} else if client.ProviderClient.AKSKOptions.DomainID != "" {
 			opts.MoreHeaders["X-Domain-Id"] = client.DomainID
 		}
 	}
@@ -150,15 +153,15 @@ func (client *ServiceClient) setMicroversionHeader(opts *RequestOpts) {
 	switch client.Type {
 	case "compute":
 
-		if client.Microversion<= "2.26"{
+		if client.Microversion <= "2.26" {
 			opts.MoreHeaders["X-OpenStack-Nova-API-Version"] = client.Microversion
-		}else {
+		} else {
 			opts.MoreHeaders["OpenStack-API-Version"] = client.Type + " " + client.Microversion
 		}
-	//case "sharev2":
-	//	opts.MoreHeaders["X-OpenStack-Manila-API-Version"] = client.Microversion
-	//case "volume":
-	//	opts.MoreHeaders["X-OpenStack-Volume-API-Version"] = client.Microversion
+		//case "sharev2":
+		//	opts.MoreHeaders["X-OpenStack-Manila-API-Version"] = client.Microversion
+		//case "volume":
+		//	opts.MoreHeaders["X-OpenStack-Volume-API-Version"] = client.Microversion
 	}
 	//
 	//if client.Type != "" {

@@ -6,22 +6,26 @@ import (
 	"time"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/functiontest/common"
+	"github.com/gophercloud/gophercloud/auth/aksk"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/ces/v1/events"
 )
 
 func main() {
-
 	fmt.Println("main start...")
-	provider, err := common.AuthAKSK()
-	//provider, err := common.AuthToken()
-	if err != nil {
-		fmt.Println("get provider client failed")
-		if ue, ok := err.(*gophercloud.UnifiedError); ok {
-			fmt.Println("ErrCode:", ue.ErrorCode())
-			fmt.Println("Message:", ue.Message())
-		}
+	opts := aksk.AKSKOptions{
+		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",
+		ProjectID:        "{ProjectID}",
+		AccessKey:        "your AK string",
+		SecretKey:        "your SK string",
+		Domain:           "yyy.com",
+		Region:           "xxx",
+		DomainID:         "{domainID}",
+	}
+
+	provider, errAuth := openstack.AuthenticatedClient(opts)
+	if errAuth != nil {
+		fmt.Println("Failed to get the provider: ", errAuth)
 		return
 	}
 
@@ -34,7 +38,6 @@ func main() {
 		}
 		return
 	}
-
 	EventCreate(sc)
 	fmt.Println("main end...")
 }
@@ -43,12 +46,10 @@ func EventCreate(sc *gophercloud.ServiceClient) {
 	opts := events.CreateOpts{
 		{
 			EventName:   "systemInvaded",
-			EventSource: "financial.Sytem",
+			EventSource: "financial.System",
 			Time:        time.Now().Unix() * 1000,
 			Detail: events.EventItemDetail{
 				Content: "The financial system was invaded",
-				//GroupId:"rg15221211517051YWWkEnVd",
-				//ResourceId:"1234567890sjgggad",
 				ResourceName: "ecs001",
 				EventLevel:   "Major",
 				EventState:   "normal",
@@ -56,7 +57,7 @@ func EventCreate(sc *gophercloud.ServiceClient) {
 		},
 	}
 
-	eventRes, err := events.Create(sc, opts).Extract()
+	createInfo, err := events.Create(sc, opts).Extract()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -66,6 +67,9 @@ func EventCreate(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	bytes, _ := json.MarshalIndent(eventRes, "", " ")
-	fmt.Println(string(bytes))
+	res, marshalErr := json.MarshalIndent(createInfo, "", " ")
+	if marshalErr != nil {
+		fmt.Printf("Marshal createInfo error: %s\n", marshalErr.Error())
+	}
+	fmt.Println(string(res))
 }

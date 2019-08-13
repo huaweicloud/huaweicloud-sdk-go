@@ -41,12 +41,11 @@ func TestList(t *testing.T) {
 	HandleListSuccessfully(t)
 
 	subnetID := "5ae24488-454f-499c-86c4-c0355704005d"
-	actual, err := privateips.List(client.ServiceClient(), subnetID, privateips.ListOpts{
-		Limit: 2,
-	}).AllPages()
-
+	pageData, err := privateips.List(client.ServiceClient(), subnetID, privateips.ListOpts{}).AllPages()
 	th.AssertNoErr(t, err)
-	th.CheckDeepEquals(t, &ListResponse, actual)
+	actual, err := privateips.ExtractPrivateIps(pageData)
+	th.AssertNoErr(t, err)
+	th.CheckDeepEquals(t, ListResponse, actual)
 }
 
 func TestDelete(t *testing.T) {

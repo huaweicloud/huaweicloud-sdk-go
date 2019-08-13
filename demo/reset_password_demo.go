@@ -33,7 +33,7 @@ func main() {
 		return
 	}
 
-	pwd := "Hello@123"
+	pwd := "XXXXXXX"
 
 	err_reset := cloudserversV2.ResetPassword(client, "d2e1a23b-0844-4580-a2c4-b2ca3a5d4167", pwd).ExtractErr()
 

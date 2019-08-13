@@ -318,113 +318,169 @@ import (
 // List Output is a sample response to a List call.
 const ListOutput = `
 {
-    "links": {
-      "self": "http://example.com:9001/v2/zones"
-    },
-    "metadata": {
-      "total_count": 2
-    },
-    "zones": [
-        {
-            "id": "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-            "pool_id": "572ba08c-d929-4c70-8e42-03824bb24ca2",
-            "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
-            "name": "example.org.",
-            "email": "joe@example.org",
-            "ttl": 7200,
-            "serial": 1404757531,
-            "status": "ACTIVE",
-            "action": "CREATE",
-            "description": "This is an example zone.",
-            "masters": [],
-            "type": "PRIMARY",
-            "transferred_at": null,
-            "version": 1,
-            "created_at": "2014-07-07T18:25:31.275934",
-            "updated_at": null,
-            "links": {
-              "self": "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3"
-            }
-        },
-        {
-            "id": "34c4561c-9205-4386-9df5-167436f5a222",
-            "pool_id": "572ba08c-d929-4c70-8e42-03824bb24ca2",
-            "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
-            "name": "foo.example.com.",
-            "email": "joe@foo.example.com",
-            "ttl": 7200,
-            "serial": 1488053571,
-            "status": "ACTIVE",
-            "action": "CREATE",
-            "description": "This is another example zone.",
-            "masters": ["example.com."],
-            "type": "PRIMARY",
-            "transferred_at": null,
-            "version": 1,
-            "created_at": "2014-07-07T18:25:31.275934",
-            "updated_at": "2015-02-25T20:23:01.234567",
-            "links": {
-              "self": "https://127.0.0.1:9001/v2/zones/34c4561c-9205-4386-9df5-167436f5a222"
-            }
-        }
-    ]
+	"links": {
+		"self": "http://example.com:9001/v2/zones"
+	},
+	"metadata": {
+		"total_count": 2
+	},
+	"zones": [{
+		"id": "ff8080825b8fc86c015b94bc6f8712c3",
+		"name": "example.com.",
+		"description": "This is an example zone.",
+		"email": "xx@example.com",
+		"ttl": 300,
+		"serial": 0,
+		"masters": [],
+		"status": "ACTIVE",
+		"links": {
+			"self": "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3"
+		},
+		"pool_id": "ff8080825ab738f4015ab7513298010e",
+		"project_id": "e55c6f3dc4e34c9f86353b664ae0e70c",
+		"zone_type": "private",
+		"created_at": "2017-04-22T08:17:08.997",
+		"updated_at": "2017-04-22T08:17:09.997",
+		"record_num": 2,
+		"routers": [{
+			"status": "ACTIVE",
+			"router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+			"router_region": "xx"
+		},
+		{
+			"status": "ACTIVE",
+			"router_id": "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+			"router_region": "xx"
+		}]
+	},
+	{
+		"id": "ff8080825b8fc86c015b94bc6f871223",
+		"name": "example.com.",
+		"description": "This is an example zone.",
+		"email": "xx@example.com",
+		"ttl": 300,
+		"serial": 0,
+		"masters": [],
+		"status": "ACTIVE",
+		"links": {
+			"self": "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3"
+		},
+		"pool_id": "ff8080825ab738f4015ab7513298010e",
+		"project_id": "e55c6f3dc4e34c9f86353b664ae0e70c",
+		"zone_type": "private",
+		"created_at": "2017-04-22T08:17:08.997",
+		"updated_at": "2017-04-22T08:17:09.997",
+		"record_num": 2,
+		"routers": [{
+			"status": "ACTIVE",
+			"router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+			"router_region": "xx"
+		},
+		{
+			"status": "ACTIVE",
+			"router_id": "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+			"router_region": "xx"
+		}]
+	}]
 }
 `
 
 // GetOutput is a sample response to a Get call.
 const GetOutput = `
 {
-    "id": "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-    "pool_id": "572ba08c-d929-4c70-8e42-03824bb24ca2",
-    "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
-    "name": "example.org.",
-    "email": "joe@example.org",
-    "ttl": 7200,
-    "serial": 1404757531,
-    "status": "ACTIVE",
-    "action": "CREATE",
+    "id": "ff8080825b8fc86c015b94bc6f8712c3",
+    "name": "example.com.",
     "description": "This is an example zone.",
+    "email": "xx@example.com",
+    "ttl": 300,
+    "serial": 0,
     "masters": [],
-    "type": "PRIMARY",
-    "transferred_at": null,
-    "version": 1,
-    "created_at": "2014-07-07T18:25:31.275934",
-    "updated_at": null,
+    "status": "ACTIVE",
     "links": {
-      "self": "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3"
-    }
+        "self": "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3"
+    },
+    "pool_id": "ff8080825ab738f4015ab7513298010e",
+    "project_id": "e55c6f3dc4e34c9f86353b664ae0e70c",
+    "zone_type": "private",
+    "created_at": "2017-04-22T08:17:08.997",
+    "updated_at": "2017-04-22T08:17:09.997",
+    "record_num": 2,
+    "routers": [
+        {
+            "status": "ACTIVE",
+            "router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+            "router_region": "xx"
+        },
+        {
+            "status": "ACTIVE",
+            "router_id": "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+            "router_region": "xx"
+        }
+    ]
 }
 `
 
 var FirstZone = zones.Zone{
-	ID:          "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-	Name:        "example.org.",
-	Email:       "joe@example.org",
-	Serial:      1404757531,
+	ID:          "ff8080825b8fc86c015b94bc6f8712c3",
+	Name:        "example.com.",
+	Email:       "xx@example.com",
+	Serial:      0,
 	Status:      "ACTIVE",
 	Description: "This is an example zone.",
 	Masters:     []string{},
-	CreatedAt:   "2014-07-07T18:25:31.275934",
+	CreatedAt:   "2017-04-22T08:17:08.997",
+	UpdatedAt:   "2017-04-22T08:17:09.997",
+	TTL:         300,
 	Links: zones.Link{
-		Self: "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-		Next: "",
+		Self: "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3",
+	},
+	PoolId:    "ff8080825ab738f4015ab7513298010e",
+	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
+	ZoneType:  "private",
+	RecordNum: 2,
+	Routers: []zones.Router{
+		{
+			RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
+			Status:       "ACTIVE",
+			RouterRegion: "xx",
+		},
+		{
+			RouterId:     "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+			Status:       "ACTIVE",
+			RouterRegion: "xx",
+		},
 	},
 }
 
 var SecondZone = zones.Zone{
-	ID:          "34c4561c-9205-4386-9df5-167436f5a222",
-	Name:        "foo.example.com.",
-	Email:       "joe@foo.example.com",
-	Serial:      1488053571,
+	ID:          "ff8080825b8fc86c015b94bc6f871223",
+	Name:        "example.com.",
+	Email:       "xx@example.com",
+	Serial:      0,
 	Status:      "ACTIVE",
-	Description: "This is another example zone.",
-	Masters:     []string{"example.com."},
-
-	CreatedAt: "2014-07-07T18:25:31.275934",
-	UpdatedAt: "2015-02-25T20:23:01.234567",
+	Description: "This is an example zone.",
+	Masters:     []string{},
+	CreatedAt:   "2017-04-22T08:17:08.997",
+	UpdatedAt:   "2017-04-22T08:17:09.997",
+	TTL:         300,
 	Links: zones.Link{
-		Self: "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-		Next: "",
+		Self: "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3",
+	},
+	PoolId:    "ff8080825ab738f4015ab7513298010e",
+	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
+	ZoneType:  "private",
+	RecordNum: 2,
+	Routers: []zones.Router{
+		{
+			RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
+			Status:       "ACTIVE",
+			RouterRegion: "xx",
+		},
+		{
+			RouterId:     "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+			Status:       "ACTIVE",
+			RouterRegion: "xx",
+		},
 	},
 }
 
@@ -445,7 +501,7 @@ func HandleListSuccessfully(t *testing.T) {
 
 // HandleGetSuccessfully configures the test server to respond to a List request.
 func HandleGetSuccessfully(t *testing.T) {
-	th.Mux.HandleFunc("/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3", func(w http.ResponseWriter, r *http.Request) {
+	th.Mux.HandleFunc("/zones/ff8080825b8fc86c015b94bc6f8712c3", func(w http.ResponseWriter, r *http.Request) {
 		th.TestMethod(t, r, "GET")
 		th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
@@ -457,42 +513,71 @@ func HandleGetSuccessfully(t *testing.T) {
 // CreateZoneRequest is a sample request to create a zone.
 const CreateZoneRequest = `
 {
-    "name": "example.org.",
-    "email": "joe@example.org",
-    "type": "PRIMARY",
-    "ttl": 7200,
-    "description": "This is an example zone."
+  "name": "example.org.",
+  "email": "joe@example.org",
+  "zone_type": "PRIMARY",
+  "description": "This is an example zone.",
+  "router": {
+    "router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+    "router_region": "xx"
+  }
 }
 `
 
 // CreateZoneResponse is a sample response to a create request.
 const CreateZoneResponse = `
 {
-    "id": "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-    "pool_id": "572ba08c-d929-4c70-8e42-03824bb24ca2",
-    "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
-    "name": "example.org.",
-    "email": "joe@example.org",
-    "ttl": 7200,
-    "serial": 1404757531,
-    "status": "ACTIVE",
-    "action": "CREATE",
+    "id": "ff8080825b8fc86c015b94bc6f8712c3",
+    "name": "example.com.",
     "description": "This is an example zone.",
+    "email": "xx@example.com",
+    "ttl": 300,
+    "serial": 0,
     "masters": [],
-    "type": "PRIMARY",
-    "transferred_at": null,
-    "version": 1,
-    "created_at": "2014-07-07T18:25:31.275934",
-    "updated_at": null,
+    "status": "ACTIVE",
     "links": {
-      "self": "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3"
-    }
+        "self": "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3"
+    },
+    "pool_id": "ff8080825ab738f4015ab7513298010e",
+    "project_id": "e55c6f3dc4e34c9f86353b664ae0e70c",
+    "zone_type": "private",
+    "created_at": "2017-04-22T08:17:08.997",
+    "updated_at": "2017-04-22T08:17:09.997",
+    "record_num": 2,
+    "routers": 
+        {
+            "status": "ACTIVE",
+            "router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+            "router_region": "xx"
+        }
 }
 `
 
 // CreatedZone is the expected created zone
-var CreatedZone = FirstZone
-
+var CreatedZone = zones.ZoneCreateResponse{
+	ID:          "ff8080825b8fc86c015b94bc6f8712c3",
+	Name:        "example.com.",
+	Email:       "xx@example.com",
+	Serial:      0,
+	Status:      "ACTIVE",
+	Description: "This is an example zone.",
+	Masters:     []string{},
+	CreatedAt:   "2017-04-22T08:17:08.997",
+	UpdatedAt:   "2017-04-22T08:17:09.997",
+	TTL:         300,
+	Links: zones.Link{
+		Self: "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3",
+	},
+	PoolId:    "ff8080825ab738f4015ab7513298010e",
+	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
+	ZoneType:  "private",
+	RecordNum: 2,
+	Routers: zones.Router{
+		RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
+		Status:       "ACTIVE",
+		RouterRegion: "xx",
+	},
+}
 // HandleZoneCreationSuccessfully configures the test server to respond to a Create request.
 func HandleCreateSuccessfully(t *testing.T) {
 	th.Mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {
@@ -556,31 +641,41 @@ func HandleUpdateSuccessfully(t *testing.T) {
 // DeleteZoneResponse is a sample response to update a zone.
 const DeleteZoneResponse = `
 {
-    "id": "a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
-    "pool_id": "572ba08c-d929-4c70-8e42-03824bb24ca2",
-    "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
-    "name": "example.org.",
-    "email": "joe@example.org",
-    "ttl": 600,
-    "serial": 1404757531,
-    "status": "PENDING",
-    "action": "DELETE",
+    "id": "ff8080825b8fc86c015b94bc6f8712c3",
+    "name": "example.com.",
     "description": "Updated Description",
+    "email": "xx@example.com",
+    "ttl": 300,
+    "serial": 0,
     "masters": [],
-    "type": "PRIMARY",
-    "transferred_at": null,
-    "version": 1,
-    "created_at": "2014-07-07T18:25:31.275934",
-    "updated_at": null,
+    "status": "PENDING",
     "links": {
-      "self": "https://127.0.0.1:9001/v2/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3"
-    }
+        "self": "https://Endpoint/v2/zones/ff8080825b8fc86c015b94bc6f8712c3"
+    },
+    "pool_id": "ff8080825ab738f4015ab7513298010e",
+    "project_id": "e55c6f3dc4e34c9f86353b664ae0e70c",
+    "zone_type": "private",
+    "created_at": "2017-04-22T08:17:08.997",
+    "updated_at": "2017-04-22T08:17:09.997",
+    "record_num": 2,
+    "routers": [
+        {
+            "status": "ACTIVE",
+            "router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
+            "router_region": "xx"
+        },
+        {
+            "status": "ACTIVE",
+            "router_id": "f0791650-db8c-4a20-8a44-a06c6e24b15b",
+            "router_region": "xx"
+        }
+    ]
 }
 `
 
 // HandleZoneDeleteSuccessfully configures the test server to respond to an Delete request.
 func HandleDeleteSuccessfully(t *testing.T) {
-	th.Mux.HandleFunc("/zones/a86dba58-0043-4cc6-a1bb-69d5e86f3ca3",
+	th.Mux.HandleFunc("/zones/ff8080825b8fc86c015b94bc6f8712c3",
 		func(w http.ResponseWriter, r *http.Request) {
 			th.TestMethod(t, r, "DELETE")
 			th.TestHeader(t, r, "X-Auth-Token", client.TokenID)

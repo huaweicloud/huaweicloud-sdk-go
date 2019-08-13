@@ -38,20 +38,20 @@ func (r MetricDatasResult) ExtractMetricDatas() ([]MetricData, error) {
 }
 
 type Datapoint struct {
-	// Ö¸±êÖµ£¬¸Ã×Ö¶ÎÃû³ÆÓëÇëÇó²ÎÊıÖĞfilterÊ¹ÓÃµÄ²éÑ¯ÖµÏàÍ¬¡£
+	// æŒ‡æ ‡å€¼ï¼Œè¯¥å­—æ®µåç§°ä¸è¯·æ±‚å‚æ•°ä¸­filterä½¿ç”¨çš„æŸ¥è¯¢å€¼ç›¸åŒã€‚
 	Average float64 `json:"average"`
-	// Ö¸±ê²É¼¯Ê±¼ä¡£
+	// æŒ‡æ ‡é‡‡é›†æ—¶é—´ã€‚
 	Timestamp int `json:"timestamp"`
-	// Ö¸±êµ¥Î»
+	// æŒ‡æ ‡å•ä½
 	Unit string `json:"unit,omitempty"`
 }
 
 type EventDataInfo struct {
-	// ÊÂ¼şÀàĞÍ£¬ÀıÈçinstance_host_info¡£
+	// äº‹ä»¶ç±»å‹ï¼Œä¾‹å¦‚instance_host_infoã€‚
 	Type string `json:"type"`
-	// ÊÂ¼şÉÏ±¨Ê±¼ä¡£
+	// äº‹ä»¶ä¸ŠæŠ¥æ—¶é—´ã€‚
 	Timestamp int `json:"timestamp"`
-	// Ö÷»úÅäÖÃĞÅÏ¢¡£
+	// ä¸»æœºé…ç½®ä¿¡æ¯ã€‚
 	Value string `json:"value"`
 }
 
@@ -61,9 +61,9 @@ type EventData struct {
 }
 
 type Metricdata struct {
-	//  Ö¸±êÊı¾İÁĞ±í¡£ÓÉÓÚ²éÑ¯Êı¾İÊ±£¬ÔÆ¼à¿Ø»á¸ù¾İËùÑ¡ÔñµÄ¾ÛºÏÁ£¶ÈÏòÇ°È¡Õûfrom²ÎÊı£¬ËùÒÔdatapointsÖĞ°üº¬µÄÊı¾İµãÓĞ¿ÉÄÜ»á¶àÓÚÔ¤ÆÚ¡£
+	//  æŒ‡æ ‡æ•°æ®åˆ—è¡¨ã€‚ç”±äºæŸ¥è¯¢æ•°æ®æ—¶ï¼Œäº‘ç›‘æ§ä¼šæ ¹æ®æ‰€é€‰æ‹©çš„èšåˆç²’åº¦å‘å‰å–æ•´fromå‚æ•°ï¼Œæ‰€ä»¥datapointsä¸­åŒ…å«çš„æ•°æ®ç‚¹æœ‰å¯èƒ½ä¼šå¤šäºé¢„æœŸã€‚
 	Datapoints []Datapoint `json:"datapoints"`
-	// Ö¸±êÃû³Æ£¬ÀıÈçµ¯ĞÔÔÆ·şÎñÆ÷¼à¿ØÖ¸±êÖĞµÄcpu_util¡£
+	// æŒ‡æ ‡åç§°ï¼Œä¾‹å¦‚å¼¹æ€§äº‘æœåŠ¡å™¨ç›‘æ§æŒ‡æ ‡ä¸­çš„cpu_utilã€‚
 	MetricName string `json:"metric_name"`
 }
 

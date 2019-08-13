@@ -39,33 +39,32 @@ func (opts EventItem) ToMap() (map[string]interface{}, error) {
 }
 
 func (opts CreateOpts) ToCreateMap() ([]map[string]interface{}, error) {
-    newOpts := make([]map[string]interface{}, len(opts))
-    for i, opt := range opts {
-        opt, err := opt.ToMap()
-        if err != nil {
-            return nil, err
-        }
-        newOpts[i] = opt
-    }
-    return newOpts, nil
+	newOpts := make([]map[string]interface{}, len(opts))
+	for i, opt := range opts {
+		opt, err := opt.ToMap()
+		if err != nil {
+			return nil, err
+		}
+		newOpts[i] = opt
+	}
+	return newOpts, nil
 }
 
 type CreateOptsBuilder interface {
 	ToCreateMap() ([]map[string]interface{}, error)
 }
 
-/*
+
 func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
-    b, err := opts.ToCreateMap()
-    if err != nil {
-        r.Err = err
-        return
-    }
+	b, err := opts.ToCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
 
-    _, r.Err = client.Post(createURL(client), b, &r.Body, &gophercloud.RequestOpts{
-        OkCodes: []int{201},
-    })
+	_, r.Err = client.Post(createURL(client), b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{201},
+	})
 
-    return
+	return
 }
-*/

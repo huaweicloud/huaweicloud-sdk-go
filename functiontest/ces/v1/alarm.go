@@ -1,5 +1,5 @@
 package main
-/*
+
 import (
 	"encoding/json"
 	"fmt"
@@ -16,7 +16,6 @@ var alarmId string
 func main() {
 
 	fmt.Println("main start...")
-
 	provider, err := common.AuthAKSK()
 	//provider, err := common.AuthToken()
 	if err != nil {
@@ -29,7 +28,6 @@ func main() {
 	}
 
 	sc, err := openstack.NewCESV1(provider, gophercloud.EndpointOpts{})
-
 	if err != nil {
 		fmt.Println("get ces client failed")
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -51,14 +49,14 @@ func AlarmList(sc *gophercloud.ServiceClient) {
 		Limit: 10,
 	}
 
-	var alarmsOnepage alarms.Alarms
+	var alarmsOnePage alarms.Alarms
 	err := alarms.List(sc, opts).EachPage(func(page pagination.Page) (bool, error) {
-		alarmtemp, err := alarms.ExtractAlarms(page)
+		alarmList, err := alarms.ExtractAlarms(page)
 		if err != nil {
 			fmt.Println(err)
 			return false, err
 		}
-		alarmsOnepage = alarmtemp
+		alarmsOnePage = alarmList
 		return false, err
 	})
 	if err != nil {
@@ -70,10 +68,10 @@ func AlarmList(sc *gophercloud.ServiceClient) {
 		return
 	}
 
-	bytes, _ := json.MarshalIndent(alarmsOnepage, "", " ")
+	bytes, _ := json.MarshalIndent(alarmsOnePage, "", " ")
 	fmt.Println(string(bytes))
 
-	allpages, err := alarms.List(sc, opts).AllPages()
+	allPages, err := alarms.List(sc, opts).AllPages()
 	if err != nil {
 		fmt.Println(err)
 		if ue, ok := err.(*gophercloud.UnifiedError); ok {
@@ -82,9 +80,9 @@ func AlarmList(sc *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	alarmsallpage, _ := alarms.ExtractAlarms(allpages)
+	alarmsAllPage, _ := alarms.ExtractAlarms(allPages)
 	fmt.Println("Test AlarmList success！")
-	bytes, _ = json.MarshalIndent(alarmsallpage, "", " ")
+	bytes, _ = json.MarshalIndent(alarmsAllPage, "", " ")
 	fmt.Println(string(bytes))
 }
 
@@ -175,5 +173,3 @@ func AlarmDelete(sc *gophercloud.ServiceClient) {
 	}
 	fmt.Println("Test AlarmDelete success！")
 }
-
-*/

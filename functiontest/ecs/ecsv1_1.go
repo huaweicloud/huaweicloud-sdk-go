@@ -8,6 +8,9 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1_1/cloudservers"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1_1/cloudserversext"
+	"strings"
+	"time"
+	"encoding/json"
 )
 
 func main() {
@@ -30,15 +33,17 @@ func main() {
 		return
 	}
 
-	//TestCreate(sc)
-	//TestExtCreateServer(sc)
+	TestCreate(sc)
+	TestExtCreateServer(sc)
+	TestPostPaidServerCreate(sc)
+	TestPrePaidServerCreate(sc)
 	TestGetJobResult(sc)
 	fmt.Println("main end...")
 }
 
 func TestExtCreateServer(sc *gophercloud.ServiceClient) {
 	nics := []cloudservers.Nic{
-		cloudservers.Nic{
+		{
 			SubnetId: "9a56640e-5503-4b8d-8231-963fc59ff91c",
 		},
 	}
@@ -48,11 +53,11 @@ func TestExtCreateServer(sc *gophercloud.ServiceClient) {
 	}
 
 	dvs := []cloudservers.DataVolume{
-		cloudservers.DataVolume{
+		{
 			VolumeType: "SATA",
 			Size:       60,
 		},
-		cloudservers.DataVolume{
+		{
 			VolumeType: "SATA",
 			Size:       70,
 		},
@@ -84,9 +89,121 @@ func TestExtCreateServer(sc *gophercloud.ServiceClient) {
 	fmt.Println("orderId:", orderId)
 }
 
+//TestPostPaidServerCreate tests creating post paid server
+func TestPostPaidServerCreate(client *gophercloud.ServiceClient) {
+	nics := []cloudservers.Nic{
+		{
+			SubnetId: "a050d1ef-ff89-467a-a10c-f679d300c844",
+		},
+	}
+	rv := cloudservers.RootVolume{
+		VolumeType: "SAS",
+		Size:       40,
+	}
+	opts := cloudservers.CreateOpts{
+		Name:             "PostPaidServer",
+		FlavorRef:        "s6.small.1",
+		ImageRef:         "67f433d8-ed0e-4321-a8a2-a71838539e09",
+		VpcId:            "fc7f54f1-703e-4f71-ab5c-e755f96b3c0c",
+		Nics:             nics,
+		RootVolume:       rv,
+		AvailabilityZone: "cn-north-1a",
+		Count: 2,
+	}
+	resp,createErr := cloudservers.CreateServer(client, opts)
+	if createErr != nil {
+		fmt.Println("createErr:", createErr)
+		if ue, ok := createErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("resp:", resp)
+
+	var jobRst cloudservers.JobResult
+	for {
+		time.Sleep(time.Duration(10)*time.Second)
+		job, getJobErr := cloudservers.GetJobResult(client, resp.Job.Id)
+		if getJobErr != nil {
+			fmt.Println("getJobResultErr:", getJobErr)
+			if ue, ok := getJobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(job, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", job.Status) == 0 {
+			jobRst = job
+			fmt.Println("Create server success!")
+			break
+		} else if strings.Compare("FAIL", job.Status) == 0 {
+			jobRst = job
+			fmt.Println("Create server failed!")
+			break
+		}
+	}
+	subJobs := jobRst.Entities.SubJobs
+	var successServers []string
+	var failServers []string
+	for _, value := range subJobs {
+		if strings.Compare("SUCCESS", value.Status) == 0 {
+			successServers = append(successServers, value.Entities.ServerId)
+		} else {
+			failServers = append(failServers, value.Entities.ServerId)
+		}
+	}
+	fmt.Println("jobId is ", resp.Job.Id)
+	fmt.Println("successServers is ", successServers)
+	fmt.Println("failServers is ", failServers)
+}
+
+//TestPrePaidServerCreate tests creating prepaid server
+func TestPrePaidServerCreate(client *gophercloud.ServiceClient) {
+	nics := []cloudservers.Nic{
+		{
+			SubnetId: "47822b98-c5bd-45b3-9454-d9773380f249",
+		},
+	}
+	rv := cloudservers.RootVolume{
+		VolumeType: "SAS",
+		Size:       40,
+	}
+	extendParam := &cloudservers.ServerExtendParam{
+		ChargingMode:     "prePaid",
+		PeriodType:       "month",
+		PeriodNum:        1,
+		IsAutoPay:        "true",
+	}
+	opts := cloudservers.CreateOpts{
+		Name:             "PrePaidServer",
+		FlavorRef:        "c1.medium",
+		ImageRef:         "4c4f6f5d-b198-44bf-96a5-f5e8a44bda37",
+		VpcId:            "00a2e4fe-5295-4c0e-8bfd-ad3b8426cb93",
+		Nics:             nics,
+		RootVolume:       rv,
+		AvailabilityZone: "AZ1",
+		ExtendParam:      extendParam,
+	}
+	entity, createErr := cloudservers.CreateServer(client, opts)
+	if createErr != nil {
+		fmt.Println("createErr:", createErr)
+		if ue, ok := createErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("orderId is ", entity.Order.Id)
+	fmt.Println("serverIds is ", entity.Server.IDs)
+}
+
 func TestCreate(sc *gophercloud.ServiceClient) {
 	nics := []cloudservers.Nic{
-		cloudservers.Nic{
+		{
 			SubnetId: "9a56640e-5503-4b8d-8231-963fc59ff91c",
 		},
 	}
@@ -96,21 +213,21 @@ func TestCreate(sc *gophercloud.ServiceClient) {
 	}
 
 	dvs := []cloudservers.DataVolume{
-		cloudservers.DataVolume{
+		{
 			VolumeType: "SATA",
 			Size:       60,
 		},
-		cloudservers.DataVolume{
+		{
 			VolumeType: "SATA",
 			Size:       70,
 		},
 	}
 
 	securityGroups := []cloudservers.SecurityGroup{
-		cloudservers.SecurityGroup{
+		{
 			ID: "45678904567890456789HUdd",
 		},
-		cloudservers.SecurityGroup{
+		{
 			ID: "11111111111110456789HUdd",
 		},
 	}

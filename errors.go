@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-//各服务错误信息
+//Define Service error information.
 const (
 	//ECS
 	EcsAuthRequired          = "Authentication required"
@@ -62,7 +62,7 @@ const (
 	ELB1071QuotaExceeded = "Quota exceeded for resources: \\['loadbalancer'\\]"
 )
 
-//Common Error
+//Common Error.
 const (
 	//Com1000
 	CE_MissingInputCode    = "Com.1000" //client error
@@ -114,12 +114,13 @@ const (
 	//其他非典型错误，不再统一定义。
 )
 
-//统一定义后端错误
+//UnifiedError, Unified definition of backend errors.
 type UnifiedError struct {
 	ErrCode    interface{} `json:"code"`
 	ErrMessage string      `json:"message"`
 }
 
+//Initialize SDK client error.
 func NewSystemCommonError(code, message string) error {
 	return &UnifiedError{
 		ErrCode:    code,
@@ -127,15 +128,18 @@ func NewSystemCommonError(code, message string) error {
 	}
 }
 
+//NewSystemServerError,Handle background API error codes.
 func NewSystemServerError(httpStatus int, responseContent string) error {
 	//e.Body {"error": {"message": "instance is not shutoff.","code": "IMG.0008"}}
 	return ParseSeverError(httpStatus, responseContent)
 }
 
+//Error,Implement the Error() interface.
 func (e UnifiedError) Error() string {
 	return fmt.Sprintf("{\"ErrorCode\":\"%s\",\"Message\":\"%s\"}", e.ErrCode, e.ErrMessage)
 }
 
+//ErrorCode,Error code converted to string type.
 func (e UnifiedError) ErrorCode() string {
 	if s, ok := e.ErrCode.(string); ok {
 		return s
@@ -148,10 +152,12 @@ func (e UnifiedError) ErrorCode() string {
 	return ""
 }
 
+//Message,Return error message.
 func (e UnifiedError) Message() string {
 	return e.ErrMessage
 }
 
+// OneLevelError,Define the error code structure and match the error code of one layer of json structure
 type OneLevelError struct {
 	Message    string
 	Request_id string
@@ -160,6 +166,7 @@ type OneLevelError struct {
 	Code	   string `json:"code"`
 }
 
+// ParseSeverError,This function uses json serialization to parse background API error codes.
 func ParseSeverError(httpStatus int, responseContent string) error {
 	//一层结构如下：
 	//第一种：{"error_msg": "Instance *89973356-f733-418b-95b2-f6fc27244f18 could not be found.","err_code": 404}
@@ -232,6 +239,7 @@ func ParseSeverError(httpStatus int, responseContent string) error {
 	}
 }
 
+//MatchErrorCode,Match the error code according to the error message
 func MatchErrorCode(httpStatus int, message string) string {
 	//common error
 	if ok, _ := regexp.MatchString(CE_ApiNotFoundMessage, message); ok {
