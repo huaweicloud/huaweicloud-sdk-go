@@ -31,7 +31,9 @@ var endpointSchemaList = map[string]string{
 	"VPCV2.0": "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
 	"ASV1":    "https://as.%(region)s.%(domain)s/autoscaling-api/v1/%(projectID)s/",
 	"ASV2":    "https://as.%(region)s.%(domain)s/autoscaling-api/v2/%(projectID)s/",
-	"DNS": "https://dns.%(region)s.%(domain)s/",
+	"DNS":     "https://dns.%(region)s.%(domain)s/",
+	"FGSV2":   "https://functiongraph.%(region)s.%(domain)s/v2/%(projectID)s/",
+	"RDSV3":   "https://rds.%(region)s.%(domain)s/v3/%(projectID)s/",
 }
 
 /*

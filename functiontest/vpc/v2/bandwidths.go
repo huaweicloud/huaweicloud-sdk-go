@@ -162,7 +162,7 @@ func TestInsertPublicIPBandwidths(sc *gophercloud.ServiceClient) {
 }
 func TestRemovePublicIPBandwidths(sc *gophercloud.ServiceClient) {
 
-	var size int = 10
+	var size = 10
 
 	var publicIPList []bandwidths.PublicIpInfoID
 

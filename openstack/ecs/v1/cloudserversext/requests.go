@@ -149,10 +149,12 @@ func getVolumeInfo(client *gophercloud.ServiceClient, cloudServerResp *cloudserv
 	vaExt := make([]VolumeInfo, 0)
 
 	if len(cloudServerResp.VolumeAttached) > 0 {
-		for i, va := range cloudServerResp.VolumeAttached {
+		for _, va := range cloudServerResp.VolumeAttached {
 			volume, err := volumes.Get(client, va.ID).Extract()
 			if err != nil { //错误时特殊处理，不返回。
-				vaExt[i].ID = va.ID
+				vaExt = append(vaExt, VolumeInfo{
+					ID:         va.ID,
+				})
 				continue
 			}
 			vaExt = append(vaExt, VolumeInfo{

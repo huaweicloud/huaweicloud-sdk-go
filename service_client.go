@@ -32,6 +32,12 @@ type ServiceClient struct {
 
 	// lock,The service needs to be locked when setting the micro version.
 	lock sync.Mutex
+
+	// MoreHeaders allows users (or Gophercloud) to set service-wide headers on requests. Put another way,
+	// values set in this field will be set on all the HTTP requests the service client sends.
+	MoreHeaders map[string]string
+
+	HandleError func(httpStatus int, responseContent string) error
 }
 
 // SetMicroversion,Set the service micro version field.
@@ -167,4 +173,21 @@ func (client *ServiceClient) setMicroversionHeader(opts *RequestOpts) {
 	//if client.Type != "" {
 	//	opts.MoreHeaders["OpenStack-API-Version"] = client.Type + " " + client.Microversion
 	//}
+}
+
+// Request carries out the HTTP operation for the service client
+func (client *ServiceClient) Request(method, url string, options *RequestOpts) (*http.Response, error) {
+	if len(client.MoreHeaders) > 0 {
+		if options == nil {
+			options = new(RequestOpts)
+		}
+		for k, v := range client.MoreHeaders {
+			options.MoreHeaders[k] = v
+		}
+	}
+
+	if client.HandleError != nil {
+		options.HandleError = client.HandleError
+	}
+	return client.ProviderClient.Request(method, url, options)
 }

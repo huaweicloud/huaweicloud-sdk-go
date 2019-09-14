@@ -446,7 +446,7 @@ func (signParas *reqSignParams) getScope() string {
 }
 
 func (buff *StringBuilder) Write(s string) *StringBuilder {
-	buff.builder.WriteString((s))
+	buff.builder.WriteString(s)
 	return buff
 }
 

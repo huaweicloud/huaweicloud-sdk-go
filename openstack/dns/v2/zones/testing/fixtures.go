@@ -303,16 +303,16 @@ func HandleDeleteSuccessfully(t *testing.T) {
 		})
 }
 
- */
+*/
 package testing
 
 import (
 	"fmt"
-	"net/http"
-	"testing"
 	"github.com/gophercloud/gophercloud/openstack/dns/v2/zones"
 	th "github.com/gophercloud/gophercloud/testhelper"
 	"github.com/gophercloud/gophercloud/testhelper/client"
+	"net/http"
+	"testing"
 )
 
 // List Output is a sample response to a List call.
@@ -438,7 +438,7 @@ var FirstZone = zones.Zone{
 	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
 	ZoneType:  "private",
 	RecordNum: 2,
-	Routers: []zones.Router{
+	Routers: []zones.AssociateRouterResponse{
 		{
 			RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
 			Status:       "ACTIVE",
@@ -470,7 +470,7 @@ var SecondZone = zones.Zone{
 	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
 	ZoneType:  "private",
 	RecordNum: 2,
-	Routers: []zones.Router{
+	Routers: []zones.AssociateRouterResponse{
 		{
 			RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
 			Status:       "ACTIVE",
@@ -544,7 +544,7 @@ const CreateZoneResponse = `
     "created_at": "2017-04-22T08:17:08.997",
     "updated_at": "2017-04-22T08:17:09.997",
     "record_num": 2,
-    "routers": 
+    "router": 
         {
             "status": "ACTIVE",
             "router_id": "19664294-0bf6-4271-ad3a-94b8c79c6558",
@@ -572,12 +572,13 @@ var CreatedZone = zones.ZoneCreateResponse{
 	ProjectId: "e55c6f3dc4e34c9f86353b664ae0e70c",
 	ZoneType:  "private",
 	RecordNum: 2,
-	Routers: zones.Router{
+	Router: zones.AssociateRouterResponse{
 		RouterId:     "19664294-0bf6-4271-ad3a-94b8c79c6558",
 		Status:       "ACTIVE",
 		RouterRegion: "xx",
 	},
 }
+
 // HandleZoneCreationSuccessfully configures the test server to respond to a Create request.
 func HandleCreateSuccessfully(t *testing.T) {
 	th.Mux.HandleFunc("/zones", func(w http.ResponseWriter, r *http.Request) {

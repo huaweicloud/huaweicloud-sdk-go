@@ -12,6 +12,7 @@ type PostPaid struct {
 	Name                string         `json:"name"`
 	Size                int            `json:"size"`
 	ID                  string         `json:"id"`
+	Status              string         `json:"status"`
 	ShareType           string         `json:"share_type"`
 	ChargeMode          string         `json:"charge_mode"`
 	BandwidthType       string         `json:"bandwidth_type"`

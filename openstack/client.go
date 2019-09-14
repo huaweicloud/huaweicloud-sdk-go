@@ -19,6 +19,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/endpoints"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/services"
 	"github.com/gophercloud/gophercloud/pagination"
+	"encoding/json"
 )
 
 const (
@@ -648,9 +649,39 @@ func NewVPCV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // NewCESV1 creates a ServiceClient that may be used with the v1 cloud eye service
 // package.
 func NewCESV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	type details struct {
+		Details string `json:"details"`
+		Code    string `json:"code"`
+	}
+	type CESError struct {
+		Message string  `json:"message"`
+		Code    int     `json:"code"`
+		Details details `json:"details"`
+		Element string  `json:"element"`
+	}
+
 	sc, err := initClientOpts(client, eo, "cesv1")
+	sc.HandleError = func(httpStatus int, responseContent string) error {
+		var cesErr CESError
+		var code string
+		message := responseContent
+		marshalErr := json.Unmarshal([]byte(responseContent), &cesErr)
+
+		if marshalErr == nil && cesErr.Details.Code != "" {
+			code = cesErr.Details.Code
+			message = cesErr.Details.Details
+		} else {
+			code = gophercloud.MatchErrorCode(httpStatus, message)
+		}
+		return &gophercloud.UnifiedError{
+			ErrCode:    code,
+			ErrMessage: message,
+		}
+
+	}
 	return sc, err
 }
+
 
 // NewVPCV2 creates a ServiceClient that may be used with the v2.0 vpc
 // package.
@@ -670,5 +701,18 @@ func NewASV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*
 // package.
 func NewASV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "asv2")
+	return sc, err
+}
+
+// NewFGSV2 creates a ServiceClient that may be used with the v2 as
+// package.
+func NewFGSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+    sc, err := initClientOpts(client, eo, "fgsv2")
+    return sc, err
+}
+// NewRDSV3 creates a ServiceClient that may be used with the v3 rds
+// package.
+func NewRDSV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "rdsv3")
 	return sc, err
 }

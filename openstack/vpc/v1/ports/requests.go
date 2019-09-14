@@ -159,7 +159,7 @@ type ListOpts struct {
 	Limit int `q:"limit"`
 
 	// Specifies that the EnterpriseProjectId is used as the filter.
-	EnterpriseProjectId string `json:"enterprise_project_id"`
+	EnterpriseProjectId string `q:"enterprise_project_id"`
 }
 
 type ListOptsBuilder interface {

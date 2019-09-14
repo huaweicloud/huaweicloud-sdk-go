@@ -76,7 +76,7 @@ type ListOpts struct {
 
 	// enterprise_project_id
 	// Specifies the enterprise_project_id used as the query filter.
-	EnterpriseProjectId string `json:"enterprise_project_id"`
+	EnterpriseProjectId string `q:"enterprise_project_id"`
 }
 
 type ListOptsBuilder interface {

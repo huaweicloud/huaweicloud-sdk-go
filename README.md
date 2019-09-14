@@ -11,3 +11,5 @@ The following services' SDK are included.
 \- DNS  
 \- AS  
 \- BSS  
+\- FunctionGraph  
+\- RDS

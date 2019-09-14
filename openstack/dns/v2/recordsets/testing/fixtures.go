@@ -21,7 +21,7 @@ const ListByZoneOutput = `
             "links": {
                 "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648"
             },
-            "updated_at": null,
+            "update_at": null,
             "records": [
                 "10.1.0.2"
             ],
@@ -31,7 +31,7 @@ const ListByZoneOutput = `
             "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
             "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
             "zone_name": "example.com.",
-            "created_at": "2014-10-24T19:59:44.000000",
+            "create_at": "2014-10-24T19:59:44.000000",
             "version": 1,
             "type": "A",
             "status": "PENDING",
@@ -42,7 +42,7 @@ const ListByZoneOutput = `
             "links": {
                 "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/7423aeaf-b354-4bd7-8aba-2e831567b478"
             },
-            "updated_at": "2017-03-04T14:29:07.000000",
+            "update_at": "2017-03-04T14:29:07.000000",
             "records": [
                 "10.1.0.3",
                 "10.1.0.4"
@@ -53,7 +53,7 @@ const ListByZoneOutput = `
             "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
             "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
             "zone_name": "example.com.",
-            "created_at": "2014-10-24T19:59:44.000000",
+            "create_at": "2014-10-24T19:59:44.000000",
             "version": 1,
             "type": "A",
             "status": "PENDING",
@@ -78,7 +78,7 @@ const ListByZoneOutputLimited = `
             "links": {
                 "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/7423aeaf-b354-4bd7-8aba-2e831567b478"
             },
-            "updated_at": "2017-03-04T14:29:07.000000",
+            "update_at": "2017-03-04T14:29:07.000000",
             "records": [
                 "10.1.0.3",
                 "10.1.0.4"
@@ -89,11 +89,9 @@ const ListByZoneOutputLimited = `
             "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
             "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
             "zone_name": "example.com.",
-            "created_at": "2014-10-24T19:59:44.000000",
-            "version": 1,
+            "create_at": "2014-10-24T19:59:44.000000",
             "type": "A",
-            "status": "PENDING",
-            "action": "CREATE"
+            "status": "PENDING"
         }
     ],
     "links": {
@@ -112,7 +110,7 @@ const GetOutput = `
 		"links": {
 				"self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648"
 		},
-		"updated_at": null,
+		"update_at": null,
 		"records": [
 				"10.1.0.2"
 		],
@@ -122,7 +120,7 @@ const GetOutput = `
 		"project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
 		"zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
 		"zone_name": "example.com.",
-		"created_at": "2014-10-24T19:59:44.000000",
+		"create_at": "2014-10-24T19:59:44.000000",
 		"version": 1,
 		"type": "A",
 		"status": "PENDING",
@@ -145,49 +143,36 @@ var FirstRecordSetCreatedAt, _ = time.Parse(gophercloud.RFC3339MilliNoZ, "2014-1
 var FirstRecordSet = recordsets.RecordSet{
 	ID:          "f7b10e9b-0cae-4a91-b162-562bc6096648",
 	Description: "This is an example record set.",
-	UpdatedAt:   time.Time{},
 	Records:     []string{"10.1.0.2"},
 	TTL:         3600,
 	Name:        "example.org.",
 	ProjectID:   "4335d1f0-f793-11e2-b778-0800200c9a66",
 	ZoneID:      "2150b1bf-dee2-4221-9d85-11f7886fb15f",
 	ZoneName:    "example.com.",
-	CreatedAt:   FirstRecordSetCreatedAt,
-	Version:     1,
+	CreatedAt:   "2014-10-24T19:59:44.000000",
 	Type:        "A",
 	Status:      "PENDING",
-	Action:      "CREATE",
-	Links: []gophercloud.Link{
-		{
-			Rel:  "self",
-			Href: "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648",
-		},
+	Links: recordsets.Link{
+		Self: "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648",
 	},
 }
 
 // SecondRecordSet is the first result in ListByZoneOutput
-var SecondRecordSetCreatedAt, _ = time.Parse(gophercloud.RFC3339MilliNoZ, "2014-10-24T19:59:44.000000")
-var SecondRecordSetUpdatedAt, _ = time.Parse(gophercloud.RFC3339MilliNoZ, "2017-03-04T14:29:07.000000")
 var SecondRecordSet = recordsets.RecordSet{
 	ID:          "7423aeaf-b354-4bd7-8aba-2e831567b478",
 	Description: "This is another example record set.",
-	UpdatedAt:   SecondRecordSetUpdatedAt,
+	UpdatedAt:   "2017-03-04T14:29:07.000000",
 	Records:     []string{"10.1.0.3", "10.1.0.4"},
 	TTL:         3600,
 	Name:        "foo.example.org.",
 	ProjectID:   "4335d1f0-f793-11e2-b778-0800200c9a66",
 	ZoneID:      "2150b1bf-dee2-4221-9d85-11f7886fb15f",
 	ZoneName:    "example.com.",
-	CreatedAt:   SecondRecordSetCreatedAt,
-	Version:     1,
+	CreatedAt:   "2014-10-24T19:59:44.000000",
 	Type:        "A",
 	Status:      "PENDING",
-	Action:      "CREATE",
-	Links: []gophercloud.Link{
-		{
-			Rel:  "self",
-			Href: "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/7423aeaf-b354-4bd7-8aba-2e831567b478",
-		},
+	Links: recordsets.Link{
+		Self: "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/7423aeaf-b354-4bd7-8aba-2e831567b478",
 	},
 }
 
@@ -250,7 +235,7 @@ const CreateRecordSetResponse = `
     "links": {
         "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648"
     },
-    "updated_at": null,
+    "update_at": null,
     "records": [
         "10.1.0.2"
     ],
@@ -260,7 +245,7 @@ const CreateRecordSetResponse = `
     "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
     "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
     "zone_name": "example.com.",
-    "created_at": "2014-10-24T19:59:44.000000",
+    "create_at": "2014-10-24T19:59:44.000000",
     "version": 1,
     "type": "A",
     "status": "PENDING",
@@ -304,7 +289,7 @@ const UpdateRecordSetResponse = `
     "links": {
         "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648"
     },
-    "updated_at": null,
+    "update_at": null,
     "records": [
         "10.1.0.2",
         "10.1.0.3"
@@ -315,7 +300,7 @@ const UpdateRecordSetResponse = `
     "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
     "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
     "zone_name": "example.com.",
-    "created_at": "2014-10-24T19:59:44.000000",
+    "create_at": "2014-10-24T19:59:44.000000",
     "version": 2,
     "type": "A",
     "status": "PENDING",
@@ -344,18 +329,18 @@ const DeleteRecordSetResponse = `
     "links": {
         "self": "https://127.0.0.1:9001/v2/zones/2150b1bf-dee2-4221-9d85-11f7886fb15f/recordsets/f7b10e9b-0cae-4a91-b162-562bc6096648"
     },
-    "updated_at": null,
+    "update_at": null,
     "records": [
         "10.1.0.2",
-        "10.1.0.3",
+        "10.1.0.3"
     ],
-    "ttl": null,
+    "ttl": 3600,
     "id": "f7b10e9b-0cae-4a91-b162-562bc6096648",
     "name": "example.org.",
     "project_id": "4335d1f0-f793-11e2-b778-0800200c9a66",
     "zone_id": "2150b1bf-dee2-4221-9d85-11f7886fb15f",
     "zone_name": "example.com.",
-    "created_at": "2014-10-24T19:59:44.000000",
+    "create_at": "2014-10-24T19:59:44.000000",
     "version": 2,
     "type": "A",
     "status": "PENDING",
@@ -371,7 +356,7 @@ func HandleDeleteSuccessfully(t *testing.T) {
 			th.TestHeader(t, r, "X-Auth-Token", client.TokenID)
 
 			w.WriteHeader(http.StatusAccepted)
-			//w.Header().Add("Content-Type", "application/json")
-			//fmt.Fprintf(w, DeleteZoneResponse)
+			w.Header().Add("Content-Type", "application/json")
+			fmt.Fprintf(w, DeleteRecordSetResponse)
 		})
 }

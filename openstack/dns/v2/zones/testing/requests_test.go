@@ -107,7 +107,7 @@ func TestDelete(t *testing.T) {
 }
 
 
- */
+*/
 
 package testing
 
@@ -128,7 +128,7 @@ func TestList(t *testing.T) {
 	count := 0
 	err := zones.List(client.ServiceClient(), nil).EachPage(func(page pagination.Page) (bool, error) {
 		count++
-		actual, err := zones.ExtractList(page)
+		actual, err := zones.ExtractZones(page)
 		th.AssertNoErr(t, err)
 		th.CheckDeepEquals(t, ExpectedZonesSlice, actual.Zones)
 
@@ -145,7 +145,7 @@ func TestListAllPages(t *testing.T) {
 
 	allPages, err := zones.List(client.ServiceClient(), nil).AllPages()
 	th.AssertNoErr(t, err)
-	allZones, err := zones.ExtractList(allPages)
+	allZones, err := zones.ExtractZones(allPages)
 	th.AssertNoErr(t, err)
 	th.CheckEquals(t, 2, len(allZones.Zones))
 }

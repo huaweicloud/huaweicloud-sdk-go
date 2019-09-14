@@ -32,7 +32,7 @@ func main() {
 		return
 	}
 	GetFlavorList(sc)
-	GetFlavorExtraSpecsList(sc)
+	//GetFlavorExtraSpecsList(sc)
 	fmt.Println("main end...")
 }
 

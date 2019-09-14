@@ -49,9 +49,10 @@ func memberCreate(sc *gophercloud.ServiceClient) {
 		fmt.Println("ErrCode:", ue.ErrorCode())
 		fmt.Println("Message:", ue.Message())
 	}
-	return
+
 	fmt.Println("member status is :", member.Status)
 	fmt.Println("member ID is :", member.MemberID)
+	return
 }
 
 func memberGet(sc *gophercloud.ServiceClient) {
@@ -64,9 +65,10 @@ func memberGet(sc *gophercloud.ServiceClient) {
 		fmt.Println("ErrCode:", ue.ErrorCode())
 		fmt.Println("Message:", ue.Message())
 	}
-	return
+
 	fmt.Println("member status is :", member.Status)
 	fmt.Println("member ID is :", member.MemberID)
+	return
 }
 
 func memberUpdate(sc *gophercloud.ServiceClient) {
@@ -85,9 +87,10 @@ func memberUpdate(sc *gophercloud.ServiceClient) {
 		fmt.Println("ErrCode:", ue.ErrorCode())
 		fmt.Println("Message:", ue.Message())
 	}
-	return
+
 	fmt.Println("member status is :", member.Status)
 	fmt.Println("member ID is :", member.MemberID)
+	return
 }
 
 func memberDelete(sc *gophercloud.ServiceClient) {

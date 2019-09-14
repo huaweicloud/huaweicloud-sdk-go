@@ -2,12 +2,11 @@ package testing
 
 import (
 	"encoding/json"
-	"testing"
-
 	"github.com/gophercloud/gophercloud/openstack/dns/v2/recordsets"
 	"github.com/gophercloud/gophercloud/pagination"
 	th "github.com/gophercloud/gophercloud/testhelper"
 	"github.com/gophercloud/gophercloud/testhelper/client"
+	"testing"
 )
 
 func TestListByZone(t *testing.T) {
@@ -20,7 +19,7 @@ func TestListByZone(t *testing.T) {
 		count++
 		actual, err := recordsets.ExtractRecordSets(page)
 		th.AssertNoErr(t, err)
-		th.CheckDeepEquals(t, ExpectedRecordSetSlice, actual)
+		th.CheckDeepEquals(t, ExpectedRecordSetSlice, actual.Recordsets)
 
 		return true, nil
 	})
@@ -34,7 +33,7 @@ func TestListByZoneLimited(t *testing.T) {
 	HandleListByZoneSuccessfully(t)
 
 	count := 0
-	listOpts := recordsets.ListOpts{
+	listOpts := recordsets.ListByZoneOpts{
 		Limit:  1,
 		Marker: "f7b10e9b-0cae-4a91-b162-562bc6096648",
 	}
@@ -42,7 +41,7 @@ func TestListByZoneLimited(t *testing.T) {
 		count++
 		actual, err := recordsets.ExtractRecordSets(page)
 		th.AssertNoErr(t, err)
-		th.CheckDeepEquals(t, ExpectedRecordSetSliceLimited, actual)
+		th.CheckDeepEquals(t, ExpectedRecordSetSliceLimited, actual.Recordsets)
 
 		return true, nil
 	})
@@ -59,7 +58,7 @@ func TestListByZoneAllPages(t *testing.T) {
 	th.AssertNoErr(t, err)
 	allRecordSets, err := recordsets.ExtractRecordSets(allPages)
 	th.AssertNoErr(t, err)
-	th.CheckEquals(t, 2, len(allRecordSets))
+	th.CheckEquals(t, 2, len(allRecordSets.Recordsets))
 }
 
 func TestGet(t *testing.T) {
@@ -117,10 +116,8 @@ func TestUpdate(t *testing.T) {
 
 	UpdatedRecordSet := CreatedRecordSet
 	UpdatedRecordSet.Status = "PENDING"
-	UpdatedRecordSet.Action = "UPDATE"
 	UpdatedRecordSet.Description = "Updated description"
 	UpdatedRecordSet.Records = []string{"10.1.0.2", "10.1.0.3"}
-	UpdatedRecordSet.Version = 2
 
 	actual, err := recordsets.Update(client.ServiceClient(), UpdatedRecordSet.ZoneID, UpdatedRecordSet.ID, updateOpts).Extract()
 	th.AssertNoErr(t, err)
@@ -134,12 +131,10 @@ func TestDelete(t *testing.T) {
 
 	DeletedRecordSet := CreatedRecordSet
 	DeletedRecordSet.Status = "PENDING"
-	DeletedRecordSet.Action = "UPDATE"
 	DeletedRecordSet.Description = "Updated description"
 	DeletedRecordSet.Records = []string{"10.1.0.2", "10.1.0.3"}
-	DeletedRecordSet.Version = 2
 
-	err := recordsets.Delete(client.ServiceClient(), DeletedRecordSet.ZoneID, DeletedRecordSet.ID).ExtractErr()
+	actual, err := recordsets.Delete(client.ServiceClient(), DeletedRecordSet.ZoneID, DeletedRecordSet.ID).Extract()
+	th.CheckDeepEquals(t, &DeletedRecordSet, actual)
 	th.AssertNoErr(t, err)
-	//th.CheckDeepEquals(t, &DeletedZone, actual)
 }

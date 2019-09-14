@@ -27,10 +27,23 @@ OS_PROJECT_NAME. If OS_PROJECT_ID and OS_PROJECT_NAME are set, they will
 still be referred as "tenant" in Gophercloud.
 
 To use this function, first set the OS_* environment variables (for example,
-by sourcing an `openrc` file), then:
+by sourcing an `openrc` file),or use os.Setenv() function :
+	os.Setenv("OS_AUTH_URL", "https://iam.xxx.yyy.com/v3")
+	os.Setenv("OS_USERNAME", "{your user name}")
+	os.Setenv("OS_PASSWORD", "{your password }")
 
-	opts, err := openstack.TokenOptionsFromEnv()
+then:
+
+	opts, err := auth.TokenOptionsFromEnv()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
 	provider, err := openstack.AuthenticatedClient(opts)
+Now use the provider, you can initialize the serviceClient.
 */
 func TokenOptionsFromEnv() (token.TokenOptions, error) {
 	authURL := os.Getenv("OS_AUTH_URL")
@@ -84,6 +97,35 @@ func TokenOptionsFromEnv() (token.TokenOptions, error) {
 	return to, nil
 }
 
+/*
+AKSKOptionsFromEnv fills out an aksk.AKSKOptions structure with the
+settings found on the various HWCLOUD_* environment variables.
+
+The following variables provide sources of truth: HWCLOUD_AUTH_URL, HWCLOUD_ACCESS_KEY,
+HWCLOUD_SECRET_KEY, HWCLOUD_ACCESS_KEY_STS_TOKEN, and HWCLOUD_PROJECT_ID,HWCLOUD_DOMAIN_ID,HWCLOUD_REGION,HWCLOUD_DOMAIN_NAME.
+
+Of these, HWCLOUD_AUTH_URL, HWCLOUD_ACCESS_KEY, and HWCLOUD_SECRET_KEY must have settings,
+or an error will result.The rest of others are optional.
+
+To use this function, first set the HWCLOUD_* environment variables (for example,
+by sourcing an `openrc` file), or use os.Setenv() function :
+	os.Setenv("HWCLOUD_AUTH_URL", "https://iam.xxx.yyy.com/v3")
+	os.Setenv("HWCLOUD_ACCESS_KEY", "{your AK string}")
+	os.Setenv("HWCLOUD_SECRET_KEY", "{your SK string}")
+
+then:
+
+	opts, err := auth.AKSKOptionsFromEnv()
+	if err != nil {
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	provider, err := openstack.AuthenticatedClient(opts)
+Now use the provider, you can initialize the serviceClient.
+*/
 func AKSKOptionsFromEnv() (aksk.AKSKOptions, error) {
 
 	authURL := os.Getenv("HWCLOUD_AUTH_URL")

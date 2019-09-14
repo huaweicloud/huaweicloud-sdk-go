@@ -113,6 +113,9 @@ type PublicIPUpdateResp struct {
 	// Specifies the obtained elastic IP address.
 	PublicIpAddress string `json:"public_ip_address"`
 
+	// Specifies the private IP address bound to the elastic IP address.
+	PrivateIpAddress string `json:"private_ip_address"`
+
 	// Specifies the obtained elastic IPv6 address.
 	PublicIpV6Address string `json:"public_ipv6_address"`
 
@@ -133,6 +136,16 @@ type PublicIPUpdateResp struct {
 
 	// Specifies the bandwidth ID of the elastic IP address.
 	BandwidthId string `json:"bandwidth_id"`
+
+	// Specifies whether the bandwidth is shared or exclusive.
+	BandwidthShareType string `json:"bandwidth_share_type"`
+
+	// Specifies the bandwidth name.
+	BandwidthName string `json:"bandwidth_name"`
+
+	//	Enterprise project ID. The maximum length is 36 bytes, with the U-ID format of the hyphen "-", or the string "0".
+	//When creating an elastic public IP address, bind the enterprise project ID to the elastic public network IP.
+	EnterpriseProjectId string `json:"enterprise_project_id"`
 }
 type commonResult struct {
 	gophercloud.Result

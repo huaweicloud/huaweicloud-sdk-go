@@ -187,6 +187,8 @@ type RequestOpts struct {
 	// ErrorContext specifies the resource error type to return if an error is encountered.
 	// This lets resources override default error messages based on the response status code.
 	ErrorContext error
+
+	HandleError func(httpStatus int, responseContent string) error
 }
 
 var applicationJSON = "application/json"
@@ -291,6 +293,10 @@ func (client *ProviderClient) Request(method, url string, options *RequestOpts) 
 			if client.ReauthFunc != nil && b {
 				return doReauthAndReq(client, prereqtok, method, url, options)
 			}
+		}
+
+		if options.HandleError != nil {
+			return resp, options.HandleError(resp.StatusCode, string(body))
 		}
 
 		return resp, NewSystemServerError(resp.StatusCode, string(body))
