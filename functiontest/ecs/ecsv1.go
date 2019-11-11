@@ -11,6 +11,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/cloudserversext"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1/job"
 	"github.com/gophercloud/gophercloud/pagination"
+	"strings"
 	"time"
 )
 
@@ -38,8 +39,16 @@ func main() {
 	//TestConfigEcsAutoRecovery(sc)
 	//TestAddServerOnMonitorList(sc)
 	//TestBatchChangeOS(sc)
-	TestListDetailOnePage(sc)
+	//TestListDetailOnePage(sc)
 	//TestListDetailAllPages(sc)
+	TestBatchStartServers(sc)
+	TestBatchRebootServers(sc)
+	TestBatchStopServers(sc)
+	TestBatchUpdateServersName(sc)
+	TestBatchCreateServerTags(sc)
+	TestBatchDeleteServerTags(sc)
+	TestListProjectTags(sc)
+	TestListServerTags(sc)
 	fmt.Println("main end...")
 
 }
@@ -255,4 +264,279 @@ func TestListDetailAllPages(sc *gophercloud.ServiceClient) {
 		fmt.Println("Server info is :", string(jsServer))
 	}
 
+}
+
+//TestBatchStartServers tests the batch start servers function.
+func TestBatchStartServers(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchStartOpts{
+		Servers: []cloudservers.Server{
+			{ID: "ca5b7bdb-4f3b-494e-8563-018ca0b18c3d"},
+			{ID: "4c8c776d-050c-4216-950e-c2807666d86c"},
+		},
+	}
+
+	resp, err := cloudservers.BatchStart(sc, opts).ExtractJob()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("jobID:", resp.ID)
+	var jobObj job.JobResult
+	for {
+		time.Sleep(10 * time.Second)
+		jobRst, jobErr := job.GetJobResult(sc, resp.ID)
+		if jobErr != nil {
+			fmt.Println("getJobResultErr:", jobErr)
+			if ue, ok := jobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch start is success!")
+			break
+		} else if strings.Compare("FAIL", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch start is failed!")
+			break
+		}
+	}
+	subJobs := jobObj.Entities.SubJobs
+	var successServers []string
+	var failServers []string
+	for _, value := range subJobs {
+		if strings.Compare("SUCCESS", value.Status) == 0 {
+			successServers = append(successServers, value.Entities.ServerId)
+		} else {
+			failServers = append(failServers, value.Entities.ServerId)
+		}
+	}
+	fmt.Println("successServers is ", successServers)
+	fmt.Println("failServers is ", failServers)
+}
+
+//TestBatchRebootServers tests the batch reboot servers function.
+func TestBatchRebootServers(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchRebootOpts{
+		Type: cloudservers.Type(cloudservers.Soft),
+		Servers: []cloudservers.Server{
+			{ID: "f51ba5c4-4ac4-4725-9965-4106773e0499"},
+			{ID: "f935d800-b801-4f05-829a-4688e2caaf06"},
+		},
+	}
+
+	resp, err := cloudservers.BatchReboot(sc, opts).ExtractJob()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	fmt.Println("jobID:", resp.ID)
+	var jobObj job.JobResult
+	for {
+		time.Sleep(10 * time.Second)
+		jobRst, jobErr := job.GetJobResult(sc, resp.ID)
+		if jobErr != nil {
+			fmt.Println("getJobResultErr:", jobErr)
+			if ue, ok := jobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch reboot is success!")
+			break
+		} else if strings.Compare("FAIL", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch reboot is failed!")
+			break
+		}
+	}
+	subJobs := jobObj.Entities.SubJobs
+	var successServers []string
+	var failServers []string
+	for _, value := range subJobs {
+		if strings.Compare("SUCCESS", value.Status) == 0 {
+			successServers = append(successServers, value.Entities.ServerId)
+		} else {
+			failServers = append(failServers, value.Entities.ServerId)
+		}
+	}
+	fmt.Println("successServers is ", successServers)
+	fmt.Println("failServers is ", failServers)
+}
+
+//TestBatchStopServers tests the batch stop servers function.
+func TestBatchStopServers(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchStopOpts{
+		Type: cloudservers.Type(cloudservers.Hard),
+		Servers: []cloudservers.Server{
+			{ID: "f51ba5c4-4ac4-4725-9965-4106773e0499"},
+			{ID: "f935d800-b801-4f05-829a-4688e2caaf06"},
+		},
+	}
+
+	resp, err := cloudservers.BatchStop(sc, opts).ExtractJob()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("jobID:", resp.ID)
+	var jobObj job.JobResult
+	for {
+		time.Sleep(10 * time.Second)
+		jobRst, jobErr := job.GetJobResult(sc, resp.ID)
+		if jobErr != nil {
+			fmt.Println("getJobResultErr:", jobErr)
+			if ue, ok := jobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch stop is success!")
+			break
+		} else if strings.Compare("FAIL", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers batch stop is failed!")
+			break
+		}
+	}
+	subJobs := jobObj.Entities.SubJobs
+	var successServers []string
+	var failServers []string
+	for _, value := range subJobs {
+		if strings.Compare("SUCCESS", value.Status) == 0 {
+			successServers = append(successServers, value.Entities.ServerId)
+		} else {
+			failServers = append(failServers, value.Entities.ServerId)
+		}
+	}
+	fmt.Println("successServers is ", successServers)
+	fmt.Println("failServers is ", failServers)
+}
+
+//BatchUpdateServersName requests to batch update servers name.
+func TestBatchUpdateServersName(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchUpdateOpts{
+		Name: "test-name",
+		Servers: []cloudservers.Server{
+			{ID: "5a2b0b54-f45f-4144-8ad8-6ccb131b9c57"},
+			{ID: "b0a9d2b4-2cae-4b66-a6ba-6af70f3bd7f8"},
+		},
+	}
+
+	resp, err := cloudservers.BatchUpdate(sc, opts).ExtractBatchUpdate()
+	if err != nil {
+		if err1, ok := err.(*cloudservers.BatchOperateError); ok {
+			fmt.Println("ErrorCode:", err1.ErrorCode())
+			fmt.Println("Message:", err1.Message())
+			fmt.Println("ErrorInfo:", err1.Error())
+		}
+		return
+	}
+	servers := resp.Response
+	for _, server := range servers {
+		fmt.Println("the server update name success: ", server.ID)
+	}
+}
+
+//TestBatchCreateServerTags tests the batch create server tags function.
+func TestBatchCreateServerTags(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchTagCreateOpts{
+		Tags: []cloudservers.TagCreate{
+			{Key: "key1", Value: "value1"},
+		},
+	}
+	err := cloudservers.BatchCreateServerTags(sc, "dc69a241-f192-47d7-be31-cd43b1106a45", opts).ExtractErr()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(" TestBatchCreateServerTags success!")
+}
+
+//TestBatchDeleteServerTags tests the batch delete server tags function.
+func TestBatchDeleteServerTags(sc *gophercloud.ServiceClient) {
+	opts := cloudservers.BatchTagDeleteOpts{
+		Tags: []cloudservers.TagDelete{
+			{Key: "key1", Value: ""},
+		},
+	}
+	err := cloudservers.BatchDeleteServerTags(sc, "f935d800-b801-4f05-829a-4688e2caaf06", opts).ExtractErr()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(" TestBatchDeleteServerTags success!")
+}
+
+//TestListProjectTags tests the query project tags function.
+func TestListProjectTags(sc *gophercloud.ServiceClient) {
+	resp, err := cloudservers.ListProjectTags(sc).Extract()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, jsErr := json.MarshalIndent(resp, "", " ")
+	if jsErr != nil {
+		fmt.Println(jsErr)
+		return
+	}
+	fmt.Println("TestListProjectTags success!")
+	fmt.Println(string(b))
+}
+
+//TestListServerTags tests the query project tags function.
+func TestListServerTags(sc *gophercloud.ServiceClient) {
+	resp, err := cloudservers.ListServerTags(sc, "f935d800-b801-4f05-829a-4688e2caaf06").Extract()
+	if err != nil {
+		fmt.Println("err:", err)
+		if ue, ok := err.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+
+	b, jsErr := json.MarshalIndent(resp, "", " ")
+	if jsErr != nil {
+		fmt.Println(jsErr)
+		return
+	}
+	fmt.Println("TestListServerTags success!")
+	fmt.Println(string(b))
 }

@@ -72,7 +72,7 @@ func main() {
 
 	fmt.Println("main end...")
 }
-//测试样例，用户参考使用接口CreateAndGetRdsInstanceInfo：创建单实例或者HA实例，并查询创建实例的结果信息，如果创建成功，返回结果包括实例信息的ID、VPC等信息
+
 func CreateAndGetRdsInstanceInfoTest(client *gophercloud.ServiceClient) {
 
 	InstancesTestStruct := instances.CreateRdsOpts{
@@ -109,7 +109,7 @@ func CreateAndGetRdsInstanceInfoTest(client *gophercloud.ServiceClient) {
 	}
 
 }
-//测试样例，用户参考使用接口CreateAndGetRdsReplica：创建只读实例，并查询创建实例的结果信息，如果创建成功，返回结果包括实例信息的ID、VPC等信息
+
 func CreateAndGetRdsReplicaInfoTest(client *gophercloud.ServiceClient) {
 
 	instancesTestStruct := instances.CreateReplicaOpts{
@@ -132,8 +132,8 @@ func CreateAndGetRdsReplicaInfoTest(client *gophercloud.ServiceClient) {
 		fmt.Println("[LogInfor]CreateAndGetRdsReplicaInfoTest instanceInfor.PrivateIps =  ", instanceInfor.PrivateIps)
 	}
 }
-//用户直接调用此接口，创建只读实例，并查询创建实例的结果信息，如果创建成功，返回结果包括实例信息的ID、VPC等信息
-func CreateAndGetRdsReplica(client *gophercloud.ServiceClient, instancesCreate instances.CreateReplicaOpts ,trytimes int) *instances.RdsInstanceResponse {
+
+func CreateAndGetRdsReplica(client *gophercloud.ServiceClient, instancesCreate instances.CreateReplicaOpts, trytimes int) *instances.RdsInstanceResponse {
 
 	job, createRdsInstanceErr := instances.CreateReplica(client, instancesCreate).Extract()
 	if createRdsInstanceErr != nil {
@@ -171,7 +171,7 @@ func CreateAndGetRdsReplica(client *gophercloud.ServiceClient, instancesCreate i
 	}
 	return instanceResTmp
 }
-//用户直接调用此接口，创建单实例或者HA实例，并查询创建实例的结果信息，如果创建成功，返回结果包括实例信息的ID、VPC等信息
+
 func CreateAndGetRdsInstanceInfo(client *gophercloud.ServiceClient, instancesCreate instances.CreateRdsOpts, trytimes int) (*instances.RdsInstanceResponse, error) {
 
 	job, createRdsInstanceErr := instances.Create(client, instancesCreate).Extract()
@@ -210,7 +210,6 @@ func CreateAndGetRdsInstanceInfo(client *gophercloud.ServiceClient, instancesCre
 	return instanceResTmp, nil
 }
 
-//通过实例ID，获取创建后的实例信息，接口提供给以上创建实例查询信息使用
 func GetRdsInstanceInfo(sc *gophercloud.ServiceClient, instanceID string) *instances.RdsInstanceResponse {
 	opts := instances.ListRdsInstanceOpts{
 		Limit:  0,
@@ -257,8 +256,8 @@ func GetRdsInstanceInfo(sc *gophercloud.ServiceClient, instanceID string) *insta
 	fmt.Println("[LogInfor] GetRdsInstanceInfo instanceTmp is ", instanceResTmp)
 	return instanceResTmp
 }
-//查询RDS界面使用的VPC信息，返回完整的VPC列表信息给用户内部接口使用，仅限RDS创建实例使用
-func ListRdsVPCTest(sc *gophercloud.ServiceClient)[]vpcs.VPC {
+
+func ListRdsVPCTest(sc *gophercloud.ServiceClient) []vpcs.VPC {
 
 	allpages, err := vpcs.List(sc, vpcs.ListOpts{
 		//Limit: 2,
@@ -282,7 +281,7 @@ func ListRdsVPCTest(sc *gophercloud.ServiceClient)[]vpcs.VPC {
 	return  result
 
 }
-//查询RDS界面使用的安全组信息，返回安全组列表
+
 func ListRdsSecurityGroupTest(client *gophercloud.ServiceClient) []securitygroups.SecurityGroup {
 	allPages, err := securitygroups.List(client, securitygroups.ListOpts{
 		Limit: 1,
@@ -304,8 +303,8 @@ func ListRdsSecurityGroupTest(client *gophercloud.ServiceClient) []securitygroup
 	}
 	return  result
 }
-//通过VPCID查询RDS界面使用的子网信息
-func ListRdsSubnetTest(sc *gophercloud.ServiceClient, vpcid string)[]subnets.Subnet {
+
+func ListRdsSubnetTest(sc *gophercloud.ServiceClient, vpcid string) []subnets.Subnet {
 
 	allPages, err := subnets.List(sc, subnets.ListOpts{
 		VpcID: vpcid,

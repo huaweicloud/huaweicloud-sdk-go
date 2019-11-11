@@ -1,9 +1,9 @@
 package cloudservers
 
 import (
+	"fmt"
 	"github.com/gophercloud/gophercloud"
 	"net/url"
-	"fmt"
 )
 
 func createURL(sc *gophercloud.ServiceClient) string {
@@ -43,4 +43,25 @@ func batchChangeURL(sc *gophercloud.ServiceClient) string {
 
 func listDetailURL(sc *gophercloud.ServiceClient) string {
 	return sc.ServiceURL("cloudservers", "detail")
+}
+
+func batchActionURL(sc *gophercloud.ServiceClient) string {
+	return sc.ServiceURL("cloudservers", "action")
+}
+
+func batchUpdateURL(sc *gophercloud.ServiceClient) string {
+	return sc.ServiceURL("cloudservers", "server-name")
+}
+
+
+func batchTagActionURL(sc *gophercloud.ServiceClient, serverID string) string {
+	return sc.ServiceURL("cloudservers", serverID, "tags", "action")
+}
+
+func listProjectTagsURL(sc *gophercloud.ServiceClient) string {
+	return sc.ServiceURL("cloudservers", "tags")
+}
+
+func listServerTagsURL(sc *gophercloud.ServiceClient, serverID string) string {
+	return sc.ServiceURL("cloudservers", serverID, "tags")
 }

@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	gophercloud.EnableDebug = true
 	fmt.Println("main start...")
 	//Set authentication parameters
 	tokenOpts := token.TokenOptions{

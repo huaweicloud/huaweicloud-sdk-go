@@ -126,9 +126,9 @@ func CreateServer(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (cr
 		err = errServer
 		return
 	}
-	createResult = CreateCloudServerResponse{Job:job,
-		        Order:order,
-		        Server:server}
+	createResult = CreateCloudServerResponse{Job: job,
+		Order:  order,
+		Server: server}
 	return
 }
 
@@ -272,6 +272,9 @@ type ServerExtendParam struct {
 
 	//下单订购后，是否自动从客户的账户中支付，而不需要客户手动去进行支付。
 	IsAutoPay string `json:"isAutoPay,omitempty"`
+
+	//企业项目ID。
+	EnterpriseProjectID string `json:"enterprise_project_id,omitempty"`
 
 	//是否配置虚拟机自动恢复的功能。
 	SupportAutoRecovery string `json:"support_auto_recovery,omitempty"`

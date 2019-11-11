@@ -150,8 +150,12 @@ type RdsInstanceResponse struct {
 	DiskEncryptionId    string            `json:"disk_encryption_id"`
 	EnterpriseProjectId string            `json:"enterprise_project_id"`
 	TimeZone            string            `json:"time_zone"`
+	ChargeInfo          ChargeInfoMode    `json:"charge_info"`
 }
 
+type ChargeInfoMode struct {
+	ChargeMode            string            `json:"charge_mode"`
+}
 type Nodes struct {
 	Id               string `json:"id"`
 	Name             string `json:"name"`
@@ -228,8 +232,10 @@ type Slowloglist struct {
 	Rowsexamined string `json:"rows_examined"`
 	Database     string `json:"database"`
 	Users        string `json:"users" `
-	QuerySample  string `json:"query_sample" "`
+	QuerySample  string `json:"query_sample"`
 	Type         string `json:"type" `
+	StartTime    string `json:"start_time" `
+	ClientIp     string `json:"client_ip" `
 }
 
 type SlowLogPage struct {

@@ -9,7 +9,7 @@ type CreateBackupsOpts struct {
 	InstanceId  string      `json:"instance_id"  required:"true"`
 	Name        string      `json:"name" required:"true"`
 	Description string      `json:"description,omitempty"`
-	Databases   []Databases `json:"description,omitempty"`
+	Databases   []Databases `json:"databases,omitempty"`
 }
 type Databases struct {
 	Name string `json:"name" required:"true"`

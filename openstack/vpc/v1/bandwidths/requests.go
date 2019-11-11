@@ -20,6 +20,10 @@ type ListOpts struct {
 
 	// Specifies the number of records returned on each page.
 	Limit int `q:"limit"`
+
+	// enterprise_project_id
+	// You can use this field to filter the bandwidth under an enterprise project.
+	EnterpriseProjectId string `q:"enterprise_project_id"`
 }
 
 type ListOptsBuilder interface {

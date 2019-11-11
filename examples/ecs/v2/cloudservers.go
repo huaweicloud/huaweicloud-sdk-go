@@ -10,7 +10,6 @@ import (
 
 func main() {
 	fmt.Println("main start...")
-	gophercloud.EnableDebug = true
 	//Set authentication parameters
 	akskOptions := aksk.AKSKOptions{
 		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",

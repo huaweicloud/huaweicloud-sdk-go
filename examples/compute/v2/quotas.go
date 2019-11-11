@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	fmt.Println("main start...")
 	//Set authentication parameters
 	tokenOpts := token.TokenOptions{

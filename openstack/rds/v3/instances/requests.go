@@ -136,7 +136,7 @@ func Delete(client *gophercloud.ServiceClient, instanceId string) (r DeleteInsta
 
 	url := deleteURL(client, instanceId)
 
-	_, r.Err = client.Delete(url, &gophercloud.RequestOpts{JSONResponse:&r.Body,MoreHeaders: map[string]string{"Content-Type": "application/json"}})
+	_, r.Err = client.Delete(url, &gophercloud.RequestOpts{JSONResponse: &r.Body, MoreHeaders: map[string]string{"Content-Type": "application/json"}})
 
 	return
 }
@@ -359,7 +359,7 @@ type DbSlowLogOpts struct {
 	EndDate   string `q:"end_date"`
 	Offset    string `q:"offset"`
 	Limit     string `q:"limit"`
-	Level     string `q:"level"`
+	Type     string `q:"type"`
 }
 
 type DbSlowLogBuilder interface {
@@ -386,7 +386,7 @@ func ListSlowLog(client *gophercloud.ServiceClient, opts DbSlowLogBuilder, insta
 	}
 
 	pageRdsList := pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
-		return ErrorLogPage{pagination.Offset{PageResult: r}}
+		return SlowLogPage{pagination.Offset{PageResult: r}}
 	})
 
 	rdsheader := map[string]string{"Content-Type": "application/json"}

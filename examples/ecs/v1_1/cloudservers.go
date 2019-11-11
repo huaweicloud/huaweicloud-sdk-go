@@ -13,7 +13,6 @@ import (
 
 func main() {
 	fmt.Println("main start...")
-	gophercloud.EnableDebug = true
 	//Set authentication parameters
 	tokenOpts := token.TokenOptions{
 		IdentityEndpoint: "https://iam.xxx.yyy.com/v3",

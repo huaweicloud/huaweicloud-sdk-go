@@ -46,7 +46,7 @@ func main() {
 	RestarRdsInstanceTest(client,"ab954e0bad034849abb7a2666041cc17in01")
 	SingleToHaRdsInstanceTest(client,"9787515fe01746e192fa872e85ed61bein01")
 	ResizeFlavorRdsInstanceTest(client,"9787515fe01746e192fa872e85ed61bein01")
-	EnlargeVolumeRdseTest(client,"0477dd5f47c141809e4d0ea2ffde9655in01")
+	EnlargeVolumeRdsTest(client,"0477dd5f47c141809e4d0ea2ffde9655in01")
 
 	fmt.Println("main end...")
 }
@@ -197,7 +197,7 @@ func ResizeFlavorRdsInstanceTest(client *gophercloud.ServiceClient, InstanceId s
 	fmt.Println("servers Resize Flavor Rds Instance Test  is success!")
 }
 
-func EnlargeVolumeRdseTest(client *gophercloud.ServiceClient, InstanceId string) {
+func EnlargeVolumeRdsTest(client *gophercloud.ServiceClient, InstanceId string) {
 	EnlargeVolumeBody := instances.EnlargeVolumeRdsOpts{
 		EnlargeVolume: &instances.EnlargeVolumeSize{Size: 160},
 	}
@@ -254,10 +254,10 @@ func ListErrorLogTest(sc *gophercloud.ServiceClient, instanceID string) {
 
 func ListSlowLogTest(sc *gophercloud.ServiceClient, instanceID string) {
 	opts := instances.DbSlowLogOpts{
-		StartDate: "2019-08-06T10:41:14+0800",
-		EndDate:   "2019-08-30T10:41:14+0800",
-		Level:     "INSERT",
-		Limit:     "1",
+		StartDate: "2019-09-30T10:41:14+0800",
+		EndDate:   "2019-10-12T10:41:14+0800",
+		Type:     "INSERT",
+		Limit:     "10",
 		Offset:    "1",
 	}
 	err := instances.ListSlowLog(sc, opts, instanceID).EachPage(func(page pagination.Page) (bool, error) {

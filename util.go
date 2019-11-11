@@ -157,7 +157,7 @@ func (log *Logger) Debug(format string, v ...interface{}) {
 	}
 }
 
-func writeMsg(msg string) error {
+func writeMsg(msg string) {
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {
 		file = "???"
@@ -167,7 +167,6 @@ func writeMsg(msg string) error {
 	msg = fmt.Sprintf("[%s:%s] %s", filename, strconv.FormatInt(int64(line), 10), msg)
 
 	printMsg(msg)
-	return nil
 }
 
 //printMsg

@@ -160,6 +160,11 @@ type BatchChangeResult struct {
 	gophercloud.Result
 }
 
+//JobResult defining the result struct of job.
+type JobResult struct {
+	gophercloud.Result
+}
+
 //Job defining the struct of job.
 type Job struct {
 	ID string `json:"job_id"`
@@ -168,6 +173,13 @@ type Job struct {
 //ExtractJob defining the result of batch change OS function by extracting job.
 func (r BatchChangeResult) ExtractJob() (*Job, error) {
 	var j *Job
+	err := r.ExtractInto(&j)
+	return j, err
+}
+
+//ExtractJob defining the result by extracting job.
+func (r JobResult) ExtractJob() (Job, error) {
+	var j Job
 	err := r.ExtractInto(&j)
 	return j, err
 }
@@ -197,5 +209,73 @@ func (r CloudServerPage) IsEmpty() (bool, error) {
 func ExtractCloudServers(r pagination.Page) (CloudServerDetail, error) {
 	var s CloudServerDetail
 	err := (r.(CloudServerPage)).ExtractInto(&s)
+	return s, err
+}
+
+//BatchUpdateResult defining the result struct of batch updating.
+type BatchUpdateResult struct {
+	gophercloud.Result
+}
+
+//ServerID defines struct of batch update response element.
+type ServerID struct {
+	ID string `json:"id"`
+}
+
+//BatchUpdateResp defines struct of batch update response.
+type BatchUpdateResp struct {
+	Response []ServerID `json:"response"`
+}
+
+//ExtractBatchUpdate defining the result by extracting response.
+func (r BatchUpdateResult) ExtractBatchUpdate() (BatchUpdateResp, error) {
+	var j BatchUpdateResp
+	err := r.ExtractInto(&j)
+	return j, err
+}
+
+//ProjectTagsResult defining the result struct of project tags.
+type ProjectTagsResult struct {
+	gophercloud.Result
+}
+
+//Tags defining the struct of tags.
+type Tags struct {
+	Tags []Tag `json:"tags"`
+}
+
+//Tag defining the struct of tag element.
+type Tag struct {
+	Key    string   `json:"key"`
+	Values []string `json:"values"`
+}
+
+//Extract defining the result of listing tags by extracting
+func (r ProjectTagsResult) Extract() (Tags, error) {
+	var s Tags
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+//ServerTagsResult defining the result struct of server tags.
+type ServerTagsResult struct {
+	gophercloud.Result
+}
+
+//ServerTags defining the struct of tags.
+type ServerTags struct {
+	Tags []ResourceTag `json:"tags"`
+}
+
+//ResourceTag defining the struct of server tag element.
+type ResourceTag struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+//Extract defining the result of listing tags by extracting
+func (r ServerTagsResult) Extract() (ServerTags, error) {
+	var s ServerTags
+	err := r.ExtractInto(&s)
 	return s, err
 }
