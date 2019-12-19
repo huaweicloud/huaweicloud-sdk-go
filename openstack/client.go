@@ -231,9 +231,16 @@ func Authenticate(client *gophercloud.ProviderClient, options auth.AuthOptionsPr
 		if isAKSKOptions {
 			return akskAuthV3(client, endpoint, akskOptions, gophercloud.EndpointOpts{})
 		} else {
-			return fmt.Errorf("Unrecognized auth options provider: %s", reflect.TypeOf(options))
+			TokenIdOptions, isTokenIdOptions := options.(tokenAuth.TokenIdOptions)
+
+			if isTokenIdOptions {
+				return tokenIDAuthV3(client, endpoint, TokenIdOptions, gophercloud.EndpointOpts{})
+			} else {
+				return fmt.Errorf("Unrecognized auth options provider: %s", reflect.TypeOf(options))
+			}
 		}
 	}
+
 }
 
 func getEntryByServiceId(entries []tokens3.CatalogEntry, serviceId string) *tokens3.CatalogEntry {
@@ -248,6 +255,82 @@ func getEntryByServiceId(entries []tokens3.CatalogEntry, serviceId string) *toke
 	}
 
 	return nil
+}
+
+func tokenIDAuthV3(client *gophercloud.ProviderClient, endpoint string, tokenIdOptions tokenAuth.TokenIdOptions, eo gophercloud.EndpointOpts) error {
+	// Override the generated service endpoint with the one returned by the version endpoint.
+
+	client.TokenID = tokenIdOptions.AuthToken
+
+	v3Client, err := NewIdentityV3(client, eo)
+	if err != nil {
+		return err
+	}
+
+	if endpoint != "" {
+		v3Client.Endpoint = endpoint
+	}
+
+	var entries = make([]tokens3.CatalogEntry, 0, 1)
+	serviceListErr := services.List(v3Client, services.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
+		serviceLst, err := services.ExtractServices(page)
+		if err != nil {
+			return false, err
+		}
+
+		for _, svc := range serviceLst {
+			entry := tokens3.CatalogEntry{
+				Type: svc.Type,
+				Name: svc.Name,
+				ID:   svc.ID,
+			}
+			entries = append(entries, entry)
+		}
+
+		return true, nil
+	})
+
+	if serviceListErr != nil {
+		return serviceListErr
+	}
+
+	endpointListErr := endpoints.List(v3Client, endpoints.ListOpts{}).EachPage(func(page pagination.Page) (bool, error) {
+		endpointList, err := endpoints.ExtractEndpoints(page)
+		if err != nil {
+			return false, err
+		}
+
+		for _, endpoint := range endpointList {
+			entry := getEntryByServiceId(entries, endpoint.ServiceID)
+
+			if entry != nil {
+				entry.Endpoints = append(entry.Endpoints, tokens3.Endpoint{
+					URL:       strings.Replace(endpoint.URL, "$(tenant_id)s", tokenIdOptions.ProjectID, -1),
+					Region:    endpoint.Region,
+					Interface: string(endpoint.Availability),
+					ID:        endpoint.ID,
+				})
+			}
+		}
+
+		client.EndpointLocator = func(opts gophercloud.EndpointOpts) (string, error) {
+			return V3TokenIdExtractEndpointURL(&tokens3.ServiceCatalog{
+				Entries: entries,
+			}, opts, tokenIdOptions)
+		}
+
+		return true, nil
+	})
+
+	if endpointListErr != nil {
+		return endpointListErr
+	}
+
+	if client.EndpointLocator == nil {
+		return gophercloud.NewSystemCommonError(gophercloud.CE_NoEndPointInCatalogCode, gophercloud.CE_NoEndPointInCatalogMessage)
+	} else {
+		return nil
+	}
 }
 
 func akskAuthV3(client *gophercloud.ProviderClient, endpoint string, options akskAuth.AKSKOptions, eo gophercloud.EndpointOpts) error {
@@ -634,8 +717,14 @@ func NewIMSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // NewBSSV1 creates a ServiceClient that may be used to access the v1.0
 // BSS service.
 func NewBSSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
-	sc, err := initClientOpts(client, eo, "bss")
-	sc.ResourceBase = sc.Endpoint + "v1.0/"
+	sc, err := initClientOpts(client, eo, "bssv1")
+	return sc, err
+}
+
+// NewBSS-INTLV1 creates a ServiceClient that may be used to access the v1.0
+// BSS-INTLV1 service.
+func NewBSSIntlV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "bss-intlv1")
 	return sc, err
 }
 

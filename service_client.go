@@ -183,6 +183,9 @@ func (client *ServiceClient) Request(method, url string, options *RequestOpts) (
 		}
 		for k, v := range client.MoreHeaders {
 			options.MoreHeaders[k] = v
+			//if _, ok := options.MoreHeaders[k]; !ok {
+				//options.MoreHeaders[k] = v
+			//}
 		}
 	}
 

@@ -21,9 +21,9 @@ func main() {
 	}
 
 	//初始化provider client。
-	provider, err_auth := openstack.AuthenticatedClient(opts)
-	if err_auth != nil {
-		fmt.Println("Failed to get the provider: ", err_auth)
+	provider, errAuth := openstack.AuthenticatedClient(opts)
+	if errAuth != nil {
+		fmt.Println("Failed to get the provider: ", errAuth)
 		return
 	}
 

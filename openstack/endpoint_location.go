@@ -25,7 +25,8 @@ var endpointSchemaList = map[string]string{
 	"VOLUMEV2": "https://evs.%(region)s.%(domain)s/v2/%(projectID)s/",
 	//"ANTIDDOS":      "https://antiddos.%(region)s.%(domain)s/",
 	//"BSS":           "https://bss.%(region)s.%(domain)s/",
-	"BSS":     "https://bss.cn-north-1.%(domain)s/",
+	"BSSV1":     "https://bss.%(domain)s/v1.0/",
+	"BSSINTLV1":  "https://bss.%(domain)s/v1.0/",
 	"VPC":     "https://vpc.%(region)s.%(domain)s/v1/%(projectID)s/",
 	"CESV1":   "https://ces.%(region)s.%(domain)s/V1.0/%(projectID)s/",
 	"VPCV2.0": "https://vpc.%(region)s.%(domain)s/v2.0/%(projectID)s/",
@@ -34,6 +35,7 @@ var endpointSchemaList = map[string]string{
 	"DNS":     "https://dns.%(region)s.%(domain)s/",
 	"FGSV2":   "https://functiongraph.%(region)s.%(domain)s/v2/%(projectID)s/",
 	"RDSV3":   "https://rds.%(region)s.%(domain)s/v3/%(projectID)s/",
+	"IDENTITY": "https://iam.%(domain)s/v3",
 }
 
 /*
@@ -115,6 +117,24 @@ func V3ExtractEndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.Endp
 			endpointFromEnv = strings.Replace(endpointFromEnv, "%(projectID)s", opts.ProjectID, 1)
 			return endpointFromEnv, nil
 		}
+	}
+
+	return V3EndpointURL(catalog, opts)
+}
+
+// Extract Endpoints from the catalog entries that match the requested Type, Interface, Name if provided, and Region if provided.
+func V3TokenIdExtractEndpointURL(catalog *tokens3.ServiceCatalog, opts gophercloud.EndpointOpts, tokenIdOptions tokenAuth.TokenIdOptions) (string, error) {
+
+	if opts.Type == "" {
+		return "", errors.New("Service type can not be empty.")
+	}
+
+	ss := strings.Replace(opts.Type, "-", "_", -1)
+	key := fmt.Sprintf("SDK_%s_ENDPOINT_OVERRIDE", strings.ToUpper(ss))
+	endpointFromEnv := os.Getenv(key)
+	if endpointFromEnv != "" {
+		endpointFromEnv = strings.Replace(endpointFromEnv, "%(projectID)s", tokenIdOptions.ProjectID, 1)
+		return endpointFromEnv, nil
 	}
 
 	return V3EndpointURL(catalog, opts)

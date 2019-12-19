@@ -59,6 +59,10 @@ type CreateOpts struct {
 	// characters that can contain letters, digits, underscores (_), and hyphens (-).
 	Name string `json:"name" required:"true"`
 
+	// Specifies the subnet description. The value is a string of 0 to 255
+	// characters and cannot contain "<" or ">".
+	Description string `json:"description,omitempty"`
+
 	// Specifies the network segment on which the subnet resides. The
 	// value must be in CIDR format. The value must be within the CIDR block of the VPC. The
 	// subnet mask cannot be greater than 28.
@@ -133,6 +137,10 @@ type UpdateOpts struct {
 	// Specifies the subnet name. The value is a string of 1 to 64
 	// characters that can contain letters, digits, underscores (_), and hyphens (-).
 	Name string `json:"name" required:"true"`
+
+	// Specifies the subnet description. The value is a string of 0 to 255
+	// characters and cannot contain "<" or ">".
+	Description string `json:"description,omitempty"`
 
 	// Specifies whether the DHCP function is enabled for the subnet.
 	// The value can be true or false. If this parameter is left blank, it is set to true by

@@ -15,6 +15,10 @@ type Subnet struct {
 	// characters that can contain letters, digits, underscores (_), and hyphens (-).
 	Name string `json:"name"`
 
+	// Specifies the subnet description. The value is a string of 0 to 255
+	// characters and cannot contain "<" or ">".
+	Description string `json:"description,omitempty"`
+
 	// Specifies the network segment on which the subnet resides. The
 	// value must be in CIDR format. The value must be within the CIDR block of the VPC. The
 	// subnet mask cannot be greater than 28.

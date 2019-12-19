@@ -11,6 +11,10 @@ type CreateOpts struct {
 	// letters, underscores (_), and hyphens (-).
 	Name string `json:"name,omitempty"`
 
+	// Specifies the VPC description. The value is a string of 0 to 255
+	// characters and cannot contain "<" or ">".
+	Description string `json:"description,omitempty"`
+
 	// Specifies the range of available subnets in the VPC. The value
 	// must be in CIDR format, for example, 192.168.0.0/16. The value ranges from 10.0.0.0/8
 	// to 10.255.255.0/24, 172.16.0.0/12 to 172.31.255.0/24, or 192.168.0.0/16 to
@@ -101,6 +105,10 @@ type UpdateOpts struct {
 	// tenant. The value is a string of no more than 64 characters and can contain digits,
 	// letters, underscores (_), and hyphens (-).
 	Name string `json:"name,omitempty"`
+
+	// Specifies the VPC description. The value is a string of 0 to 255
+	// characters and cannot contain "<" or ">".
+	Description string `json:"description,omitempty"`
 
 	// Specifies the range of available subnets in the VPC. The value
 	// must be in CIDR format, for example, 192.168.0.0/16. The value ranges from 10.0.0.0/8
