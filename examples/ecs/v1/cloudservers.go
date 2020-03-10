@@ -46,11 +46,14 @@ func main() {
 	BatchStartServers(client)
 	BatchRebootServers(client)
 	BatchStopServers(client)
-	BatchUpdateServersName(client)
 	BatchCreateServerTags(client)
 	BatchDeleteServerTags(client)
 	ListProjectTags(client)
 	ListServerTags(client)
+
+	// Batch Update Servers Name example
+	BatchUpdateServersNameExample(tokenOpts)
+
 	fmt.Println("main end...")
 
 }
@@ -428,17 +431,32 @@ func BatchStopServers(sc *gophercloud.ServiceClient) {
 	fmt.Println("failServers is ", failServers)
 }
 
-//BatchUpdateServersName requests to batch update servers name.
-func BatchUpdateServersName(sc *gophercloud.ServiceClient) {
+func BatchUpdateServersNameExample(tokenOpts token.TokenOptions) {
+
+	// BatchUpdate supports a maximum of 1000 servers, which will take longer and requires timeout adjustments.
+	conf := gophercloud.NewConfig().WithTimeout(time.Second * 30)
+
+	//Init provider client
+	provider, authErr := openstack.AuthenticatedClientWithOptions(tokenOpts, conf)
+	if authErr != nil {
+		fmt.Println("Failed to get the AuthenticatedClient: ", authErr)
+		return
+	}
+	//Init service client
+	client, clientErr := openstack.NewECSV1(provider, gophercloud.EndpointOpts{})
+	if clientErr != nil {
+		fmt.Println("Failed to get the NewECSV1 client: ", clientErr)
+		return
+	}
+
 	opts := cloudservers.BatchUpdateOpts{
 		Name: "test-name",
 		Servers: []cloudservers.Server{
-			{ID: "5a2b0b54-f45f-4144-8ad8-6ccb131b9c57"},
-			{ID: "b0a9d2b4-2cae-4b66-a6ba-6af70f3bd7f8"},
+			{ID: "fafdaaf7-0b75-4208-b05c-269ed3a8f45a"},
+			{ID: "cb92348b-e8d3-424a-8dc9-2a982177fb23"},
 		},
 	}
-
-	resp, err := cloudservers.BatchUpdate(sc, opts).ExtractBatchUpdate()
+	resp, err := cloudservers.BatchUpdate(client, opts).ExtractBatchUpdate()
 	if err != nil {
 		if err1, ok := err.(*cloudservers.BatchOperateError); ok {
 			fmt.Println("ErrorCode:", err1.ErrorCode())

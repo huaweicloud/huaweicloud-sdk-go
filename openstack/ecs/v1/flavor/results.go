@@ -1,8 +1,8 @@
 package flavor
 
 import (
-	"github.com/gophercloud/gophercloud/pagination"
 	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/pagination"
 )
 
 type Flavor struct {
@@ -48,6 +48,9 @@ type Flavor struct {
 
 	// Reserved
 	AccessIsPublic bool `json:"os-flavor-access:is_public"`
+
+	// quota:attachableQuantity
+	AttachableQuantity AttachableQuantity `json:"attachableQuantity"`
 }
 
 type Link struct {
@@ -68,6 +71,24 @@ type OsExtraSpecs struct {
 	// Specifies the resource type.
 	ResourceType string `json:"resource_type"`
 
+	// Specifies the vnic type.
+	InstanceVnicType string `json:"instance_vnic:type"`
+
+	// Specifies the vnic instance bandwidth.
+	InstanceVnicBandwidth int64 `json:"instance_vnic:instance_bandwidth"`
+
+	// Specifies the vnic maxCount.
+	InstanceVnicMaxCount int `json:"instance_vnic:max_count"`
+
+	// Specifies the quota local disk.
+	QuotaLocalDisk string `json:"quota:local_disk"`
+
+	// Specifies the quota nvme ssd.
+	QuotaLocalNvmeSsd string `json:"quota:nvme_ssd"`
+
+	// Specifies the io persistent grant.
+	IoPersistentGrant bool `json:"extra_spec:io:persistent_grant"`
+
 	// Specifies the generation of an ECS type
 	Generation string `json:"ecs:generation"`
 
@@ -83,6 +104,29 @@ type OsExtraSpecs struct {
 
 	// Indicates the model and quantity of passthrough-enabled GPUs on P1 ECSs.
 	PciPassthroughAlias string `json:"pci_passthrough:alias"`
+
+	// cond:operation:status
+	CondOperationStatus string `json:"cond:operation:status"`
+
+	// cond:operation:az
+	CondOperationAz string `json:"cond:operation:az"`
+
+	// quota:max_rate
+	QuotaMaxRate string `json:"quota:max_rate"`
+
+	// quota:min_rate
+	QuotaMinRate string `json:"quota:min_rate"`
+
+	// quota:max_pps
+	QuotaMaxPps string `json:"quota:max_pps"`
+
+}
+
+type AttachableQuantity struct {
+	FreeScsi int `json:"free_scsi"`
+	FreeBlk  int `json:"free_blk"`
+	FreeDisk int `json:"free_disk"`
+	FreeNik  int `json:"free_nic"`
 }
 
 // FlavorsPage is the page returned by a pager when traversing over a
@@ -94,18 +138,20 @@ type FlavorsPage struct {
 // IsEmpty checks whether a FlavorsPage struct is empty.
 func (r FlavorsPage) IsEmpty() (bool, error) {
 	is, err := ExtractFlavors(r)
-	return len(is) == 0, err
+	return len(is.Fs) == 0, err
 }
 
 // ExtractFlavors accepts a Page struct, specifically a FlavorsPage struct,
 // and extracts the elements into a slice of flavor structs. In other words,
 // a generic collection is mapped into a relevant slice.
-func ExtractFlavors(r pagination.Page) ([]Flavor, error) {
-	var s struct {
-		Flavors []Flavor `json:"flavors"`
-	}
+func ExtractFlavors(r pagination.Page) (Flavors, error) {
+	var s Flavors
 	err := (r.(FlavorsPage)).ExtractInto(&s)
-	return s.Flavors, err
+	return s, err
+}
+
+type Flavors struct {
+	Fs []Flavor `json:"flavors"`
 }
 
 type Job struct {
@@ -128,4 +174,3 @@ func (r ResizeResult) ExtractJob() (Job, error) {
 	err := r.ExtractInto(&j)
 	return j, err
 }
-
