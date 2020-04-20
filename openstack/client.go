@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/gophercloud/gophercloud"
@@ -614,8 +615,34 @@ func NewComputeV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpt
 // NewNetworkV2 creates a ServiceClient that may be used with the v2 network
 // package.
 func NewNetworkV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	type neutronError struct {
+		Message string  `json:"message"`
+		Type    string  `json:"type"`
+		Details string  `json:"details"`
+	}
+	type NetworkError struct {
+		NeutronError neutronError `json:"NeutronError"`
+	}
+
 	sc, err := initClientOpts(client, eo, "network")
 	sc.ResourceBase = sc.Endpoint + "v2.0/"
+	sc.HandleError = func(httpStatus int, responseContent string) error {
+		var networkError NetworkError
+		var code string
+		message := responseContent
+		marshalErr := json.Unmarshal([]byte(responseContent), &networkError)
+
+		if marshalErr == nil && networkError.NeutronError.Message != "" {
+			code = strconv.Itoa(httpStatus)
+			message = networkError.NeutronError.Message
+		} else {
+			code = gophercloud.MatchErrorCode(httpStatus, message)
+		}
+		return &gophercloud.UnifiedError{
+			ErrCode:    code,
+			ErrMessage: message,
+		}
+	}
 	return sc, err
 }
 

@@ -134,7 +134,10 @@ type ListOpts struct {
 	// Name will filter by the specified volume name.
 	Name string `q:"name"`
 
-	Maker string `q:"maker"`
+	Marker string `q:"marker"`
+
+	// Requests a page size of items.
+	Limit int `q:"limit"`
 
 	SortDir string `q:"sort_dir"`
 

@@ -59,5 +59,13 @@ Example to Delete a Region
 	if err != nil {
 		panic(err)
 	}
+
+Example to Get a Region
+
+	regionID := "TestRegion"
+	region, err := regions.Get(identityClient, regionID).Extract()
+	if err != nil {
+		panic(err)
+	}
 */
 package regions

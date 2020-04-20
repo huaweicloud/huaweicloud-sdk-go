@@ -191,7 +191,7 @@ type ListOptsBuilder interface {
 
 type ListOpts struct {
 	// Number of resources returned on each page.Value range:
-	// 0–500.Commonly used values are 10, 20, and 50.
+	// 0â€“500.Commonly used values are 10, 20, and 50.
 	Limit int `q:"limit"`
 
 	// Start resource ID of pagination query.If the parameter is left
@@ -253,7 +253,7 @@ type CreateOpts struct {
 	ZoneType string `json:"zone_type" required:"true"`
 
 	// Caching period of the SOA record set (in seconds).The default
-	// value is 300s.The value range is 300–2147483647.
+	// value is 300s.The value range is 300â€“2147483647.
 	TTL int `json:"ttl,omitempty"`
 
 	// Router information (VPC associated with the private zone)
@@ -288,7 +288,7 @@ type UpdateOpts struct {
 	Email string `json:"email,omitempty"`
 
 	// Caching period of the SOA record set (in seconds).The default
-	// value is 300s.The value range is 300–2147483647.
+	// value is 300s.The value range is 300â€“2147483647.
 	TTL int `json:"ttl,omitempty"`
 
 	// Description of the domain name, which cannot exceed 255

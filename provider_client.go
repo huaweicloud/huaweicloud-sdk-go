@@ -17,7 +17,7 @@ import (
 )
 
 // DefaultUserAgent is the default User-Agent string set in the request header.
-const DefaultUserAgent = "huawei-cloud-sdk-go/1.0.21"
+const DefaultUserAgent = "huawei-cloud-sdk-go/1.0.22"
 
 // ProviderClient stores details that are required to interact with any
 // services within a specific provider's API.

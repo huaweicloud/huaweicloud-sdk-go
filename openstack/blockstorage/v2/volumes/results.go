@@ -47,9 +47,9 @@ type Volume struct {
 	// AvailabilityZone is which availability zone the volume is in.
 	AvailabilityZone string `json:"availability_zone"`
 	// The date when this volume was created.
-	CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"created_at"`
 	// The date when this volume was last updated
-	UpdatedAt time.Time `json:"-"`
+	UpdatedAt time.Time `json:"updated_at"`
 	// Instances onto which the volume is attached.
 	Attachments []Attachment `json:"attachments"`
 	// Human-readable display name for the volume.

@@ -24,6 +24,12 @@ type Region struct {
 
 	// ParentRegionID is the ID of the parent region.
 	ParentRegionID string `json:"parent_region_id"`
+
+	// Locales is the names of the region
+	Locales map[string]interface{} `json:"locales"`
+
+	// Type is the type of the region
+	Type string `json:"type"`
 }
 
 func (r *Region) UnmarshalJSON(b []byte) error {
