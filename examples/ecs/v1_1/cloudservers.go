@@ -191,6 +191,7 @@ func PrePaidServerCreate(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
+	fmt.Println("jobId is ", entity.Job.Id)
 	fmt.Println("orderId is ", entity.Order.Id)
 	fmt.Println("serverIds is ", entity.Server.IDs)
 }
