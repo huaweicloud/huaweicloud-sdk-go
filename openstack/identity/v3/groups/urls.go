@@ -21,3 +21,15 @@ func updateURL(client *gophercloud.ServiceClient, groupID string) string {
 func deleteURL(client *gophercloud.ServiceClient, groupID string) string {
 	return client.ServiceURL("groups", groupID)
 }
+
+func addUserToGroupURL(client *gophercloud.ServiceClient, groupID string, userID string) string {
+	return client.ServiceURL("groups", groupID, "users", userID)
+}
+
+func checkUserInGroupURL(client *gophercloud.ServiceClient, groupID string, userID string) string {
+	return client.ServiceURL("groups", groupID, "users", userID)
+}
+
+func removeUserFromGroupURL(client *gophercloud.ServiceClient, groupID string, userID string) string {
+	return client.ServiceURL("groups", groupID, "users", userID)
+}

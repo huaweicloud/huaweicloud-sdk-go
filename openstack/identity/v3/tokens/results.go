@@ -15,6 +15,7 @@ type Endpoint struct {
 	Region    string `json:"region"`
 	Interface string `json:"interface"`
 	URL       string `json:"url"`
+	RegionId  string `json:"region_id"`
 }
 
 // CatalogEntry provides a type-safe interface to an Identity API V3 service
@@ -60,6 +61,7 @@ type User struct {
 	Domain Domain `json:"domain"`
 	ID     string `json:"id"`
 	Name   string `json:"name"`
+	PasswordExpiresAt string `json:"password_expires_at"`
 }
 
 // Role provides information about roles to which User is authorized.
@@ -167,4 +169,55 @@ type Token struct {
 
 func (r commonResult) ExtractInto(v interface{}) error {
 	return r.ExtractIntoStructPtr(v, "token")
+}
+
+
+type AssumeBy struct {
+	User User `json:"user"`
+}
+
+
+type TokenBody struct {
+	CatalogEntry []CatalogEntry `json:"catalog"`
+	Domain *Domain `json:"domain",omitempty`
+	ExpiresAt time.Time `json:"expires_at"`
+	IssuedAt time.Time `json:"issued_at"`
+	Methods []string `json:"methods"`
+	Project *Project `json:"project",omitempty`
+	Roles []Role `json:"roles"`
+	User *User `json:"user",omitempty`
+}
+
+type AgencyTokenBody struct {
+	AssumedBy *AssumeBy `json:"assumed_by",omitempty`
+	CatalogEntry []CatalogEntry `json:"catalog"`
+	Domain *Domain `json:"domain",omitempty`
+	ExpiresAt time.Time `json:"expires_at"`
+	IssuedAt time.Time `json:"issued_at"`
+	Methods []string `json:"methods"`
+	Project *Project `json:"project",omitempty`
+	Roles []Role `json:"roles"`
+	User *User `json:"user",omitempty`
+}
+
+
+
+func (r commonResult) ExtractTokenBody() (*TokenBody, error) {
+	var s TokenBody
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, err
+}
+
+func (r commonResult) ExtractAgencyTokenBody() (*AgencyTokenBody, error) {
+	var s AgencyTokenBody
+	err := r.ExtractInto(&s)
+	if err != nil {
+		return nil, err
+	}
+
+	return &s, err
 }

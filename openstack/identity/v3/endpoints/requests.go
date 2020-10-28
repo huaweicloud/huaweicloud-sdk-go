@@ -74,6 +74,30 @@ func (opts ListOpts) ToEndpointListParams() (string, error) {
 	return q.String(), err
 }
 
+type ListEndPointsOpts struct {
+	// Availability is the interface type of the Endpoint (admin, internal,
+	// or public), referenced by the gophercloud.Availability type.
+	Interface gophercloud.Availability `q:"interface"`
+
+	// ServiceID is the ID of the service the Endpoint refers to.
+	ServiceID string `q:"service_id"`
+
+	// Page is a result page to reference in the results.
+	Page int `q:"page"`
+
+	// PerPage determines how many results per page are returned.
+	PerPage int `q:"per_page"`
+}
+
+type ListEndPointOptsBuilder interface {
+	ToEndpointListParams() (string, error)
+}
+
+func (opts ListEndPointsOpts) ToEndpointListParams() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
 // List enumerates endpoints in a paginated collection, optionally filtered
 // by ListOpts criteria.
 func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
@@ -88,6 +112,26 @@ func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pa
 	return pagination.NewPager(client, u, func(r pagination.PageResult) pagination.Page {
 		return EndpointPage{pagination.LinkedPageBase{PageResult: r}}
 	})
+}
+
+func ListEndPoint(client *gophercloud.ServiceClient, opts ListEndPointOptsBuilder) pagination.Pager {
+	u := listURL(client)
+	if opts != nil {
+		q, err := gophercloud.BuildQueryString(opts)
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		u += q.String()
+	}
+	return pagination.NewPager(client, u, func(r pagination.PageResult) pagination.Page {
+		return EndpointPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+// Get returns additional information about a endpoint, given its ID.
+func Get(client *gophercloud.ServiceClient, endpointID string) (r GetResult) {
+	_, r.Err = client.Get(endpointURL(client, endpointID), &r.Body, nil)
+	return
 }
 
 // UpdateOptsBuilder allows extensions to add parameters to the Update request.

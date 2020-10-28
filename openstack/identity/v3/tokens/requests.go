@@ -223,3 +223,121 @@ func Revoke(c *gophercloud.ServiceClient, token string) (r RevokeResult) {
 	})
 	return
 }
+
+type AuthOptionPwdtBuilder interface {
+	ToTokenV3PwdCreateMap() (map[string]interface{}, error)
+}
+
+type AuthOptionAgencytBuilder interface {
+	ToTokenV3AgencyCreateMap() (map[string]interface{}, error)
+}
+
+type DomainReq struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
+type ProjectReq struct {
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+}
+
+type UserReq struct {
+	ID       string    `json:"id,omitempty"`
+	Name     string    `json:"name,omitempty"`
+	Password string    `json:"password"`
+	Domain   DomainReq `json:"domain,omitempty"`
+	PassCode string    `json:"passcode"`
+}
+
+type PasswordReq struct {
+	User UserReq `json:"user,omitempty"`
+}
+
+type TotpReq struct {
+	User UserReq `json:"user,omitempty"`
+}
+
+type AssumeRoleReq struct {
+	DomainID   string `json:"domain_id,omitempty"`
+	DomainName string `json:"domain_name,omitempty"`
+	XroleName  string `json:"xrole_name,omitempty"`
+}
+
+type IdentityReq struct {
+	Methods    []string      `json:"methods,omitempty"`
+	Password   *PasswordReq   `json:"password,omitempty"`
+	Totp       *TotpReq       `json:"totp,omitempty"`
+	AssumeRole *AssumeRoleReq `json:"assume_role",omitempty`
+}
+
+type ScopeReq struct {
+	Domain  *DomainReq  `json:"domain,omitempty"`
+	Project *ProjectReq `json:"project,omitempty"`
+}
+type AuthReq struct {
+	Identity *IdentityReq `json:"identity,omitempty"`
+	Scope    *ScopeReq    `json:"scope,omitempty"`
+}
+
+type PwdTokenOptions struct {
+	Auth *AuthReq `json:"auth,omitempty"`
+}
+
+type AgencyTokenOptions struct {
+	Auth AuthReq `json:"auth,omitempty"`
+}
+
+func (pwdTokenOpts *PwdTokenOptions) ToTokenV3PwdCreateMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(pwdTokenOpts, "")
+	return b, err
+}
+
+func (agencyTokenOptions *AgencyTokenOptions) ToTokenV3AgencyCreateMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(agencyTokenOptions, "")
+	return b, err
+}
+
+func CreateTokenByPassword(c *gophercloud.ServiceClient, opts PwdTokenOptions, nocatalog string) (r CreateResult) {
+	b, err := opts.ToTokenV3PwdCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, err = c.Post(passwordTokenURL(c, nocatalog), b, &r.Body, &gophercloud.RequestOpts{
+		MoreHeaders: map[string]string{"X-Auth-Token": ""},
+	})
+	if err != nil {
+		r.Err = err
+		return
+	}
+	return r
+}
+
+func ValidateToken(c *gophercloud.ServiceClient, token string, nocatalog string) (r GetResult) {
+	resp, err := c.Get(validateURL(c, nocatalog), &r.Body, &gophercloud.RequestOpts{
+		MoreHeaders: subjectTokenHeaders(c, token),
+		OkCodes:     []int{200, 203},
+	})
+	if resp != nil {
+		r.Err = err
+		r.Header = resp.Header
+	}
+	return
+}
+
+func CreateTokenByAgency(c *gophercloud.ServiceClient, opts AgencyTokenOptions, nocatalog string) (r CreateResult) {
+	b, err := opts.ToTokenV3AgencyCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, err = c.Post(agencyTokenURL(c, nocatalog), b, &r.Body, &gophercloud.RequestOpts{
+		MoreHeaders: map[string]string{"X-Auth-Token": ""},
+	})
+	if err != nil {
+		r.Err = err
+		return
+	}
+	return r
+}

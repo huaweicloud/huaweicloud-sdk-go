@@ -22,6 +22,14 @@ func (r serviceResult) Extract() (*Service, error) {
 	return s.Service, err
 }
 
+func (r serviceResult) ExtractService() (*ServiceDetail, error) {
+	var s struct {
+		Service *ServiceDetail `json:"service"`
+	}
+	err := r.ExtractInto(&s)
+	return s.Service, err
+}
+
 // CreateResult is the response from a Create request. Call its Extract method
 // to interpret it as a Service.
 type CreateResult struct {
@@ -65,6 +73,25 @@ type Service struct {
 
 	// Extra is a collection of miscellaneous key/values.
 	Extra map[string]interface{} `json:"-"`
+}
+
+type ServiceDetail struct {
+	// ID is the unique ID of the service.
+	ID string `json:"id"`
+
+	// Type is the type of the service.
+	Name string `json:"name"`
+
+	// Type is the type of the service.
+	Type string `json:"type"`
+
+	// Enabled is whether or not the service is enabled.
+	Enabled bool `json:"enabled"`
+
+	// Links contains referencing links to the service.
+	Links map[string]interface{} `json:"links"`
+
+	Description string `json:"description"`
 }
 
 func (r *Service) UnmarshalJSON(b []byte) error {
@@ -131,4 +158,40 @@ func ExtractServices(r pagination.Page) ([]Service, error) {
 	}
 	err := (r.(ServicePage)).ExtractInto(&s)
 	return s.Services, err
+}
+
+func ExtractListServices(r pagination.Page) ([]ServiceDetail, error) {
+	var s struct {
+		Services []ServiceDetail `json:"services"`
+	}
+	err := (r.(ServicePage)).ExtractInto(&s)
+	return s.Services, err
+}
+
+type catalogResult struct {
+	serviceResult
+}
+
+type catalogResponse struct {
+	Catalog []struct {
+		Endpoints []struct {
+			ID        string `json:"id"`
+			Interface string `json:"interface"`
+			Region    string `json:"region"`
+			RegionID  string `json:"region_id"`
+			URL       string `json:"url"`
+		} `json:"endpoints"`
+		ID   string `json:"id"`
+		Name string `json:"name"`
+		Type string `json:"type"`
+	} `json:"catalog"`
+	Links struct {
+		Self string `json:"self"`
+	} `json:"links"`
+}
+
+func (r catalogResult) ExtractCatalog() (*catalogResponse, error) {
+	var s catalogResponse
+	err := r.ExtractInto(&s)
+	return &s, err
 }

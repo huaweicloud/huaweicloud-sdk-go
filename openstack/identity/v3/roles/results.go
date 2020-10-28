@@ -2,7 +2,6 @@ package roles
 
 import (
 	"encoding/json"
-
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/internal"
 	"github.com/gophercloud/gophercloud/pagination"
@@ -24,6 +23,38 @@ type Role struct {
 
 	// Extra is a collection of miscellaneous key/values.
 	Extra map[string]interface{} `json:"-"`
+}
+
+type RoleDetail struct {
+	// DomainID is the domain ID the role belongs to.
+	DomainID string `json:"domain_id"`
+
+	Catalog string `json:"catalog"`
+
+	// ID is the unique ID of the role.
+	ID string `json:"id"`
+
+	// Links contains referencing links to the role.
+	Links map[string]interface{} `json:"links"`
+
+	// Name is the role name
+	Name string `json:"name"`
+
+	CreateTime string `json:"created_time"`
+
+	Description string `json:"description"`
+
+	DescriptionCn string `json:"description_cn"`
+
+	DisplayName string `json:"display_name"`
+
+	Flag string `json:"flag"`
+
+	Type string `json:"type"`
+
+	UpdatedTime string `json:"updated_time"`
+
+	Policy map[string]interface{} `json:"policy"`
 }
 
 func (r *Role) UnmarshalJSON(b []byte) error {
@@ -84,6 +115,14 @@ type DeleteResult struct {
 	gophercloud.ErrResult
 }
 
+type PutResult struct {
+	gophercloud.ErrResult
+}
+
+type HeadResult struct {
+	gophercloud.ErrResult
+}
+
 // RolePage is a single page of Role results.
 type RolePage struct {
 	pagination.LinkedPageBase
@@ -120,10 +159,27 @@ func ExtractRoles(r pagination.Page) ([]Role, error) {
 	return s.Roles, err
 }
 
+func ExtractListRoles(r pagination.Page) ([]RoleDetail, error) {
+	var s struct {
+		Roles []RoleDetail `json:"roles"`
+	}
+	err := (r.(RolePage)).ExtractInto(&s)
+	return s.Roles, err
+}
+
 // Extract interprets any roleResults as a Role.
 func (r roleResult) Extract() (*Role, error) {
 	var s struct {
 		Role *Role `json:"role"`
+	}
+	err := r.ExtractInto(&s)
+	return s.Role, err
+}
+
+// Extract interprets any roleResults as a Role.
+func (r roleResult) ExtractGroup() (*RoleDetail, error) {
+	var s struct {
+		Role *RoleDetail `json:"role"`
 	}
 	err := r.ExtractInto(&s)
 	return s.Role, err
@@ -211,4 +267,37 @@ type AssignmentResult struct {
 // Call ExtractErr method to determine if the request succeeded or failed.
 type UnassignmentResult struct {
 	gophercloud.ErrResult
+}
+
+type ListResult struct {
+	roleResult
+}
+
+type ListResponse struct {
+	Roles []struct {
+		DomainID      string                 `json:"domain_id"`
+		Catalog       string                 `json:"catalog"`
+		ID            string                 `json:"id"`
+		Links         map[string]interface{} `json:"links"`
+		Name          string                 `json:"name"`
+		CreateTime    string                 `json:"created_time"`
+		Description   string                 `json:"description"`
+		DescriptionCn string                 `json:"description_cn"`
+		DisplayName   string                 `json:"display_name"`
+		Flag          string                 `json:"flag"`
+		Type          string                 `json:"type"`
+		UpdatedTime   string                 `json:"updated_time"`
+		Policy        map[string]interface{} `json:"policy"`
+	} `json:"roles"`
+	Links struct {
+		Next     interface{} `json:"next"`
+		Previous interface{} `json:"previous"`
+		Self     string      `json:"self"`
+	} `json:"links"`
+}
+
+func (r ListResult) ExtractList() (*ListResponse, error) {
+	var s ListResponse
+	err := r.ExtractInto(&s)
+	return &s, err
 }

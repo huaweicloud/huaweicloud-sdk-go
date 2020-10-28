@@ -36,6 +36,8 @@ var endpointSchemaList = map[string]string{
 	"FGSV2":   "https://functiongraph.%(region)s.%(domain)s/v2/%(projectID)s/",
 	"RDSV3":   "https://rds.%(region)s.%(domain)s/v3/%(projectID)s/",
 	"IDENTITY": "https://iam.%(domain)s/v3",
+	"TMSV1":     "https://tms.%(domain)s/v1.0",
+	"EPSV1":     "https://eps.%(domain)s/v1.0",
 }
 
 /*

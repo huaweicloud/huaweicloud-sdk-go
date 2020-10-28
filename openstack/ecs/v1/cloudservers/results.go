@@ -280,3 +280,28 @@ func (r ServerTagsResult) Extract() (ServerTags, error) {
 	err := r.ExtractInto(&s)
 	return s, err
 }
+
+type commonResult struct {
+	gophercloud.Result
+}
+
+type CreateResult struct {
+	commonResult
+}
+
+func (r commonResult) ExtractJob() (Job, error) {
+	var j Job
+	err := r.ExtractInto(&j)
+	return j, err
+}
+
+type Servers struct {
+	IDs []string `json:"serverIds"`
+}
+
+//ExtractServer is used to extract server struct in response
+func (r commonResult) ExtractServer() (Servers, error) {
+	var s Servers
+	err := r.ExtractInto(&s)
+	return s, err
+}

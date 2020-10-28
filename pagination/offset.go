@@ -28,7 +28,7 @@ func (current Offset) NextPageURL() (string, error) {
 	}
 	*/
 	if currentOffset == "" {
-		return "", nil
+		currentOffset = "0"
 	}
 
 	offset,err := strconv.Atoi(currentOffset)
@@ -37,7 +37,7 @@ func (current Offset) NextPageURL() (string, error) {
 	}
 
 	if currentLimit == "" {
-		return "", nil
+		currentLimit = "100"
 	}
 
 	limit,err := strconv.Atoi(currentLimit)
@@ -47,6 +47,7 @@ func (current Offset) NextPageURL() (string, error) {
 	}
 
 	q.Set("offset", strconv.Itoa(offset + limit))
+	q.Set("limit", strconv.Itoa(limit))
 	currentURL.RawQuery = q.Encode()
 
 	return currentURL.String(), nil

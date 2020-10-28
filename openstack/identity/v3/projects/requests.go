@@ -28,6 +28,10 @@ type ListOpts struct {
 
 	// ParentID filters the response by projects of a given parent project.
 	ParentID string `q:"parent_id"`
+
+	Page int `q:"page"`
+
+	PerPage int `q:"per_page"`
 }
 
 // ToProjectListQuery formats a ListOpts into a query string.
@@ -148,5 +152,31 @@ func Update(client *gophercloud.ServiceClient, id string, opts UpdateOptsBuilder
 	_, r.Err = client.Patch(updateURL(client, id), b, &r.Body, &gophercloud.RequestOpts{
 		OkCodes: []int{200},
 	})
+	return
+}
+
+func ListProjects(client *gophercloud.ServiceClient) (r GetResult) {
+	_, r.Err = client.Get(listProjectsURL(client), &r.Body, nil)
+	return
+}
+
+func ListProjectsByConditions(client *gophercloud.ServiceClient, opts ListOpts) (r GetResult) {
+	queryParameter , err := opts.ToProjectListQuery()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Get(listURL(client) + queryParameter, &r.Body, nil)
+
+	return
+}
+
+func ListProjectsForUser(client *gophercloud.ServiceClient, userID string) (r GetResult) {
+	_, r.Err = client.Get(listForUserURL(client, userID), &r.Body, nil)
+	return
+}
+
+func GetProjectDetails(client *gophercloud.ServiceClient, projectID string) (r GetResult) {
+	_, r.Err = client.Get(getDetailsURL(client, projectID), &r.Body, nil)
 	return
 }

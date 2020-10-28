@@ -40,7 +40,7 @@ func AuthToken() (*gophercloud.ProviderClient, error) {
 		Username:         "",
 		Password:         "",
 		DomainID:         "",
-		ProjectID:         "",
+		ProjectID:        "",
 		AllowReauth:      true,
 	}
 	provider, err := openstack.AuthenticatedClient(tokenOpts)

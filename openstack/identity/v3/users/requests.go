@@ -55,11 +55,49 @@ func (opts ListOpts) ToUserListQuery() (string, error) {
 	return q.String(), err
 }
 
+// ListOpts provides options to filter the List results.
+type UserListOpts struct {
+	// DomainID filters the response by a domain ID.
+	DomainID string `q:"domain_id"`
+
+	// Enabled filters the response by enabled users.
+	Enabled *bool `q:"enabled"`
+
+	// Name filters the response by username.
+	Name string `q:"name"`
+
+	// PasswordExpiresAt filters the response based on expiring passwords.
+	PasswordExpiresAt string `q:"password_expires_at"`
+}
+
+type ListUserOptsBuilder interface {
+	ToUserListDetailQuery() (string, error)
+}
+
+func (opts UserListOpts) ToUserListDetailQuery() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
 // List enumerates the Users to which the current token has access.
 func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(client)
 	if opts != nil {
 		query, err := opts.ToUserListQuery()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return UserPage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func ListUser(client *gophercloud.ServiceClient, opts ListUserOptsBuilder) pagination.Pager {
+	url := listURL(client)
+	if opts != nil {
+		query, err := opts.ToUserListDetailQuery()
 		if err != nil {
 			return pagination.Pager{Err: err}
 		}
@@ -127,9 +165,51 @@ func (opts CreateOpts) ToUserCreateMap() (map[string]interface{}, error) {
 	return b, nil
 }
 
+type CreateUserOpts struct {
+	// Name is the name of the new user.
+	Name string `json:"name" required:"true"`
+
+	// Description is a description of the user.
+	Description string `json:"description,omitempty"`
+
+	// DomainID is the ID of the domain the user belongs to.
+	DomainID string `json:"domain_id,omitempty"`
+
+	// Enabled sets the user status to enabled or disabled.
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// Password is the password of the new user.
+	Password string `json:"password,omitempty"`
+}
+
+type CreateUserOptsBuilder interface {
+	ToUserCreateDetailMap() (map[string]interface{}, error)
+}
+
+func (opts CreateUserOpts) ToUserCreateDetailMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(opts, "user")
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
 // Create creates a new User.
 func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
 	b, err := opts.ToUserCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(createURL(client), &b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{201},
+	})
+	return
+}
+
+func CreateUser(client *gophercloud.ServiceClient, opts CreateUserOptsBuilder) (r CreateResult) {
+	b, err := opts.ToUserCreateDetailMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -191,9 +271,52 @@ func (opts UpdateOpts) ToUserUpdateMap() (map[string]interface{}, error) {
 	return b, nil
 }
 
+type UpdateUserOpts struct {
+	// Name is the name of the new user.
+	Name string `json:"name,omitempty"`
+
+	// Description is a description of the user.
+	Description string `json:"description,omitempty"`
+
+	// DomainID is the ID of the domain the user belongs to.
+	DomainID string `json:"domain_id,omitempty"`
+
+	// Enabled sets the user status to enabled or disabled.
+	Enabled *bool `json:"enabled,omitempty"`
+
+	// Password is the password of the new user.
+	Password string `json:"password,omitempty"`
+
+	PwdStatus *bool `json:"pwd_status,omitempty"`
+}
+
+type UpdateUserOptsBuilder interface {
+	ToUserUpdateDetailMap() (map[string]interface{}, error)
+}
+
+func (opts UpdateUserOpts) ToUserUpdateDetailMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(opts, "user")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 // Update updates an existing User.
 func Update(client *gophercloud.ServiceClient, userID string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToUserUpdateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Patch(updateURL(client, userID), &b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
+
+func UpdateUser(client *gophercloud.ServiceClient, userID string, opts UpdateUserOpts) (r UpdateResult) {
+	b, err := opts.ToUserUpdateDetailMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -212,6 +335,13 @@ func Delete(client *gophercloud.ServiceClient, userID string) (r DeleteResult) {
 
 // ListGroups enumerates groups user belongs to.
 func ListGroups(client *gophercloud.ServiceClient, userID string) pagination.Pager {
+	url := listGroupsURL(client, userID)
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return groups.GroupPage{LinkedPageBase: pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func ListGroupsForUser(client *gophercloud.ServiceClient, userID string) pagination.Pager {
 	url := listGroupsURL(client, userID)
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
 		return groups.GroupPage{LinkedPageBase: pagination.LinkedPageBase{PageResult: r}}
@@ -239,4 +369,41 @@ func ListInGroup(client *gophercloud.ServiceClient, groupID string, opts ListOpt
 	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
 		return UserPage{pagination.LinkedPageBase{PageResult: r}}
 	})
+}
+
+type UpdatePasswordOpts struct {
+	Password         string `json:"password" required:"true"`
+	OriginalPassword string `json:"original_password" required:"true"`
+}
+
+type UpdatePasswordOptsBuilder interface {
+	ToUserPasswordCreateMap() (map[string]interface{}, error)
+}
+
+func (opts UpdatePasswordOpts) ToUserPasswordCreateMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(&opts, "user")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func UpdateUserPassword(client *gophercloud.ServiceClient, userId string, opts UpdatePasswordOptsBuilder) (r UpdateRsResult) {
+	b, err := opts.ToUserPasswordCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+
+	url := updatePasswordURL(client, userId)
+	_, r.Err = client.Post(url, &b, nil, &gophercloud.RequestOpts{OkCodes: []int{204}})
+	return
+}
+
+func ListUsersForGroupByAdmin(client *gophercloud.ServiceClient, groupID string) (r ListResult) {
+	url := getUserOnGroup(client, groupID)
+	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
 }

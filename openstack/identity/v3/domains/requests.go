@@ -124,3 +124,19 @@ func Update(client *gophercloud.ServiceClient, id string, opts UpdateOptsBuilder
 	})
 	return
 }
+
+// List enumerates the domains to which the current token has access.
+func ListDomains(client *gophercloud.ServiceClient) (r GetResult) {
+	_, r.Err = client.Get(listDomainsURL(client), &r.Body, nil)
+	return
+}
+
+func GetDoaminPwdStrengthPolicy(client *gophercloud.ServiceClient, domainID string) (r GetResult) {
+	_, r.Err = client.Get(getPwdStrengthPolicyURL(client, domainID), &r.Body, nil)
+	return
+}
+
+func GetDoaminPwdStrengthPolicyByOption(client *gophercloud.ServiceClient, domainID string, option string) (r GetResult) {
+	_, r.Err = client.Get(getPwdStrengthPolicyURLByOption(client, domainID, option), &r.Body, nil)
+	return
+}

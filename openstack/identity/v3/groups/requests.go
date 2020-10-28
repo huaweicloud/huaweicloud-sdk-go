@@ -69,6 +69,30 @@ type CreateOpts struct {
 }
 
 // ToGroupCreateMap formats a CreateOpts into a create request.
+func (opts CreateGroupOpts) ToGroupCreateDetailMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(opts, "group")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+type CreateGroupOptsBuilder interface {
+	ToGroupCreateDetailMap() (map[string]interface{}, error)
+}
+
+type CreateGroupOpts struct {
+	// Name is the name of the new group.
+	Name string `json:"name" required:"true"`
+
+	// Description is a description of the group.
+	Description string `json:"description,omitempty"`
+
+	// DomainID is the ID of the domain the group belongs to.
+	DomainID string `json:"domain_id,omitempty"`
+}
+
+// ToGroupCreateMap formats a CreateOpts into a create request.
 func (opts CreateOpts) ToGroupCreateMap() (map[string]interface{}, error) {
 	b, err := gophercloud.BuildRequestBody(opts, "group")
 	if err != nil {
@@ -89,6 +113,19 @@ func (opts CreateOpts) ToGroupCreateMap() (map[string]interface{}, error) {
 // Create creates a new Group.
 func Create(client *gophercloud.ServiceClient, opts CreateOptsBuilder) (r CreateResult) {
 	b, err := opts.ToGroupCreateMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Post(createURL(client), &b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{201},
+	})
+	return
+}
+
+// Create creates a new Group.
+func CreateGroup(client *gophercloud.ServiceClient, opts CreateGroupOptsBuilder) (r CreateResult) {
+	b, err := opts.ToGroupCreateDetailMap()
 	if err != nil {
 		r.Err = err
 		return
@@ -138,6 +175,29 @@ func (opts UpdateOpts) ToGroupUpdateMap() (map[string]interface{}, error) {
 	return b, nil
 }
 
+type UpdateGropupOpts struct {
+	// Name is the name of the new group.
+	Name string `json:"name,omitempty"`
+
+	// Description is a description of the group.
+	Description string `json:"description,omitempty"`
+
+	// DomainID is the ID of the domain the group belongs to.
+	DomainID string `json:"domain_id,omitempty"`
+}
+
+type UpdateGroupOptsBuilder interface {
+	ToGroupUpdateDetailMap() (map[string]interface{}, error)
+}
+
+func (opts UpdateGropupOpts) ToGroupUpdateDetailMap() (map[string]interface{}, error) {
+	b, err := gophercloud.BuildRequestBody(opts, "group")
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 // Update updates an existing Group.
 func Update(client *gophercloud.ServiceClient, groupID string, opts UpdateOptsBuilder) (r UpdateResult) {
 	b, err := opts.ToGroupUpdateMap()
@@ -151,8 +211,41 @@ func Update(client *gophercloud.ServiceClient, groupID string, opts UpdateOptsBu
 	return
 }
 
+func UpdateGroup(client *gophercloud.ServiceClient, groupID string, opts UpdateGroupOptsBuilder) (r PatchResult) {
+	b, err := opts.ToGroupUpdateDetailMap()
+	if err != nil {
+		r.Err = err
+		return
+	}
+	_, r.Err = client.Patch(updateURL(client, groupID), &b, &r.Body, &gophercloud.RequestOpts{
+		OkCodes: []int{200},
+	})
+	return
+}
+
 // Delete deletes a group.
 func Delete(client *gophercloud.ServiceClient, groupID string) (r DeleteResult) {
 	_, r.Err = client.Delete(deleteURL(client, groupID), nil)
+	return
+}
+
+func AddUserToGroup(client *gophercloud.ServiceClient, groupID string, userId string) (r PutResult) {
+	url := addUserToGroupURL(client, groupID, userId)
+	_, r.Err = client.Put(url, nil, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func CheckUserInGroup(client *gophercloud.ServiceClient, groupID string, userID string) (r HeadResult) {
+	url := checkUserInGroupURL(client, groupID, userID)
+	_, r.Err = client.Head(url, &gophercloud.RequestOpts{
+		OkCodes: []int{204},
+	})
+	return
+}
+
+func RemoveUserFromGroup(client *gophercloud.ServiceClient, groupID string, userID string) (r DeleteResult) {
+	url := removeUserFromGroupURL(client, groupID, userID)
+	_, r.Err = client.Delete(url, nil)
 	return
 }

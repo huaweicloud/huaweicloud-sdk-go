@@ -27,6 +27,9 @@ type Group struct {
 
 	// Name is the name of the group.
 	Name string `json:"name"`
+
+	// CreateTime is the time to create the group
+	CreateTime int `json:"create_time"`
 }
 
 func (r *Group) UnmarshalJSON(b []byte) error {
@@ -79,6 +82,20 @@ type CreateResult struct {
 // method to interpret it as a Group.
 type UpdateResult struct {
 	groupResult
+}
+
+type PutResult struct {
+	gophercloud.ErrResult
+}
+
+type PatchResult struct {
+	groupResult
+}
+
+// HeadResult is the response from an Head operation. Call its Extract
+// method to interpret it as a Group.
+type HeadResult struct {
+	gophercloud.ErrResult
 }
 
 // DeleteResult is the response from a Delete operation. Call its ExtractErr to

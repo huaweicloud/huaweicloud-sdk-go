@@ -19,9 +19,21 @@ func (r commonResult) Extract() (*Endpoint, error) {
 	return s.Endpoint, err
 }
 
+func (r commonResult) ExtractDetail() (*EndpointDetail, error) {
+	var s struct {
+		EndpointDetail *EndpointDetail `json:"endpoint"`
+	}
+	err := r.ExtractInto(&s)
+	return s.EndpointDetail, err
+}
+
 // CreateResult is the response from a Create operation. Call its Extract
 // method to interpret it as an Endpoint.
 type CreateResult struct {
+	commonResult
+}
+
+type GetResult struct {
 	commonResult
 }
 
@@ -59,6 +71,55 @@ type Endpoint struct {
 	URL string `json:"url"`
 }
 
+type EndpointList struct {
+	// ID is the unique ID of the endpoint.
+	ID string `json:"id"`
+
+	// Region is the region the Endpoint is located in.
+	Region string `json:"region"`
+
+	RegionID string `json:"region_id"`
+
+	// ServiceID is the ID of the service the Endpoint refers to.
+	ServiceID string `json:"service_id"`
+
+	// Availability is the interface type of the Endpoint (admin, internal,
+	// or public), referenced by the gophercloud.Availability type.
+	Availability gophercloud.Availability `json:"interface"`
+
+	// URL is the url of the Endpoint.
+	URL string `json:"url"`
+
+	Enabled bool `json:"enabled"`
+
+	Links map[string]interface{} `json:"links"`
+}
+
+// Endpoint describes the entry point for another service's API.
+type EndpointDetail struct {
+	// ID is the unique ID of the endpoint.
+	ID string `json:"id"`
+
+	// Region is the region the Endpoint is located in.
+	Region string `json:"region"`
+
+	RegionID string `json:"region_id"`
+
+	// ServiceID is the ID of the service the Endpoint refers to.
+	ServiceID string `json:"service_id"`
+
+	// Availability is the interface type of the Endpoint (admin, internal,
+	// or public), referenced by the gophercloud.Availability type.
+	Availability gophercloud.Availability `json:"interface"`
+
+	// URL is the url of the Endpoint.
+	URL string `json:"url"`
+
+	Enabled bool `json:"enabled"`
+
+	Links map[string]interface{} `json:"links"`
+}
+
 // EndpointPage is a single page of Endpoint results.
 type EndpointPage struct {
 	pagination.LinkedPageBase
@@ -74,6 +135,14 @@ func (r EndpointPage) IsEmpty() (bool, error) {
 func ExtractEndpoints(r pagination.Page) ([]Endpoint, error) {
 	var s struct {
 		Endpoints []Endpoint `json:"endpoints"`
+	}
+	err := (r.(EndpointPage)).ExtractInto(&s)
+	return s.Endpoints, err
+}
+
+func ExtractEndpointsList(r pagination.Page) ([]EndpointList, error) {
+	var s struct {
+		Endpoints []EndpointList `json:"endpoints"`
 	}
 	err := (r.(EndpointPage)).ExtractInto(&s)
 	return s.Endpoints, err

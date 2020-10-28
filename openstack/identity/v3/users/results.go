@@ -42,6 +42,130 @@ type User struct {
 	PasswordExpiresAt time.Time `json:"-"`
 }
 
+type ListUserResult struct {
+	// Description is the description of the user.
+	Description string `json:"description"`
+
+	// DomainID is the domain ID the user belongs to.
+	DomainID string `json:"domain_id"`
+
+	// Enabled is whether or not the user is enabled.
+	Enabled bool `json:"enabled"`
+
+	// ID is the unique ID of the user.
+	ID string `json:"id"`
+
+	// Links contains referencing links to the user.
+	Links map[string]interface{} `json:"links"`
+
+	// Name is the name of the user.
+	Name string `json:"name"`
+
+	// PasswordExpiresAt is the timestamp when the user's password expires.
+	PasswordExpiresAt string `json:"password_expires_at"`
+
+	LastProjectId string `json:"last_project_id"`
+
+	ForceResetPwd bool `json:"forceResetPwd"`
+
+	PwdStatus bool `json:"pwd_status"`
+
+	PwdStrength string `json:"pwd_strength"`
+}
+
+type UserDetail struct {
+	// Description is the description of the user.
+	Description string `json:"description"`
+
+	// DomainID is the domain ID the user belongs to.
+	DomainID string `json:"domain_id"`
+
+	// Enabled is whether or not the user is enabled.
+	Enabled bool `json:"enabled"`
+
+	// ID is the unique ID of the user.
+	ID string `json:"id"`
+
+	// Links contains referencing links to the user.
+	Links map[string]interface{} `json:"links"`
+
+	// Name is the name of the user.
+	Name string `json:"name"`
+
+	// PasswordExpiresAt is the timestamp when the user's password expires.
+	PasswordExpiresAt string `json:"password_expires_at"`
+
+	LastProjectId string `json:"last_project_id"`
+
+	ForceResetPwd bool `json:"forceResetPwd"`
+
+	PwdStatus bool `json:"pwd_status"`
+}
+
+type CreateUserDetail struct {
+	// Description is the description of the user.
+	Description string `json:"description"`
+
+	// DomainID is the domain ID the user belongs to.
+	DomainID string `json:"domain_id"`
+
+	// Enabled is whether or not the user is enabled.
+	Enabled bool `json:"enabled"`
+
+	// ID is the unique ID of the user.
+	ID string `json:"id"`
+
+	// Links contains referencing links to the user.
+	Links map[string]interface{} `json:"links"`
+
+	// Name is the name of the user.
+	Name string `json:"name"`
+
+	// PasswordExpiresAt is the timestamp when the user's password expires.
+	PasswordExpiresAt string `json:"password_expires_at"`
+}
+
+type UpdateUserDetail struct {
+	// Description is the description of the user.
+	Description string `json:"description"`
+
+	// DomainID is the domain ID the user belongs to.
+	DomainID string `json:"domain_id"`
+
+	// Enabled is whether or not the user is enabled.
+	Enabled bool `json:"enabled"`
+
+	// ID is the unique ID of the user.
+	ID string `json:"id"`
+
+	// Links contains referencing links to the user.
+	Links map[string]interface{} `json:"links"`
+
+	Extra Extra `json:"extra"`
+
+	// Name is the name of the user.
+	Name string `json:"name"`
+
+	// PasswordExpiresAt is the timestamp when the user's password expires.
+	PasswordExpiresAt string `json:"password_expires_at"`
+
+	LastProjectId string `json:"last_project_id"`
+
+	ForceResetPwd bool `json:"forceResetPwd"`
+
+	PwdStatus bool `json:"pwd_status"`
+}
+
+type Extra struct {
+	Description string `json:"description"`
+
+	ForceResetPwd bool `json:"forceResetPwd"`
+
+	LastProjectId string `json:"last_project_id"`
+
+	PwdStatus bool `json:"pwd_status"`
+}
+
 func (r *User) UnmarshalJSON(b []byte) error {
 	type tmp User
 	var s struct {
@@ -104,6 +228,14 @@ type DeleteResult struct {
 	gophercloud.ErrResult
 }
 
+type UpdateRsResult struct {
+	gophercloud.ErrResult
+}
+
+type ListResult struct {
+	userResult
+}
+
 // UserPage is a single page of User results.
 type UserPage struct {
 	pagination.LinkedPageBase
@@ -139,6 +271,14 @@ func ExtractUsers(r pagination.Page) ([]User, error) {
 	return s.Users, err
 }
 
+func ExtractListUsers(r pagination.Page) ([]ListUserResult, error) {
+	var s struct {
+		Users []ListUserResult `json:"users"`
+	}
+	err := (r.(UserPage)).ExtractInto(&s)
+	return s.Users, err
+}
+
 // Extract interprets any user results as a User.
 func (r userResult) Extract() (*User, error) {
 	var s struct {
@@ -146,4 +286,57 @@ func (r userResult) Extract() (*User, error) {
 	}
 	err := r.ExtractInto(&s)
 	return s.User, err
+}
+
+func (r userResult) ExtractDetail() (*UserDetail, error) {
+	var s struct {
+		User *UserDetail `json:"user"`
+	}
+	err := r.ExtractInto(&s)
+	return s.User, err
+}
+
+func (r userResult) ExtractCreateUser() (*CreateUserDetail, error) {
+	var s struct {
+		User *CreateUserDetail `json:"user"`
+	}
+	err := r.ExtractInto(&s)
+	return s.User, err
+}
+
+func (r userResult) UpdateExtract() (*UpdateUserDetail, error) {
+	var s struct {
+		UpdateUserDetail *UpdateUserDetail `json:"user"`
+	}
+	err := r.ExtractInto(&s)
+	return s.UpdateUserDetail, err
+}
+
+type ListResponse struct {
+	Users []struct {
+		Description       string                 `json:"description"`
+		DomainId          string                 `json:"domain_id"`
+		Email             string                 `json:"email"`
+		Enabled           bool                   `json:"enabled"`
+		ForceResetPwd     bool                   `json:"forceResetPwd"`
+		Id                string                 `json:"id"`
+		LastProjectId     string                 `json:"last_project_id"`
+		Mobile            string                 `json:"mobile"`
+		Name              string                 `json:"name"`
+		PasswordExpiresAt string                 `json:"password_expires_at"`
+		PwdStatus         bool                   `json:"pwd_status"`
+		PwdStrength       string                 `json:"pwd_strength"`
+		Links             map[string]interface{} `json:"links"`
+	} `json:"users"`
+	Links struct {
+		Next     interface{} `json:"next"`
+		Previous interface{} `json:"previous"`
+		Self     string      `json:"self"`
+	} `json:"links"`
+}
+
+func (r ListResult) ExtractList() (*ListResponse, error) {
+	var s ListResponse
+	err := r.ExtractInto(&s)
+	return &s, err
 }

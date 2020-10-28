@@ -52,7 +52,7 @@ type CreateOpts struct {
 	SecurityGroups []SecurityGroup `json:"security_groups,omitempty"`
 
 	//待创建云服务器所在的可用分区，需要指定可用分区（AZ）的名称。
-	AvailabilityZone string `json:"availability_zone" required:"true"`
+	AvailabilityZone string `json:"availability_zone"`
 
 	//创建云服务器附加信息。
 	ExtendParam *ServerExtendParam `json:"extendparam,omitempty"`
@@ -278,6 +278,21 @@ type ServerExtendParam struct {
 
 	//是否配置虚拟机自动恢复的功能。
 	SupportAutoRecovery string `json:"support_auto_recovery,omitempty"`
+
+	// 创建竞价实例时，需指定该参数的值为“spot”。
+	MarketType string `json:"marketType,omitempty"`
+
+	// 用户愿意为竞价实例每小时支付的最高价格。
+	SpotPrice string `json:"spotPrice,omitempty"`
+
+	// 购买的竞价实例时长。
+	SpotDurationHours int `json:"spot_duration_hours,omitempty"`
+
+	// 表示购买的“竞价实例时长”的个数。
+	SpotDurationCount int `json:"spot_duration_count,omitempty"`
+
+	// 竞价实例中断策略，当前支持immediate。
+	InterruptionPolicy string `json:"interruption_policy,omitempty"`
 }
 
 type MetaData struct {

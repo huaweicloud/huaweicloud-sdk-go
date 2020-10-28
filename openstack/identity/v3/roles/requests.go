@@ -312,3 +312,70 @@ func Unassign(client *gophercloud.ServiceClient, roleID string, opts UnassignOpt
 	})
 	return
 }
+
+func GrantPermissionForGroupOnDomain(client *gophercloud.ServiceClient, domainID string, groupID string, roleID string) (r PutResult) {
+	url := addRoleForGroupOnDomainURL(client, domainID, groupID, roleID)
+	_, r.Err = client.Put(url, nil, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func GrantPermissionForGroupOnProject(client *gophercloud.ServiceClient, projectID string, groupID string, roleID string) (r PutResult) {
+	url := addRoleForGroupOnProjectURL(client, projectID, groupID, roleID)
+	_, r.Err = client.Put(url, nil, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func CheckPermissionForGroupOnProject(client *gophercloud.ServiceClient, projectID string, groupID string, roleID string) (r HeadResult) {
+	url := headRoleForGroupOnProjectURL(client, projectID, groupID, roleID)
+	_, r.Err = client.Head(url, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func CheckPermissionForGroupOnDomain(client *gophercloud.ServiceClient, domainID string, groupID string, roleID string) (r HeadResult) {
+	url := headRoleForGroupOnDomainURL(client, domainID, groupID, roleID)
+	_, r.Err = client.Head(url, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func RemovePermissionForGroupOnDomain(client *gophercloud.ServiceClient, domainID string, groupID string, roleID string) (r DeleteResult) {
+	url := deleteRoleForGroupOnDomainURL(client, domainID, groupID, roleID)
+	_, r.Err = client.Delete(url, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func RemovePermissionForGroupOnProject(client *gophercloud.ServiceClient, projectID string, groupID string, roleID string) (r DeleteResult) {
+	url := deleteRoleForGroupOnProjectURL(client, projectID, groupID, roleID)
+	_, r.Err = client.Delete(url, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func GrantPermissionToGroupOnAllProject(client *gophercloud.ServiceClient, domainID string, groupID string, roleID string) (r PutResult) {
+	url := addAlRoleForGroupOnlProjectURL(client, domainID, groupID, roleID)
+	_, r.Err = client.Put(url, nil, nil, &gophercloud.RequestOpts{
+		OkCodes: []int{204}})
+	return
+}
+
+func ListPermissionsForGroupOnDomain(client *gophercloud.ServiceClient, domainID string, groupID string) (r ListResult) {
+	url := getRolesForGroupOnDomain(client, domainID, groupID)
+	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{
+		MoreHeaders: map[string]string{"Content-Type": "application/json;charset=utf8"},
+		OkCodes:     []int{200},
+	})
+	return
+}
+
+func ListPermissionsForGroupOnProject(client *gophercloud.ServiceClient, projectID string, groupID string) (r ListResult) {
+	url := getRolesForGroupOnProject(client, projectID, groupID)
+	_, r.Err = client.Get(url, &r.Body, &gophercloud.RequestOpts{
+		MoreHeaders: map[string]string{"Content-Type": "application/json;charset=utf8"},
+		OkCodes:     []int{200},
+	})
+	return
+}

@@ -95,3 +95,50 @@ func (r domainResult) Extract() (*Domain, error) {
 	err := r.ExtractInto(&s)
 	return s.Domain, err
 }
+
+// Patch 202004
+type DomainListResult struct {
+	Domains []Domain `json:"domains"`
+}
+
+func (r domainResult) ExtractList() (DomainListResult, error) {
+	var s DomainListResult
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+type Config struct {
+	SecurityCompoliance SecurityCompoliance `json:"security_compliance"`
+}
+
+type OptionConfig struct {
+	PasswordRegex            string `json:"password_regex"`
+	PasswordRegexDescription string `json:"password_regex_description"`
+}
+
+type SecurityCompoliance struct {
+	PasswordRegex            string `json:"password_regex"`
+	PasswordRegexDescription string `json:"password_regex_description"`
+}
+
+type PwdStrengthPolicyResult struct {
+	Config Config `json:"config"`
+}
+type PwdStrengthPolicyOptionResult struct {
+	OptionConfig OptionConfig `json:"config"`
+}
+
+
+func (r domainResult) ExtractPwdStrengthPolicy() (PwdStrengthPolicyResult, error) {
+	var s PwdStrengthPolicyResult
+	err := r.ExtractInto(&s)
+	return s, err
+}
+
+
+
+func (r domainResult) ExtractPwdStrengthPolicyByOption() (PwdStrengthPolicyOptionResult, error) {
+	var s PwdStrengthPolicyOptionResult
+	err := r.ExtractInto(&s)
+	return s, err
+}

@@ -17,3 +17,7 @@ func serviceURL(client *gophercloud.ServiceClient, serviceID string) string {
 func updateURL(client *gophercloud.ServiceClient, serviceID string) string {
 	return client.ServiceURL("services", serviceID)
 }
+
+func getCatalogURL(client *gophercloud.ServiceClient) string {
+	return client.ServiceURL("auth", "catalog")
+}

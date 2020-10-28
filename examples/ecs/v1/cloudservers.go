@@ -53,6 +53,7 @@ func main() {
 
 	// Batch Update Servers Name example
 	BatchUpdateServersNameExample(tokenOpts)
+	ServerCreateV1(client)
 
 	fmt.Println("main end...")
 
@@ -546,4 +547,47 @@ func ListServerTags(sc *gophercloud.ServiceClient) {
 	}
 	fmt.Println("List server tags success!")
 	fmt.Println(string(b))
+}
+
+func ServerCreateV1(client *gophercloud.ServiceClient) {
+	nics := []cloudservers.Nic{
+		{
+			SubnetId: "ddcc9be3-fcd3-433c-ac35-100c3208e97c",
+		},
+	}
+	rv := cloudservers.RootVolume{
+		VolumeType: "SATA",
+	}
+	dvs := []cloudservers.DataVolume{
+		{
+			VolumeType: "SATA",
+			Size:       60,
+		},
+		{
+			VolumeType: "SATA",
+			Size:       70,
+		},
+	}
+	opts := cloudservers.CreateOpts{
+		Name:             "ecs_cloud_xx2",
+		FlavorRef:        "s3.small.1",
+		ImageRef:         "84663868-483c-4067-af7e-9d801e4a42f3",
+		VpcId:            "4b95e7aa-b810-43cc-bc9f-8a92cf102100",
+		Nics:             nics,
+		RootVolume:       rv,
+		DataVolumes:      dvs,
+		AvailabilityZone: "br-iaas-odin1a",
+	}
+	jobId, serverIds, createErr := cloudservers.Create(client, opts)
+	if createErr != nil {
+		fmt.Println("createErr:", createErr)
+		if ue, ok := createErr.(*gophercloud.UnifiedError); ok {
+			fmt.Println("ErrCode:", ue.ErrorCode())
+			fmt.Println("Message:", ue.Message())
+		}
+		return
+	}
+	fmt.Println("jobId is ", jobId)
+	fmt.Println("serverIds is ", serverIds)
+	fmt.Println("server create success!")
 }

@@ -75,11 +75,39 @@ func (opts ListOpts) ToServiceListMap() (string, error) {
 	return q.String(), err
 }
 
+type ListServiceOptsBuilder interface {
+	ToServiceListDetailMap() (string, error)
+}
+
+// ListOpts provides options for filtering the List results.
+type ListServiceOpts struct {
+	Type string `q:"type"`
+}
+
+func (opts ListServiceOpts) ToServiceListDetailMap() (string, error) {
+	q, err := gophercloud.BuildQueryString(opts)
+	return q.String(), err
+}
+
 // List enumerates the services available to a specific user.
 func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := listURL(client)
 	if opts != nil {
 		query, err := opts.ToServiceListMap()
+		if err != nil {
+			return pagination.Pager{Err: err}
+		}
+		url += query
+	}
+	return pagination.NewPager(client, url, func(r pagination.PageResult) pagination.Page {
+		return ServicePage{pagination.LinkedPageBase{PageResult: r}}
+	})
+}
+
+func ListService(client *gophercloud.ServiceClient, opts ListServiceOptsBuilder) pagination.Pager {
+	url := listURL(client)
+	if opts != nil {
+		query, err := opts.ToServiceListDetailMap()
 		if err != nil {
 			return pagination.Pager{Err: err}
 		}
@@ -150,5 +178,11 @@ func Update(client *gophercloud.ServiceClient, serviceID string, opts UpdateOpts
 // are deleted.
 func Delete(client *gophercloud.ServiceClient, serviceID string) (r DeleteResult) {
 	_, r.Err = client.Delete(serviceURL(client, serviceID), nil)
+	return
+}
+
+// Get returns additional information about a service, given its ID.
+func GetCatalog(client *gophercloud.ServiceClient) (r catalogResult) {
+	_, r.Err = client.Get(getCatalogURL(client), &r.Body, nil)
 	return
 }

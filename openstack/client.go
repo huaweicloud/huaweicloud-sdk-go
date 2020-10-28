@@ -587,6 +587,24 @@ func NewIdentityV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOp
 	}, nil
 }
 
+// NewIAMV3 creates a ServiceClient that may be used to access the v3.0
+// iam service.
+func NewIAMV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "iam")
+	return sc, err
+}
+
+// NewIAMV3Ext creates a ServiceClient that may be used to access the v3-ext
+// iam service.
+func NewIAMV3Ext(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "iam")
+	if strings.HasSuffix(sc.Endpoint, "v3.0/") {
+		sc.Endpoint = strings.Replace(sc.Endpoint, "v3.0/", "v3-ext/", -1)
+	}
+	return sc, err
+
+}
+
 func initClientOpts(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts, clientType string) (*gophercloud.ServiceClient, error) {
 	sc := new(gophercloud.ServiceClient)
 	eo.ApplyDefaults(clientType)
@@ -830,5 +848,15 @@ func NewFGSV2(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (
 // package.
 func NewRDSV3(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
 	sc, err := initClientOpts(client, eo, "rdsv3")
+	return sc, err
+}
+
+func NewTMSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "tmsv1")
+	return sc, err
+}
+
+func NewEPSV1(client *gophercloud.ProviderClient, eo gophercloud.EndpointOpts) (*gophercloud.ServiceClient, error) {
+	sc, err := initClientOpts(client, eo, "epsv1")
 	return sc, err
 }
