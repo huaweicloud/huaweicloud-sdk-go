@@ -123,6 +123,11 @@ type ListRdsResponse struct {
 	TotalCount int                   `json:"total_count"`
 }
 
+type Tag struct {
+	Key    string     `json:"key"`
+	Value  string     `json:"value"`
+}
+
 type RdsInstanceResponse struct {
 	Id                  string            `json:"id"`
 	Name                string            `json:"name"`
@@ -151,6 +156,7 @@ type RdsInstanceResponse struct {
 	EnterpriseProjectId string            `json:"enterprise_project_id"`
 	TimeZone            string            `json:"time_zone"`
 	ChargeInfo          ChargeInfoMode    `json:"charge_info"`
+	Tags                []Tag             `json:"tags"`
 }
 
 type ChargeInfoMode struct {
