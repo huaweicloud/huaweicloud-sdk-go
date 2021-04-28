@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/gophercloud/gophercloud/openstack"
+	"encoding/json"
 	"fmt"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/auth/token"
+	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/ecs/v1_1/cloudservers"
-	"time"
-	"encoding/json"
+	"go-sdk/openstack/ecs/v1/job"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 func ServerCreate(client *gophercloud.ServiceClient) {
 	nics := []cloudservers.Nic{
 		{
-			SubnetId: "cc7953b3-110f-4e87-b240-ff4915548875",
+			SubnetId: "ddcc9be3-fcd3-433c-ac35-100c3208e97c",
 		},
 	}
 	rv := cloudservers.RootVolume{
@@ -62,13 +63,13 @@ func ServerCreate(client *gophercloud.ServiceClient) {
 	}
 	opts := cloudservers.CreateOpts{
 		Name:             "ecs_cloud_xx2",
-		FlavorRef:        "c1.xlarge",
-		ImageRef:         "2a50f694-b8e7-4a7a-8a51-0ff7f83d1345",
-		VpcId:            "b7ff7a9b-cc95-4dd0-b76a-f586c88e6556",
+		FlavorRef:        "s3.small.1",
+		ImageRef:         "84663868-483c-4067-af7e-9d801e4a42f3",
+		VpcId:            "4b95e7aa-b810-43cc-bc9f-8a92cf102100",
 		Nics:             nics,
 		RootVolume:       rv,
 		DataVolumes:      dvs,
-		AvailabilityZone: "az1.dc1",
+		AvailabilityZone: "br-iaas-odin1a",
 	}
 	jobId, orderId, createErr := cloudservers.Create(client, opts)
 	if createErr != nil {
@@ -79,9 +80,33 @@ func ServerCreate(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	fmt.Println("jobId is ", jobId)
+	var jobObj job.JobResult
+	for {
+		time.Sleep(10 * time.Second)
+		jobRst, jobErr := job.GetJobResult(client, jobId)
+		if jobErr != nil {
+			fmt.Println("getJobResultErr:", jobErr)
+			if ue, ok := jobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers create is success!")
+			break
+		} else if strings.Compare("FAIL", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers create is failed!")
+			break
+		}
+	}
+	fmt.Println("jobObj ", jobObj)
 	fmt.Println("orderId is ", orderId)
-	fmt.Println("server create success!")
 }
 
 //PostPaidServerCreate creates a postPaid server (v1.1 version)
@@ -117,7 +142,7 @@ func PostPaidServerCreate(client *gophercloud.ServiceClient) {
 
 	var jobRst cloudservers.JobResult
 	for {
-		time.Sleep(time.Duration(10)*time.Second)
+		time.Sleep(time.Duration(10) * time.Second)
 		job, getJobErr := cloudservers.GetJobResult(client, resp.Job.Id)
 		if getJobErr != nil {
 			fmt.Println("getJobResultErr:", getJobErr)
@@ -167,10 +192,10 @@ func PrePaidServerCreate(client *gophercloud.ServiceClient) {
 		Size:       40,
 	}
 	extendParam := &cloudservers.ServerExtendParam{
-		ChargingMode:     "prePaid",
-		PeriodType:       "month",
-		PeriodNum:        1,
-		IsAutoPay:        "true",
+		ChargingMode: "prePaid",
+		PeriodType:   "month",
+		PeriodNum:    1,
+		IsAutoPay:    "true",
 	}
 	opts := cloudservers.CreateOpts{
 		Name:             "PrePaidServer",
@@ -182,7 +207,7 @@ func PrePaidServerCreate(client *gophercloud.ServiceClient) {
 		AvailabilityZone: "AZ1",
 		ExtendParam:      extendParam,
 	}
-	entity,createErr:=cloudservers.CreateServer(client, opts)
+	entity, createErr := cloudservers.CreateServer(client, opts)
 	if createErr != nil {
 		fmt.Println("createErr:", createErr)
 		if ue, ok := createErr.(*gophercloud.UnifiedError); ok {

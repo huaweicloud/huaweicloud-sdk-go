@@ -42,6 +42,8 @@ const (
 	EcsInvalidKeyName        = "Invalid key_name provided"
 	EcsInvalidInputField     = "Invalid input for field/attribute"
 	EcsResourceSoldOut       = "Instance resource is temporarily sold out."
+	EcsNoIpAvailable         = "there is no ip available in network*"
+	EcsVolumeTypeSoldOut     = "the volumeType .*. is sellout in az.*."
 
 	//IMS
 	Ims0027NoImageFoundWithId = "No image found with ID"
@@ -56,7 +58,7 @@ const (
 	ELB2006IpPortAlreadyPresent = "Member with address .*. and protocol_port .*. already present in pool .*."
 	ELB2007MemberNotFound       = "member .*. could not be found"
 
-	ELB6101QuotaExceeded  = "Quota exceeded for resources: \\['listener'\\]"
+	ELB6101QuotaExceeded = "Quota exceeded for resources: \\['listener'\\]"
 	ELB2541QuotaExceeded = "Quota exceeded for resources: \\['pool'\\]"
 	ELBb015QuotaExceeded = "Quota exceeded for resources: \\['l7policy'\\]"
 	ELB1071QuotaExceeded = "Quota exceeded for resources: \\['loadbalancer'\\]"
@@ -163,7 +165,7 @@ type OneLevelError struct {
 	Request_id string
 	ErrCode    string `json:"error_code"`
 	ErrMsg     string `json:"error_msg"`
-	Code	   string `json:"code"`
+	Code       string `json:"code"`
 }
 
 // ParseSeverError,This function uses json serialization to parse background API error codes.
@@ -250,6 +252,12 @@ func MatchErrorCode(httpStatus int, message string) string {
 	}
 
 	//ECS error
+	if ok, _ := regexp.MatchString(EcsNoIpAvailable, message); ok {
+		return "Ecs.0012"
+	}
+	if ok, _ := regexp.MatchString(EcsVolumeTypeSoldOut, message); ok {
+		return "Ecs.0044"
+	}
 	if ok, _ := regexp.MatchString(EcsAuthRequired, message); ok {
 		return "Ecs.1499"
 	}

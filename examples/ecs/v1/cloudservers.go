@@ -587,7 +587,33 @@ func ServerCreateV1(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	fmt.Println("jobId is ", jobId)
+
+	var jobObj job.JobResult
+	for {
+		time.Sleep(10 * time.Second)
+		jobRst, jobErr := job.GetJobResult(client, jobId)
+		if jobErr != nil {
+			fmt.Println("getJobResultErr:", jobErr)
+			if ue, ok := jobErr.(*gophercloud.UnifiedError); ok {
+				fmt.Println("ErrCode:", ue.ErrorCode())
+				fmt.Println("Message:", ue.Message())
+			}
+			return
+		}
+		jsJob, _ := json.MarshalIndent(jobRst, "", "   ")
+		fmt.Println(string(jsJob))
+
+		if strings.Compare("SUCCESS", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers create is success!")
+			break
+		} else if strings.Compare("FAIL", jobRst.Status) == 0 {
+			jobObj = jobRst
+			fmt.Println("Servers create is failed!")
+			break
+		}
+	}
+	fmt.Println("jobObj ", jobObj)
 	fmt.Println("serverIds is ", serverIds)
-	fmt.Println("server create success!")
+
 }

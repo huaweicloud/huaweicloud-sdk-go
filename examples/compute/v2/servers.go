@@ -1,16 +1,18 @@
 package main
 
 import (
-	"github.com/gophercloud/gophercloud/openstack"
-	"github.com/gophercloud/gophercloud"
-	"fmt"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/keypairs"
 	"encoding/json"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/startstop"
+	"fmt"
+	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/auth/aksk"
-	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/bootfromvolume"
+	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/attachinterfaces"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/bootfromvolume"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/keypairs"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/extensions/startstop"
+	"github.com/gophercloud/gophercloud/openstack/compute/v2/servers"
+	"strings"
+	"time"
 )
 
 func main() {
@@ -92,8 +94,29 @@ func ServerCreate(client *gophercloud.ServiceClient) {
 		}
 		return
 	}
-	fmt.Println(resp)
-	fmt.Println("server create success!")
+
+	var queryCount = 0
+	for {
+		queryCount++
+		time.Sleep(10 * time.Second)
+		server, serversErr := servers.Get(client, resp.ID).Extract()
+		if serversErr != nil {
+			fmt.Println("serversErr:", serversErr)
+			break
+		}
+		if strings.Compare("ACTIVE", server.Status) == 0 {
+			fmt.Println("server create success!")
+			break
+		} else if strings.Compare("ERROR", server.Status) == 0 {
+			fmt.Println("server create fail!")
+			break
+		}
+		// 10分钟超时时间
+		if queryCount == 60 {
+			break
+		}
+
+	}
 
 }
 
